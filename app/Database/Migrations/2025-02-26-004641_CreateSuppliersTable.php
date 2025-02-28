@@ -12,7 +12,6 @@ class CreateSuppliersTable extends Migration
             'supplier_id'     => ['type' => 'VARCHAR', 'constraint' => 20],
             'supplier_name'   => ['type' => 'VARCHAR', 'constraint' => 100],
             'supplier_phone'  => ['type' => 'VARCHAR', 'constraint' => 20],
-            'supplier_email'  => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
             'supplier_address'=> ['type' => 'TEXT'],
             'supplier_status' => ['type' => 'ENUM', 'constraint' => ['active', 'inactive'], 'default' => 'active'],
             'created_at'      => ['type' => 'DATETIME', 'null' => true],

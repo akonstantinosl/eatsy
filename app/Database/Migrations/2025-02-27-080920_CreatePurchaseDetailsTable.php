@@ -12,11 +12,9 @@ class CreatePurchaseDetailsTable extends Migration
             'purchase_detail_id' => ['type' => 'VARCHAR', 'constraint' => 20],
             'purchase_id'        => ['type' => 'VARCHAR', 'constraint' => 20],
             'product_id'         => ['type' => 'VARCHAR', 'constraint' => 20],
-            'purchase_type'      => ['type' => 'SET', 'constraint' => ['unit', 'box'], 'default' => 'unit'], // Menggunakan SET agar bisa memilih satu atau keduanya
-            'quantity_unit'      => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
-            'quantity_box'       => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
-            'purchase_price'     => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
-            'box_purchase_price' => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
+            'box_bought'         => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+            'unit_per_box'       => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+            'price_per_box'      => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
             'created_at'         => ['type' => 'DATETIME', 'null' => true],
         ]);
 

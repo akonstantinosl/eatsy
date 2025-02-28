@@ -20,13 +20,11 @@ class ProductController extends BaseController
         $this->supplierModel = new SupplierModel();
     }
 
-    // Read function to display the products
     public function index()
     {
         // Get all active products with related category and supplier
         $products = $this->productModel
-                    ->select('products.product_id, products.product_name, products.selling_price, products.product_stock, 
-                             products.unit_per_box, products.box_selling_price, products.box_bought, 
+                    ->select('products.product_id, products.product_name, products.purchase_price, products.selling_price, products.product_stock, 
                              product_categories.product_category_name, suppliers.supplier_name')
                     ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
                     ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
@@ -37,7 +35,6 @@ class ProductController extends BaseController
         return view('admin/products/products_index', ['products' => $products]);
     }
 
-    // Create function to show the form for adding a new product
     public function create()
     {
         // Get all product categories
@@ -53,14 +50,12 @@ class ProductController extends BaseController
         ]);
     }
 
-    // Store function to save a new product to the database
     public function store()
     {
         // Get the submitted data from the form
         $productName = $this->request->getPost('product_name');
         $productCategoryId = $this->request->getPost('product_category_id');
         $supplierId = $this->request->getPost('supplier_id');
-        $unitPerBox = $this->request->getPost('unit_per_box');
 
         // Validate if the required fields are not empty
         if (empty($productName)) {
@@ -86,7 +81,6 @@ class ProductController extends BaseController
             'product_name' => $productName,
             'product_category_id' => $productCategoryId,
             'supplier_id' => $supplierId,
-            'unit_per_box' => $unitPerBox,
             'created_at' => date('Y-m-d H:i:s'),
             'product_status' => 'active', // Default status as active
             'product_stock' => 0, // Default stock to 0
@@ -99,7 +93,6 @@ class ProductController extends BaseController
         return redirect()->to('/admin/products')->with('success', 'Product added successfully.');
     }
 
-    // Edit function to allow name, category, supplier, selling price, and box_selling price update
     public function edit($productId)
     {
         // Get product data by product_id
@@ -123,7 +116,6 @@ class ProductController extends BaseController
         ]);
     }
 
-    // Update function to update name, category, supplier, selling price, and box_selling_price with validation
     public function update($productId)
     {
         // Get the submitted data from the form
@@ -131,16 +123,10 @@ class ProductController extends BaseController
         $productCategoryId = $this->request->getPost('product_category_id');
         $supplierId = $this->request->getPost('supplier_id');
         $sellingPrice = $this->request->getPost('selling_price');
-        $unitPerBox = $this->request->getPost('unit_per_box');
-        $boxSellingPrice = $this->request->getPost('box_selling_price');
 
         // Validate if the required fields are not empty and are greater than 0
         if (empty($productName) || empty($sellingPrice) || $sellingPrice <= 0) {
             return redirect()->back()->with('error', 'Product name and selling price must be greater than 0.');
-        }
-
-        if ($boxSellingPrice <= 0) {
-            return redirect()->back()->with('error', 'Box selling price must be greater than 0.');
         }
 
         // Prepare data for update
@@ -149,8 +135,6 @@ class ProductController extends BaseController
             'product_category_id' => $productCategoryId,
             'supplier_id' => $supplierId,
             'selling_price' => $sellingPrice,
-            'unit_per_box' => $unitPerBox,
-            'box_selling_price' => $boxSellingPrice,
         ];
 
         // Update the product

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $title ?? 'Admin Dashboard' ?> | EatsyMart</title>
+    <title><?= $title ?? 'Admin Dashboard' ?> | Eatsy</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -43,7 +43,7 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="/admin/dashboard" class="brand-link">
-                <span class="brand-text font-weight-light">EatsyMart</span>
+                <span class="brand-text font-weight-light">Eatsy</span>
             </a>
 
             <!-- Sidebar -->
@@ -211,7 +211,7 @@
 
         <!-- Main Footer -->
         <footer class="main-footer">
-            <strong>Copyright &copy; <?= date('Y') ?> EatsyMart.</strong> All rights reserved.
+            <strong>Copyright &copy; <?= date('Y') ?> Eatsy.</strong> All rights reserved.
         </footer>
     </div>
     <!-- ./wrapper -->

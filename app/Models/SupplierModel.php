@@ -16,7 +16,6 @@ class SupplierModel extends Model
         'supplier_id',
         'supplier_name',
         'supplier_phone',
-        'supplier_email',
         'supplier_address',
         'supplier_status',
         'created_at',

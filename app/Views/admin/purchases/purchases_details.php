@@ -19,12 +19,16 @@
                 <td><?= date('d F Y, H:i', strtotime($purchase['purchase_date'])) ?></td>
             </tr>
             <tr>
+                <td><strong>Buyer</strong></td>
+                <td><?= esc($purchase['buyer_name']) ?></td>
+            </tr>
+            <tr>
                 <td><strong>Supplier</strong></td>
                 <td><?= esc($purchase['supplier_name']) ?></td>
             </tr>
             <tr>
                 <td><strong>Contact</strong></td>
-                <td><?= esc($purchase['contact']) ?></td>
+                <td><?= esc($purchase['supplier_phone']) ?></td>
             </tr>
             <tr>
                 <td><strong>Amount</strong></td>
@@ -77,10 +81,10 @@
                 <tr>
                     <th>#</th>
                     <th>Product Name</th>
-                    <th>Quantity Unit</th>
-                    <th>Quantity Box</th>
-                    <th>Purchase Price</th>
-                    <th>Box Purchase Price</th>
+                    <th>Box Bought</th>
+                    <th>Unit per Box</th>
+                    <th>Price per Box</th>
+                    <th>Total Price</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,10 +92,10 @@
                     <tr>
                         <td><?= $index + 1 ?></td>
                         <td><?= esc($detail['product_name']) ?></td>
-                        <td><?= esc($detail['quantity_unit']) ?></td>
-                        <td><?= esc($detail['quantity_box']) ?></td>
-                        <td><?= number_format($detail['purchase_price'], 0, ',', '.') . " IDR" ?></td>
-                        <td><?= number_format($detail['box_purchase_price'], 0, ',', '.') . " IDR" ?></td>
+                        <td><?= esc($detail['box_bought']) ?></td>
+                        <td><?= esc($detail['unit_per_box']) ?></td>
+                        <td><?= number_format($detail['price_per_box'], 0, ',', '.') . " IDR" ?></td>
+                        <td><?= number_format($detail['box_bought'] * $detail['price_per_box'], 0, ',', '.') . " IDR" ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

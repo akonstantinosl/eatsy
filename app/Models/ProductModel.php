@@ -20,11 +20,7 @@ class ProductModel extends Model
         'product_stock', 
         'product_category_id', 
         'product_status', 
-        'supplier_id', 
-        'unit_per_box', 
-        'box_purchase_price', 
-        'box_selling_price', 
-        'box_bought', 
+        'supplier_id',
         'created_at', 
         'updated_at'
     ];

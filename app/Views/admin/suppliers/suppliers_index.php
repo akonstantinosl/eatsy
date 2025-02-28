@@ -15,9 +15,8 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Supplier Name</th>
+                    <th>Name</th>
                     <th>Phone</th>
-                    <th>Email</th>
                     <th>Address</th>
                     <th>Actions</th>
                 </tr>
@@ -28,7 +27,6 @@
                         <td><?= $index + 1 ?></td>
                         <td><?= esc($supplier['supplier_name']) ?></td>
                         <td><?= esc($supplier['supplier_phone']) ?></td>
-                        <td><?= esc($supplier['supplier_email']) ?></td>
                         <td><?= esc($supplier['supplier_address']) ?></td>
                         <td>
                             <a href="/admin/suppliers/edit/<?= esc($supplier['supplier_id']) ?>" class="btn btn-warning btn-sm">

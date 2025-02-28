@@ -45,7 +45,6 @@ class SupplierController extends BaseController
         $rules = [
             'supplier_name' => 'required',
             'supplier_phone' => 'required|numeric|min_length[10]',
-            'supplier_email' => 'permit_empty|valid_email',
             'supplier_address' => 'required',
             'supplier_status' => 'required|in_list[active,inactive]',
         ];
@@ -54,7 +53,7 @@ class SupplierController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Check if the phone number or email already exists for active suppliers
+        // Check if the phone number  already exists for active suppliers
         $existingSupplier = $this->supplierModel
             ->where('supplier_phone', $this->request->getPost('supplier_phone'))
             ->where('supplier_status', 'active')
@@ -62,15 +61,6 @@ class SupplierController extends BaseController
 
         if ($existingSupplier) {
             return redirect()->back()->withInput()->with('errors', ['supplier_phone' => 'Phone number is already in use by an active supplier.']);
-        }
-
-        $existingEmailSupplier = $this->supplierModel
-            ->where('supplier_email', $this->request->getPost('supplier_email'))
-            ->where('supplier_status', 'active')
-            ->first();
-
-        if ($existingEmailSupplier) {
-            return redirect()->back()->withInput()->with('errors', ['supplier_email' => 'Email address is already in use by an active supplier.']);
         }
 
         // Generate supplier ID
@@ -92,7 +82,6 @@ class SupplierController extends BaseController
             'supplier_id' => $supplierId,
             'supplier_name' => $this->request->getPost('supplier_name'),
             'supplier_phone' => $this->request->getPost('supplier_phone'),
-            'supplier_email' => $this->request->getPost('supplier_email'),
             'supplier_address' => $this->request->getPost('supplier_address'),
             'supplier_status' => $this->request->getPost('supplier_status'),
             'created_at' => date('Y-m-d H:i:s'),
@@ -136,7 +125,6 @@ class SupplierController extends BaseController
         $rules = [
             'supplier_name' => 'required',
             'supplier_phone' => 'required|numeric|min_length[10]',
-            'supplier_email' => 'permit_empty|valid_email',
             'supplier_address' => 'required',
             'supplier_status' => 'required|in_list[active,inactive]',
         ];
@@ -145,7 +133,7 @@ class SupplierController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Check if phone number or email exists for other active suppliers
+        // Check if phone number exists for other active suppliers
         if ($this->request->getPost('supplier_phone') != $supplier['supplier_phone']) {
             $existingSupplier = $this->supplierModel
                 ->where('supplier_phone', $this->request->getPost('supplier_phone'))
@@ -157,22 +145,10 @@ class SupplierController extends BaseController
             }
         }
 
-        if ($this->request->getPost('supplier_email') != $supplier['supplier_email']) {
-            $existingEmailSupplier = $this->supplierModel
-                ->where('supplier_email', $this->request->getPost('supplier_email'))
-                ->where('supplier_status', 'active')
-                ->first();
-
-            if ($existingEmailSupplier) {
-                return redirect()->back()->withInput()->with('errors', ['supplier_email' => 'Email address is already in use by an active supplier.']);
-            }
-        }
-
         // Prepare data for update
         $data = [
             'supplier_name' => $this->request->getPost('supplier_name'),
             'supplier_phone' => $this->request->getPost('supplier_phone'),
-            'supplier_email' => $this->request->getPost('supplier_email'),
             'supplier_address' => $this->request->getPost('supplier_address'),
             'supplier_status' => $this->request->getPost('supplier_status'),
             'updated_at' => date('Y-m-d H:i:s'),

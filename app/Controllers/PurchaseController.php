@@ -6,32 +6,30 @@ use App\Models\PurchaseModel;
 use App\Models\PurchaseDetailModel;
 use App\Models\ProductModel;
 use App\Models\SupplierModel;
-use App\Models\UserModel;
+use App\Models\UserModel; 
 use CodeIgniter\Controller;
 
 class PurchaseController extends Controller
 {
-        public function index()
+    public function index()
     {
         $purchaseModel = new PurchaseModel();
+        $userModel = new UserModel();
         $supplierModel = new SupplierModel();
 
-        // Mendapatkan semua data purchase dengan informasi supplier
+        // Mendapatkan semua data purchase
         $data['purchases'] = $purchaseModel->findAll();
 
-        // Mendapatkan nama supplier untuk setiap purchase
+        // Mendapatkan nama supplier, nama user dan kontak (supplier_phone) untuk setiap purchase
         foreach ($data['purchases'] as &$purchase) {
+            // Ambil nama user berdasarkan user_id
+            $user = $userModel->find($purchase['user_id']);
+            $purchase['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
+
+            // Ambil nama supplier berdasarkan supplier_id
             $supplier = $supplierModel->find($purchase['supplier_id']);
             $purchase['supplier_name'] = $supplier ? $supplier['supplier_name'] : 'Unknown';
-
-            // Tentukan kontak berdasarkan purchase_contact
-            if ($purchase['purchase_contact'] === 'phone') {
-                $purchase['contact'] = $supplier ? $supplier['supplier_phone'] : 'No Phone';
-            } elseif ($purchase['purchase_contact'] === 'email') {
-                $purchase['contact'] = $supplier ? $supplier['supplier_email'] : 'No Email';
-            } else {
-                $purchase['contact'] = 'Unknown Contact';
-            }
+            $purchase['supplier_phone'] = $supplier ? $supplier['supplier_phone'] : 'No Phone';
         }
 
         // Menampilkan view dengan data pembelian
@@ -42,24 +40,21 @@ class PurchaseController extends Controller
     {
         $purchaseModel = new PurchaseModel();
         $purchaseDetailModel = new PurchaseDetailModel();
+        $userModel = new UserModel();
+        $supplierModel = new SupplierModel();
         $productModel = new ProductModel();
-        $supplierModel = new SupplierModel(); 
 
         // Mendapatkan data purchase berdasarkan ID
         $data['purchase'] = $purchaseModel->find($purchaseId);
 
+        // Mendapatkan nama pembeli (buyer) berdasarkan user_id
+        $user = $userModel->find($data['purchase']['user_id']);
+        $data['purchase']['buyer_name'] = $user ? $user['user_fullname'] : 'Unknown Buyer';
+
         // Mendapatkan nama supplier berdasarkan supplier_id
         $supplier = $supplierModel->find($data['purchase']['supplier_id']);
-        $data['purchase']['supplier_name'] = $supplier ? $supplier['supplier_name'] : 'Unknown'; 
-
-        // Tentukan kontak berdasarkan purchase_contact
-        if ($data['purchase']['purchase_contact'] === 'phone') {
-            $data['purchase']['contact'] = $supplier ? $supplier['supplier_phone'] : 'No Phone';
-        } elseif ($data['purchase']['purchase_contact'] === 'email') {
-            $data['purchase']['contact'] = $supplier ? $supplier['supplier_email'] : 'No Email';
-        } else {
-            $data['purchase']['contact'] = 'Unknown Contact';
-        }
+        $data['purchase']['supplier_name'] = $supplier ? $supplier['supplier_name'] : 'Unknown';
+        $data['purchase']['supplier_phone'] = $supplier ? $supplier['supplier_phone'] : 'Unknown';
 
         // Mendapatkan detail pembelian berdasarkan purchase_id
         $data['purchase_details'] = $purchaseDetailModel->where('purchase_id', $purchaseId)->findAll();
@@ -82,7 +77,7 @@ class PurchaseController extends Controller
         
         $data['suppliers'] = $supplierModel->where('supplier_status', 'active')->findAll();
         
-        return view('admin/purchases/select_suppliers', $data);
+        return view('admin/purchases/select_supplier', $data);
     }
 
     public function storeSupplier()
@@ -96,113 +91,92 @@ class PurchaseController extends Controller
     public function selectProducts($supplierId)
     {
         $productModel = new ProductModel();
-        $supplierModel = new SupplierModel(); 
-    
-        // Mendapatkan supplier berdasarkan supplierId
-        $supplier = $supplierModel->find($supplierId);
-    
-        // Mengecek apakah supplier ada dan memiliki email, jika tidak, gunakan telepon
-        if ($supplier) {
-            if (!empty($supplier['supplier_email'])) {
-                $contact = $supplier['supplier_email']; 
-            } else {
-                $contact = $supplier['supplier_phone']; 
-            }
-        } else {
-            $contact = 'No Contact Available';
-        }
     
         // Fetch all products associated with the selected supplier
         $data['supplier_id'] = $supplierId;
         $data['products'] = $productModel->where('supplier_id', $supplierId)->findAll();
-        $data['contact'] = $contact;  // Menambahkan informasi kontak ke data
     
-        return view('admin/purchases/select_products', $data);
+        return view('admin/purchases/select_product', $data);
     }
-    public function storeProducts()
+
+    public function store()
     {
-        $purchaseModel = new PurchaseModel();
-        $purchaseDetailModel = new PurchaseDetailModel();
-        $userModel = new UserModel();  // Declare the user model
-
-        // Retrieve the logged-in user's ID from the session
-        $userId = session()->get('user_id');
+        // Get the POST data for the purchase
+        $postData = $this->request->getPost();
         
-        // Check if user_id exists in the session
-        if (!$userId) {
-            // Redirect or show an error if no user is logged in
-            return redirect()->to('/login')->with('error', 'Please log in to continue.');
+        // Ensure 'products' exists and is an array
+        if (empty($postData['products']) || !is_array($postData['products'])) {
+            return redirect()->back()->with('error', 'Please select at least one product.');
         }
-
-        // Retrieve other POST data
-        $supplierId = $this->request->getPost('supplier_id');
-        $purchaseContact = $this->request->getPost('purchase_contact');
-        $purchaseNotes = $this->request->getPost('purchase_notes');
-        $products = $this->request->getPost('products');
-
-        // Tentukan status purchase berdasarkan role user
-        $user = $userModel->find($userId);
-        $purchaseStatus = ($user && $user['user_role'] === 'admin') ? 'ordered' : 'pending';
-
-        // Calculate the total purchase amount and prepare purchase details
-        $purchaseAmount = 0;
-        $purchaseDetails = [];
-
-        // Generate new purchase_id dynamically
-        $lastPurchase = $purchaseModel->orderBy('purchase_id', 'desc')->first(); // Get the last inserted purchase record
-
-        if ($lastPurchase) {
-            // Extract the last number from the 'purchase_id' (assuming 'PUR' is a fixed prefix)
-            $lastId = substr($lastPurchase['purchase_id'], 3); // Get part after 'PUR'
-            $newId = str_pad((int)$lastId + 1, 6, '0', STR_PAD_LEFT);  // Increment and pad to 6 digits
-            $purchaseId = 'PUR' . $newId;  // Generate new 'purchase_id'
-        } else {
-            // If no purchase data exists, start from 'PUR000001'
-            $purchaseId = 'PUR000001';
-        }
-
-        // Process products and calculate prices
-        foreach ($products as $product) {
-            $productId = $product['product_id'];
-            $purchasePrice = ($product['purchase_type'] === 'box') ? 0 : $product['purchase_price'];
-            $quantityUnit = ($product['purchase_type'] === 'box') ? 0 : $product['quantity_unit'];
-            $boxPurchasePrice = ($product['purchase_type'] === 'unit') ? 0 : $product['box_purchase_price'];
-            $quantityBox = ($product['purchase_type'] === 'unit') ? 0 : $product['quantity_box'];
-
-            $totalPrice = ($purchasePrice * $quantityUnit) + ($boxPurchasePrice * $quantityBox);
-            $purchaseAmount += $totalPrice;
-
-            $purchaseDetails[] = [
-                'purchase_id' => $purchaseId, // Correct purchase_id is assigned here
-                'product_id' => $productId,
-                'purchase_type' => $product['purchase_type'],
-                'quantity_unit' => $quantityUnit,
-                'quantity_box' => $quantityBox,
-                'purchase_price' => $purchasePrice,
-                'box_purchase_price' => $boxPurchasePrice,
-            ];
-        }
-
-        // Prepare data for the purchase table
+    
+        // Generate a unique purchase_id by checking existing ones
+        $purchaseModel = new PurchaseModel();
+    
+        // Find the last purchase and increment the number for the new purchase
+        $lastPurchase = $purchaseModel->orderBy('purchase_id', 'desc')->first();
+        $lastPurchaseId = $lastPurchase ? $lastPurchase['purchase_id'] : 'PUR000000';
+        $purchaseNumber = (int) substr($lastPurchaseId, 3) + 1;
+        $purchaseId = 'PUR' . str_pad($purchaseNumber, 6, '0', STR_PAD_LEFT);
+    
+        // Get logged-in user_id from session
+        $userId = session()->get('user_id'); // Assuming user_id is stored in the session
+        
+        // Prepare the purchase data
         $purchaseData = [
-            'purchase_id' => $purchaseId,  // New unique purchase_id
-            'user_id' => $userId,  // Set the logged-in user's ID here
-            'supplier_id' => $supplierId,
+            'purchase_id' => $purchaseId,
+            'supplier_id' => $postData['supplier_id'],
+            'user_id'     => $userId, // Get the user_id from the session
             'purchase_date' => date('Y-m-d H:i:s'),
-            'purchase_amount' => $purchaseAmount,
-            'purchase_contact' => $purchaseContact,
-            'order_status' => 'pending',
-            'purchase_status' => $purchaseStatus,
-            'purchase_notes' => $purchaseNotes,
+            'purchase_notes' => $postData['purchase_notes'],
+            'order_status' => 'pending', // Default status
+            'purchase_status' => 'continue',
+            'purchase_amount' => 0, // Will calculate later
         ];
-
-        // Save purchase data first
-        $purchaseModel->save($purchaseData);
-
-        // Insert purchase details after purchase data is inserted
-        $purchaseDetailModel->insertBatch($purchaseDetails);
-
-        // Redirect to the purchases page
+    
+        // Start transaction
+        $db = \Config\Database::connect();
+        $db->transStart();
+    
+        // Save the purchase
+        $purchaseModel->insert($purchaseData);
+    
+        $purchaseId = $purchaseData['purchase_id']; // Get the generated purchase ID
+        
+        $purchaseDetailModel = new PurchaseDetailModel();
+        $totalAmount = 0;
+    
+        // Process each product in the purchase
+        foreach ($postData['products'] as $product) {
+            // Ensure the required keys exist in the product array
+            if (!isset($product['product_id'], $product['box_bought'], $product['unit_per_box'], $product['price_per_box'])) {
+                continue; // Skip if any required field is missing
+            }
+    
+            // Insert the product details
+            $purchaseDetailModel->insert([
+                'purchase_id' => $purchaseId,
+                'product_id' => $product['product_id'],
+                'box_bought' => $product['box_bought'],
+                'unit_per_box' => $product['unit_per_box'],
+                'price_per_box' => $product['price_per_box'],
+            ]);
+    
+            // Calculate the total purchase amount
+            $totalAmount += $product['box_bought'] * $product['price_per_box'];
+        }
+    
+        // Update purchase amount after adding details
+        $purchaseModel->update($purchaseId, ['purchase_amount' => $totalAmount]);
+    
+        // Commit the transaction
+        $db->transComplete();
+    
+        // Check if transaction was successful
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'Failed to add purchase.');
+        }
+    
+        // Redirect to the purchase list or details page
         return redirect()->to('/admin/purchases');
     }
 }

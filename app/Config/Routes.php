@@ -82,7 +82,7 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('purchases/supplier', 'PurchaseController::selectSupplier');
     $routes->post('purchases/supplier', 'PurchaseController::storeSupplier');
     $routes->get('purchases/products/(:segment)', 'PurchaseController::selectProducts/$1');
-    $routes->post('purchases', 'PurchaseController::storeProducts');
+    $routes->post('purchases', 'PurchaseController::store');    
     
     // Customers management
     $routes->get('customers', 'CustomerController::index');

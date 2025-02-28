@@ -16,11 +16,9 @@ class PurchaseDetailModel extends Model
         'purchase_detail_id', 
         'purchase_id', 
         'product_id', 
-        'purchase_type', 
-        'quantity_unit', 
-        'quantity_box', 
-        'purchase_price', 
-        'box_purchase_price', 
+        'box_bought',
+        'unit_per_box',
+        'price_per_box',
         'created_at'
     ];
 

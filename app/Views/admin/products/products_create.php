@@ -51,15 +51,6 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="unit_per_box">Unit per Box</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="unit_per_box" name="unit_per_box" value="<?= old('unit_per_box') ?>" required min = 1>
-                    <div class="input-group-append">
-                    </div>
-                </div>
-            </div>
-
             <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Save</button>
             <a href="/admin/products" class="btn btn-default">Cancel</a>
         </form>

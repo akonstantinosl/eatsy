@@ -59,25 +59,6 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="unit_per_box">Unit per Box</label>
-                <div class="input-group">
-                    <input type="number" class="form-control" id="unit_per_box" name="unit_per_box" value="<?= old('unit_per_box', $product['unit_per_box']) ?>" required min="1">
-                    <div class="input-group-append">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="box_selling_price">Box Selling Price</label>
-                <div class="input-group">
-                    <input type="number" class="form-control" id="box_selling_price" name="box_selling_price" value="<?= old('box_selling_price', $product['box_selling_price']) ?>" required min="1">
-                    <div class="input-group-append">
-                        <span class="input-group-text">IDR</span>
-                    </div>
-                </div>
-            </div>
-
             <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Update</button>
             <a href="/admin/products" class="btn btn-default">Cancel</a>
         </form>

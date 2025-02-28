@@ -34,12 +34,6 @@
             </div>
 
             <div class="form-group">
-                <label for="supplier_email">Email</label>
-                <input type="email" class="form-control" id="supplier_email" name="supplier_email" value="<?= old('supplier_email') ?>">
-                <small class="text-muted">Leave blank if not applicable</small>
-            </div>
-
-            <div class="form-group">
                 <label for="supplier_address">Address</label>
                 <textarea class="form-control" id="supplier_address" name="supplier_address" rows="4" required><?= old('supplier_address') ?></textarea>
             </div>

@@ -16,6 +16,7 @@
                 <tr>
                     <th>#</th>
                     <th>Date</th>
+                    <th>Buyer</th>
                     <th>Supplier</th>
                     <th>Contact</th>
                     <th>Amount</th>
@@ -28,8 +29,9 @@
                     <tr>
                         <td><?= $index + 1 ?></td>
                         <td><?= date('d F Y, H:i', strtotime($purchase['purchase_date'])) ?></td> 
+                        <td><?= esc($purchase['user_fullname']) ?></td>
                         <td><?= esc($purchase['supplier_name']) ?></td>
-                        <td><?= esc($purchase['contact']) ?></td>
+                        <td><?= esc($purchase['supplier_phone']) ?></td>
                         <td><?= number_format($purchase['purchase_amount'], 0, ',', '.') . " IDR" ?></td>
                         <td>
                             <?php 

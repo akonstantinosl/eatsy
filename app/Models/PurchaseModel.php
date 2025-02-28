@@ -18,7 +18,6 @@ class PurchaseModel extends Model
         'user_id', 
         'purchase_date', 
         'purchase_amount', 
-        'purchase_contact', 
         'order_status', 
         'purchase_status', 
         'purchase_notes', 

@@ -17,10 +17,6 @@ class CreateProductsTable extends Migration
             'product_category_id'=> ['type' => 'VARCHAR', 'constraint' => 20],
             'product_status'     => ['type' => 'ENUM', 'constraint' => ['active', 'inactive'], 'default' => 'active'],
             'supplier_id'        => ['type' => 'VARCHAR', 'constraint' => 20],
-            'unit_per_box'       => ['type' => 'INT', 'constraint' => 11, 'default' => 0], 
-            'box_purchase_price' => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
-            'box_selling_price'  => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true], 
-            'box_bought'         => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
             'created_at'         => ['type' => 'DATETIME', 'null' => true],
             'updated_at'         => ['type' => 'DATETIME', 'null' => true],
         ]);

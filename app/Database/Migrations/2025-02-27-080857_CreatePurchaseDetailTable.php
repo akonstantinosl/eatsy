@@ -14,7 +14,6 @@ class CreatePurchasesTable extends Migration
             'user_id'            => ['type' => 'VARCHAR', 'constraint' => 20],
             'purchase_date'      => ['type' => 'DATETIME', 'null' => false],
             'purchase_amount'    => ['type' => 'FLOAT', 'constraint' => 20, 'default' => 0],
-            'purchase_contact'   => ['type' => 'ENUM', 'constraint' => ['phone', 'email'], 'null' => true],
             'order_status'       => ['type' => 'ENUM', 'constraint' => ['pending', 'ordered', 'completed', 'cancelled'], 'default' => 'pending'],
             'purchase_status'    => ['type' => 'ENUM', 'constraint' => ['continue', 'cancel'], 'default' => 'continue'],
             'purchase_notes'     => ['type' => 'TEXT', 'null' => true],
