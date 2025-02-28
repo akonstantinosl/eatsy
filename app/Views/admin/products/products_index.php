@@ -35,7 +35,7 @@
                         <td><?= number_format($product['purchase_price'], 0, ',', '.') . " IDR" ?></td>
                         <td><?= number_format($product['selling_price'], 0, ',', '.') . " IDR" ?></td>
                         <td>
-                            <a href="/admin/products/edit/<?= esc($product['product_id']) ?>" class="btn btn-warning btn-sm">
+                            <a href="/admin/products/edit/<?= esc($product['product_id']) ?>" class="btn btn-warning btn-sm mr-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <a href="/admin/products/delete/<?= esc($product['product_id']) ?>" 

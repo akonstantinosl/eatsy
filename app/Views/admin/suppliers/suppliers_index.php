@@ -29,7 +29,7 @@
                         <td><?= esc($supplier['supplier_phone']) ?></td>
                         <td><?= esc($supplier['supplier_address']) ?></td>
                         <td>
-                            <a href="/admin/suppliers/edit/<?= esc($supplier['supplier_id']) ?>" class="btn btn-warning btn-sm">
+                            <a href="/admin/suppliers/edit/<?= esc($supplier['supplier_id']) ?>" class="btn btn-warning btn-sm mr-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <!-- Update the form to use GET method for supplier deletion -->

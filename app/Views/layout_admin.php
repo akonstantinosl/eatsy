@@ -90,12 +90,12 @@
                                 </a>
                             </li>
                             <!-- Categories -->
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a href="/admin/products/categories" class="nav-link <?= (current_url() == base_url('admin/products/categories')) ? 'active' : '' ?>">
                                     <i class="fas fa-tags nav-icon"></i>
                                     <p>Product Categories</p>
                                 </a>
-                            </li>
+                            </li> -->
                             <!-- Product Purchase -->
                             <li class="nav-item">
                                 <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
@@ -113,29 +113,11 @@
                         </ul>
                     </li>
 
-                    <!-- Customers Menu -->
-                    <li class="nav-item has-treeview <?= (strpos(current_url(), base_url('admin/customers')) !== false) ? 'menu-open' : '' ?>">
-                        <a href="#" class="nav-link <?= (strpos(current_url(), base_url('admin/customers')) !== false) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>
-                                Customers
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
+                    <li class="nav-item">
+                        <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>Customers</p>
                         </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/admin/customers" class="nav-link <?= (current_url() == base_url('admin/customers')) ? 'active' : '' ?>">
-                                    <i class="fas fa-circle nav-icon"></i>
-                                    <p>All Customers</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/admin/customers/create" class="nav-link <?= (current_url() == base_url('admin/customers/create')) ? 'active' : '' ?>">
-                                    <i class="fas fa-circle nav-icon"></i>
-                                    <p>Add New Customer</p>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
 
                     <li class="nav-item">

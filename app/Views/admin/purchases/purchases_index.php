@@ -63,7 +63,7 @@
                             <span class="badge <?= $statusClass ?>"><?= $statusText ?></span> 
                         </td>
                         <td>
-                            <a href="/admin/purchases/details/<?= esc($purchase['purchase_id']) ?>" class="btn btn-info btn-sm">
+                            <a href="/admin/purchases/details/<?= esc($purchase['purchase_id']) ?>" class="btn btn-info btn-sm mr-2">
                                 <i class="fas fa-eye"></i> View
                             </a>
                         </td>

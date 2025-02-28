@@ -40,6 +40,16 @@ $routes->get('login', 'AuthController::loginPage');
 $routes->post('login', 'AuthController::login');
 $routes->get('logout', 'AuthController::logout');
 
+// Customer management
+$routes->group('customers', function($routes) {
+    $routes->get('', 'CustomerController::index');
+    $routes->get('create', 'CustomerController::create');
+    $routes->post('store', 'CustomerController::store');
+    $routes->get('edit/(:segment)', 'CustomerController::edit/$1');
+    $routes->post('update/(:segment)', 'CustomerController::update/$1');
+    $routes->get('delete/(:segment)', 'CustomerController::delete/$1');
+});
+
 // Admin routes group
 $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('dashboard', 'HomeController::adminDashboard');
@@ -61,12 +71,12 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('products/delete/(:segment)', 'ProductController::delete/$1');
     
     // Product Categories management
-    $routes->get('products/categories', 'CategoryController::index');
-    $routes->get('products/categories/create', 'CategoryController::create');
-    $routes->post('products/categories/store', 'CategoryController::store');
-    $routes->get('products/categories/edit/(:segment)', 'CategoryController::edit/$1');
-    $routes->post('products/categories/update/(:segment)', 'CategoryController::update/$1');
-    $routes->get('products/categories/delete/(:segment)', 'CategoryController::delete/$1');
+    // $routes->get('products/categories', 'CategoryController::index');
+    // $routes->get('products/categories/create', 'CategoryController::create');
+    // $routes->post('products/categories/store', 'CategoryController::store');
+    // $routes->get('products/categories/edit/(:segment)', 'CategoryController::edit/$1');
+    // $routes->post('products/categories/update/(:segment)', 'CategoryController::update/$1');
+    // $routes->get('products/categories/delete/(:segment)', 'CategoryController::delete/$1');
 
     // Supplier management routes
     $routes->get('suppliers', 'SupplierController::index');

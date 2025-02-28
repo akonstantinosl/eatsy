@@ -40,7 +40,7 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <a href="/admin/users/edit/<?= $user['user_id'] ?>" class="btn btn-warning btn-sm">
+                            <a href="/admin/users/edit/<?= $user['user_id'] ?>" class="btn btn-warning btn-sm mr-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <?php if ($user['user_id'] != session()->get('user_id')): ?>
