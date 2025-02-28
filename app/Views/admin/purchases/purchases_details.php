@@ -16,7 +16,7 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <td><strong>Date</strong></td>
-                <td><?= date('d F Y, H:i', strtotime($purchase['purchase_date'])) ?></td>
+                <td><?= date('d F Y, H:i', strtotime($purchase['created_at'])) ?></td> 
             </tr>
             <tr>
                 <td><strong>Buyer</strong></td>

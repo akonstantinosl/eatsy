@@ -28,7 +28,7 @@
                 <?php foreach ($purchases as $index => $purchase): ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= date('d F Y, H:i', strtotime($purchase['purchase_date'])) ?></td> 
+                        <td><?= date('d F Y, H:i', strtotime($purchase['created_at'])) ?></td> 
                         <td><?= esc($purchase['user_fullname']) ?></td>
                         <td><?= esc($purchase['supplier_name']) ?></td>
                         <td><?= esc($purchase['supplier_phone']) ?></td>

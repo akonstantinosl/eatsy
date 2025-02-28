@@ -91,7 +91,14 @@ class PurchaseController extends Controller
     public function selectProducts($supplierId)
     {
         $productModel = new ProductModel();
+        $supplierModel = new SupplierModel();
     
+        // Fetch supplier data
+        $data['supplier'] = $supplierModel->find($supplierId);
+        if (!$data['supplier']) {
+            return redirect()->to('/admin/purchases/supplier')->with('error', 'Supplier not found.');
+        }
+        
         // Fetch all products associated with the selected supplier
         $data['supplier_id'] = $supplierId;
         $data['products'] = $productModel->where('supplier_id', $supplierId)->findAll();
@@ -103,80 +110,118 @@ class PurchaseController extends Controller
     {
         // Get the POST data for the purchase
         $postData = $this->request->getPost();
-        
+
         // Ensure 'products' exists and is an array
         if (empty($postData['products']) || !is_array($postData['products'])) {
             return redirect()->back()->with('error', 'Please select at least one product.');
         }
-    
+
+        // Filter out any empty product entries
+        $selectedProducts = array_filter($postData['products'], function($product) {
+            return !empty($product['product_id']);
+        });
+
+        if (empty($selectedProducts)) {
+            return redirect()->back()->with('error', 'Please select at least one product.');
+        }
+
         // Generate a unique purchase_id by checking existing ones
         $purchaseModel = new PurchaseModel();
-    
+        $purchaseDetailModel = new PurchaseDetailModel();
+        $productModel = new ProductModel();
+
         // Find the last purchase and increment the number for the new purchase
         $lastPurchase = $purchaseModel->orderBy('purchase_id', 'desc')->first();
         $lastPurchaseId = $lastPurchase ? $lastPurchase['purchase_id'] : 'PUR000000';
         $purchaseNumber = (int) substr($lastPurchaseId, 3) + 1;
         $purchaseId = 'PUR' . str_pad($purchaseNumber, 6, '0', STR_PAD_LEFT);
-    
+
         // Get logged-in user_id from session
         $userId = session()->get('user_id'); // Assuming user_id is stored in the session
-        
+
         // Prepare the purchase data
         $purchaseData = [
             'purchase_id' => $purchaseId,
             'supplier_id' => $postData['supplier_id'],
             'user_id'     => $userId, // Get the user_id from the session
-            'purchase_date' => date('Y-m-d H:i:s'),
-            'purchase_notes' => $postData['purchase_notes'],
+            'purchase_notes' => $postData['purchase_notes'] ?? '',
             'order_status' => 'pending', // Default status
             'purchase_status' => 'continue',
             'purchase_amount' => 0, // Will calculate later
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
-    
+
         // Start transaction
         $db = \Config\Database::connect();
         $db->transStart();
-    
-        // Save the purchase
+
+        // Save the purchase to the purchases table
         $purchaseModel->insert($purchaseData);
-    
-        $purchaseId = $purchaseData['purchase_id']; // Get the generated purchase ID
         
-        $purchaseDetailModel = new PurchaseDetailModel();
         $totalAmount = 0;
-    
+        $purchaseDetails = [];
+
+        // Find the last purchase detail id and increment it
+        $lastPurchaseDetail = $purchaseDetailModel->orderBy('purchase_detail_id', 'desc')->first();
+        $lastPurchaseDetailId = $lastPurchaseDetail ? $lastPurchaseDetail['purchase_detail_id'] : 'PUD000000';
+        $purchaseDetailNumber = (int) substr($lastPurchaseDetailId, 3) + 1;
+
         // Process each product in the purchase
-        foreach ($postData['products'] as $product) {
-            // Ensure the required keys exist in the product array
-            if (!isset($product['product_id'], $product['box_bought'], $product['unit_per_box'], $product['price_per_box'])) {
-                continue; // Skip if any required field is missing
+        foreach ($selectedProducts as $index => $product) {
+            // Get product data to store the name
+            $productData = $productModel->find($product['product_id']);
+            if (!$productData) {
+                continue; // Skip if product not found
             }
-    
-            // Insert the product details
+
+            // Calculate the total price for each product
+            $boxBought = (int)$product['box_bought'];
+            $pricePerBox = (float)$product['price_per_box'];
+            $totalPrice = $boxBought * $pricePerBox;
+
+            // Generate unique purchase detail ID
+            $purchaseDetailId = 'PUD' . str_pad($purchaseDetailNumber++, 6, '0', STR_PAD_LEFT);
+
+            // Insert the product details into the purchase_details table
             $purchaseDetailModel->insert([
+                'purchase_detail_id' => $purchaseDetailId,
                 'purchase_id' => $purchaseId,
                 'product_id' => $product['product_id'],
-                'box_bought' => $product['box_bought'],
+                'box_bought' => $boxBought,
                 'unit_per_box' => $product['unit_per_box'],
-                'price_per_box' => $product['price_per_box'],
+                'price_per_box' => $pricePerBox,
+                'created_at' => date('Y-m-d H:i:s')
             ]);
-    
-            // Calculate the total purchase amount
-            $totalAmount += $product['box_bought'] * $product['price_per_box'];
+
+            // Add to total amount
+            $totalAmount += $totalPrice;
+
+            // Add product detail for the view
+            $purchaseDetails[] = [
+                'product_name' => $productData['product_name'],
+                'box_bought' => $boxBought,
+                'unit_per_box' => $product['unit_per_box'],
+                'price_per_box' => $pricePerBox,
+                'total_price' => $totalPrice
+            ];
         }
-    
+
         // Update purchase amount after adding details
         $purchaseModel->update($purchaseId, ['purchase_amount' => $totalAmount]);
-    
+
         // Commit the transaction
         $db->transComplete();
-    
+
         // Check if transaction was successful
         if ($db->transStatus() === false) {
             return redirect()->back()->with('error', 'Failed to add purchase.');
         }
-    
-        // Redirect to the purchase list or details page
+
+        // Store purchase details in session for display
+        session()->setFlashdata('purchase_details', $purchaseDetails);
+        session()->setFlashdata('success', 'Purchase successfully added with ID: ' . $purchaseId);
+
         return redirect()->to('/admin/purchases');
     }
 }

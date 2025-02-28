@@ -24,7 +24,7 @@ class PurchaseDetailsSeeder extends Seeder
                 'product_id'         => 'PDT000005',  
                 'box_bought'         => 5,
                 'unit_per_box'       => 15,
-                'price_per_box'      => 3000,
+                'price_per_box'      => 35000,
                 'created_at'         => date('Y-m-d H:i:s')
             ],
             [
@@ -33,7 +33,7 @@ class PurchaseDetailsSeeder extends Seeder
                 'product_id'         => 'PDT000008',  
                 'box_bought'         => 8,
                 'unit_per_box'       => 10,
-                'price_per_box'      => 60000,
+                'price_per_box'      => 6000,
                 'created_at'         => date('Y-m-d H:i:s')
             ],
             [
@@ -42,7 +42,7 @@ class PurchaseDetailsSeeder extends Seeder
                 'product_id'         => 'PDT000011',  
                 'box_bought'         => 5,
                 'unit_per_box'       => 20,
-                'price_per_box'      => 6000,
+                'price_per_box'      => 8000,
                 'created_at'         => date('Y-m-d H:i:s')
             ],
             [
@@ -51,7 +51,7 @@ class PurchaseDetailsSeeder extends Seeder
                 'product_id'         => 'PDT000012',  
                 'box_bought'         => 7,
                 'unit_per_box'       => 30,
-                'price_per_box'      => 4000,
+                'price_per_box'      => 7000,
                 'created_at'         => date('Y-m-d H:i:s')
             ]
         ];
