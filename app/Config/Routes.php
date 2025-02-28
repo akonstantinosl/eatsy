@@ -85,13 +85,6 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->post('purchases', 'PurchaseController::store');
     $routes->get('purchases/update-status/(:segment)/(:segment)', 'PurchaseController::updateStatus/$1/$2');
     
-    // Customers management
-    $routes->get('customers', 'CustomerController::index');
-    $routes->get('customers/create', 'CustomerController::create');
-    $routes->post('customers/store', 'CustomerController::store');
-    $routes->get('customers/edit/(:segment)', 'CustomerController::edit/$1');
-    $routes->post('customers/update/(:segment)', 'CustomerController::update/$1');
-    $routes->get('customers/delete/(:segment)', 'CustomerController::delete/$1');
 });
 
 // Staff routes group

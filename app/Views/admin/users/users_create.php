@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">Add New User</h3>
         <div class="card-tools">
-            <a href="/admin/users" class="btn btn-default btn-sm">
+            <a href="/admin/users" class="btn btn-sm" style="background-color: #5a6268; color: white;">
                 <i class="fas fa-arrow-left"></i> Back to Users
             </a>
         </div>
@@ -66,7 +66,7 @@
                 <input type="hidden" name="status" value="active"> <!-- Hidden input for status -->
             </div>
             
-            <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Save</button>
+            <button type="submit" class="btn btn-primary mr-2">Save</button>
             <a href="/admin/users" class="btn btn-default">Cancel</a>
         </form>
     </div>

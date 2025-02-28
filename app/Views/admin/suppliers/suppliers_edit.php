@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">Edit Supplier</h3>
         <div class="card-tools">
-            <a href="/admin/suppliers" class="btn btn-default btn-sm">
+            <a href="/admin/suppliers" class="btn btn-sm" style="background-color: #5a6268; color: white;">
                 <i class="fas fa-arrow-left"></i> Back to Suppliers
             </a>
         </div>
@@ -41,7 +41,7 @@
             <!-- Hidden input for status (can't be edited) -->
             <input type="hidden" name="supplier_status" value="<?= $supplier['supplier_status'] ?>">
 
-            <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Update</button>
+            <button type="submit" class="btn btn-primary mr-2">Update</button>
             <a href="/admin/suppliers" class="btn btn-default">Cancel</a>
         </form>
     </div>

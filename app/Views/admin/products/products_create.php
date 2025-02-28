@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">Add New Product</h3>
         <div class="card-tools">
-            <a href="/admin/products" class="btn btn-default btn-sm">
+            <a href="/admin/products" class="btn btn-sm" style="background-color: #5a6268; color: white;">
                 <i class="fas fa-arrow-left"></i> Back to Products
             </a>
         </div>
@@ -51,7 +51,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Save</button>
+            <button type="submit" class="btn btn-primary mr-2">Save</button>
             <a href="/admin/products" class="btn btn-default">Cancel</a>
         </form>
     </div>

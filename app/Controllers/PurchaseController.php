@@ -47,6 +47,11 @@ class PurchaseController extends Controller
         // Mendapatkan data purchase berdasarkan ID
         $data['purchase'] = $purchaseModel->find($purchaseId);
 
+        // Jika data purchase tidak ditemukan, redirect dengan pesan error
+        if (!$data['purchase']) {
+            return redirect()->to('/admin/purchases')->with('error', 'Purchase not found.');
+        }
+
         // Mendapatkan nama pembeli (buyer) berdasarkan user_id
         $user = $userModel->find($data['purchase']['user_id']);
         $data['purchase']['buyer_name'] = $user ? $user['user_fullname'] : 'Unknown Buyer';
@@ -99,12 +104,13 @@ class PurchaseController extends Controller
             return redirect()->to('/admin/purchases/supplier')->with('error', 'Supplier not found.');
         }
         
-        // Fetch all products associated with the selected supplier
         $data['supplier_id'] = $supplierId;
-        $data['products'] = $productModel->where('supplier_id', $supplierId)->findAll();
+        $data['products'] = $productModel->where('supplier_id', $supplierId)
+                                         ->where('product_status', 'active')
+                                         ->findAll();
     
         return view('admin/purchases/select_product', $data);
-    }
+    }    
 
     public function store()
     {
@@ -223,5 +229,104 @@ class PurchaseController extends Controller
         session()->setFlashdata('success', 'Purchase successfully added with ID: ' . $purchaseId);
 
         return redirect()->to('/admin/purchases');
+    }
+
+    public function updateStatus($purchaseId, $newStatus)
+    {
+        // Verify the purchase ID exists
+        $purchaseModel = new PurchaseModel();
+        $purchase = $purchaseModel->find($purchaseId);
+        
+        if (!$purchase) {
+            return redirect()->to('/admin/purchases')->with('error', 'Purchase not found.');
+        }
+        
+        // Verify the new status is valid
+        $validStatuses = ['ordered', 'cancelled', 'completed'];
+        if (!in_array($newStatus, $validStatuses)) {
+            return redirect()->to('/admin/purchases/details/' . $purchaseId)->with('error', 'Invalid status.');
+        }
+        
+        // Check current status and validate the transition
+        $currentStatus = $purchase['order_status'];
+        
+        // Only allow specific transitions
+        if ($currentStatus === 'pending' && in_array($newStatus, ['ordered', 'cancelled'])) {
+            // Allow transition from pending to ordered or cancelled
+        } else if ($currentStatus === 'ordered' && $newStatus === 'completed') {
+            // Allow transition from ordered to completed
+        } else {
+            return redirect()->to('/admin/purchases/details/' . $purchaseId)
+                ->with('error', 'Invalid status transition from ' . $currentStatus . ' to ' . $newStatus);
+        }
+        
+        // Start transaction
+        $db = \Config\Database::connect();
+        $db->transStart();
+        
+        // Update the purchase status
+        $purchaseModel->update($purchaseId, [
+            'order_status' => $newStatus,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+        
+        // If status is completed, update product stock and price
+        if ($newStatus === 'completed') {
+            $this->updateProductStockAndPrice($purchaseId);
+        }
+        
+        // Complete the transaction
+        $db->transComplete();
+        
+        // Check if transaction was successful
+        if ($db->transStatus() === false) {
+            return redirect()->to('/admin/purchases/details/' . $purchaseId)
+                ->with('error', 'Failed to update purchase status.');
+        }
+        
+        return redirect()->to('/admin/purchases/details/' . $purchaseId)
+            ->with('success', 'Purchase status updated to ' . ucfirst($newStatus));
+    }
+    
+    private function updateProductStockAndPrice($purchaseId)
+    {
+        $purchaseDetailModel = new PurchaseDetailModel();
+        $productModel = new ProductModel();
+        
+        // Get all purchase details for this purchase
+        $purchaseDetails = $purchaseDetailModel->where('purchase_id', $purchaseId)->findAll();
+        
+        foreach ($purchaseDetails as $detail) {
+            // Get the current product data
+            $product = $productModel->find($detail['product_id']);
+            
+            if (!$product) {
+                continue; // Skip if product not found
+            }
+            
+            // Calculate new units to add to stock
+            $newUnits = $detail['box_bought'] * $detail['unit_per_box'];
+            
+            // Calculate total purchase cost for this item
+            $purchaseCost = $detail['box_bought'] * $detail['price_per_box'];
+            
+            // Calculate the new average purchase price
+            $currentTotalValue = $product['purchase_price'] * $product['product_stock'];
+            $newTotalValue = $currentTotalValue + $purchaseCost;
+            $newTotalUnits = $product['product_stock'] + $newUnits;
+            
+            // Guard against division by zero
+            $newAveragePrice = $newTotalUnits > 0 ? $newTotalValue / $newTotalUnits : 0;
+            
+            // Update the product
+            $productModel->update($detail['product_id'], [
+                'product_stock' => $newTotalUnits,
+                'purchase_price' => $newAveragePrice,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+        
+        // Log the stock update activity
+        log_message('info', "Product stock updated for purchase ID: {$purchaseId}");
     }
 }

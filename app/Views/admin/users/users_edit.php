@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">Edit User</h3>
         <div class="card-tools">
-            <a href="/admin/users" class="btn btn-default btn-sm">
+            <a href="/admin/users" class="btn btn-default btn-sm" style="background-color: #5a6268; color: white;">
                 <i class="fas fa-arrow-left"></i> Back to Users
             </a>
         </div>
@@ -68,7 +68,7 @@
                 <input type="hidden" name="role" value="<?= $user['user_role'] ?>">  <!-- Role field is hidden -->
                 <input type="hidden" name="status" value="<?= $user['user_status'] ?>">  <!-- Status field is hidden -->
 
-                <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Update</button>
+                <button type="submit" class="btn btn-primary mr-2">Update</button>
                 <a href="/admin/users" class="btn btn-default">Cancel</a>
             </div>
         </form>

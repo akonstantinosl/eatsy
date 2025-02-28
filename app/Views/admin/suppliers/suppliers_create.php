@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">Add New Supplier</h3>
         <div class="card-tools">
-            <a href="/admin/suppliers" class="btn btn-default btn-sm">
+            <a href="/admin/suppliers" class="btn btn-sm" style="background-color: #5a6268; color: white;">
                 <i class="fas fa-arrow-left"></i> Back to Suppliers
             </a>
         </div>
@@ -41,7 +41,7 @@
             <!-- Hidden input for status -->
             <input type="hidden" name="supplier_status" value="active">
 
-            <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Save</button>
+            <button type="submit" class="btn btn-primary mr-2">Save</button>
             <a href="/admin/suppliers" class="btn btn-default">Cancel</a>
         </form>
     </div>

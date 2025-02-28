@@ -19,7 +19,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary">Next</button>
+            <button type="submit" class="btn btn-primary mr-2">Next</button>
             <a href="/admin/purchases" class="btn btn-default">Cancel</a>
         </form>
     </div>

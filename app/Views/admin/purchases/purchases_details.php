@@ -3,9 +3,31 @@
 <?= $this->section('content') ?>
 <div class="card">
     <div class="card-header">
+        <h3 class="card-title">Purchase Details</h3>
         <div class="card-tools">
-            <a href="/admin/purchases" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> Back to Purchases List
+            <?php if ($purchase['order_status'] === 'pending'): ?>
+                <div class="btn-group">
+                    <a href="/admin/purchases/update-status/<?= esc($purchase['purchase_id']) ?>/ordered" 
+                       class="btn btn-primary btn-sm" 
+                       onclick="return confirm('Are you sure you want to process this order?');">
+                        <i class="fas fa-check"></i> Process Order
+                    </a>
+                    <a href="/admin/purchases/update-status/<?= esc($purchase['purchase_id']) ?>/cancelled" 
+                       class="btn btn-danger btn-sm ml-2" 
+                       onclick="return confirm('Are you sure you want to cancel this order?');">
+                        <i class="fas fa-times"></i> Reject Order
+                    </a>
+                </div>
+            <?php elseif ($purchase['order_status'] === 'ordered'): ?>
+                <a href="/admin/purchases/update-status/<?= esc($purchase['purchase_id']) ?>/completed" 
+                   class="btn btn-success btn-sm" 
+                   onclick="return confirm('Are you sure the goods have been received? This action will update the stock and product price.');">
+                    <i class="fas fa-check-double"></i> Mark as Received
+                </a>
+            <?php endif; ?>
+            
+            <a href="/admin/purchases" class="btn btn-secondary btn-sm ml-2">
+                <i class="fas fa-arrow-left"></i> Back to Purchase
             </a>
         </div>
     </div>
@@ -31,12 +53,8 @@
                 <td><?= esc($purchase['supplier_phone']) ?></td>
             </tr>
             <tr>
-                <td><strong>Amount</strong></td>
-                <td><?= number_format($purchase['purchase_amount'], 0, ',', '.') . " IDR" ?></td>
-            </tr>
-            <tr>
                 <td><strong>Notes</strong></td>
-                <td><?= esc($purchase['purchase_notes']) ?></td>
+                <td><?= empty($purchase['purchase_notes']) ? '-' : esc($purchase['purchase_notes']) ?></td>
             </tr>
             <tr>
                 <td><strong>Status</strong></td>
@@ -68,6 +86,12 @@
                         }
                     ?>
                     <span class="badge <?= $statusClass ?>"><?= $statusText ?></span>
+                    
+                    <?php if ($purchase['order_status'] === 'completed'): ?>
+                        <small class="text-success ml-2">
+                            <i class="fas fa-info-circle"></i> Stock and product prices have been updated.
+                        </small>
+                    <?php endif; ?>
                 </td>
             </tr>
         </table>
@@ -88,16 +112,33 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($purchase_details as $index => $detail): ?>
+                <?php if (empty($purchase_details)): ?>
                     <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td><?= esc($detail['product_name']) ?></td>
-                        <td><?= esc($detail['box_bought']) ?></td>
-                        <td><?= esc($detail['unit_per_box']) ?></td>
-                        <td><?= number_format($detail['price_per_box'], 0, ',', '.') . " IDR" ?></td>
-                        <td><?= number_format($detail['box_bought'] * $detail['price_per_box'], 0, ',', '.') . " IDR" ?></td>
+                        <td colspan="7" class="text-center">Purchase Detail not Found</td>
                     </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <?php $grandTotal = 0; ?>
+                    <?php foreach ($purchase_details as $index => $detail): ?>
+                        <?php 
+                            $totalUnits = $detail['box_bought'] * $detail['unit_per_box'];
+                            $totalPrice = $detail['box_bought'] * $detail['price_per_box'];
+                            $grandTotal += $totalPrice;
+                        ?>
+                        <tr>
+                            <td><?= $index + 1 ?></td>
+                            <td><?= esc($detail['product_name']) ?></td>
+                            <td><?= esc($detail['box_bought']) ?></td>
+                            <td><?= esc($detail['unit_per_box']) ?></td>
+                            <td><?= esc($totalUnits) ?></td>
+                            <td><?= number_format($detail['price_per_box'], 0, ',', '.') . " IDR" ?></td>
+                            <td><?= number_format($totalPrice, 0, ',', '.') . " IDR" ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td colspan="6" class="text-right"><strong>Total</strong></td>
+                        <td><strong><?= number_format($grandTotal, 0, ',', '.') . " IDR" ?></strong></td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
