@@ -120,9 +120,11 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
         $routes->get('sales/export-pdf', 'SalesReportController::exportPdf');
     });
 
-    // Ajax Routes
-    $routes->group('ajax', ['filter' => 'admin'], function($routes) {
-        $routes->get('purchase-transactions', 'AjaxController::getPurchaseTransactions');
+    // Profit Report
+    $routes->group('reports', ['filter' => 'admin'], function($routes) {
+        $routes->get('profit', 'ProfitReportController::index');
+        $routes->post('profit/generate', 'ProfitReportController::generateReport');
+        $routes->get('profit/export-pdf', 'ProfitReportController::exportPdf');
     });
 });
 

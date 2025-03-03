@@ -1492,3 +1492,179 @@ DEBUG - 2025-03-03 14:05:49 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2025-03-03 14:05:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-03-03 14:07:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-03-03 14:09:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:19:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:19:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:23:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:24:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:24:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:35:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:35:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:35:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:35:54 --> ErrorException: Undefined array key "price_per_unit"
+[Method: POST, Route: admin/reports/profit/generate]
+in APPPATH/Controllers/ProfitReportController.php on line 109.
+ 1 APPPATH/Controllers/ProfitReportController.php(109): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->generateReport()
+ 3 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 4 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 5 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 7 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+ 8 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:36:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:36:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:36:42 --> ErrorException: Undefined array key "price_per_unit"
+[Method: POST, Route: admin/reports/profit/generate]
+in APPPATH/Controllers/ProfitReportController.php on line 109.
+ 1 APPPATH/Controllers/ProfitReportController.php(109): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->generateReport()
+ 3 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 4 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 5 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 7 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+ 8 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:38:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:38:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:38:36 --> ErrorException: Undefined array key "unit_price"
+[Method: POST, Route: admin/reports/profit/generate]
+in APPPATH/Controllers/ProfitReportController.php on line 83.
+ 1 APPPATH/Controllers/ProfitReportController.php(83): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->generateReport()
+ 3 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 4 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 5 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 7 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+ 8 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:40:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:40:45 --> ErrorException: Undefined array key "price_per_unit"
+[Method: POST, Route: admin/reports/profit/generate]
+in APPPATH/Controllers/ProfitReportController.php on line 111.
+ 1 APPPATH/Controllers/ProfitReportController.php(111): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->generateReport()
+ 3 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 4 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 5 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 7 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+ 8 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:43:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:44:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:44:24 --> Error: Class "App\Controllers\PDF" not found
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/Controllers/ProfitReportController.php on line 247.
+ 1 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->exportPdf()
+ 2 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 3 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 4 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 6 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+ 7 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:46:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:46:15 --> Error: Class "App\Controllers\FPDF" not found
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/Controllers/ProfitReportController.php on line 17.
+ 1 VENDORPATH/composer/ClassLoader.php(576): include()
+ 2 VENDORPATH/composer/ClassLoader.php(427): Composer\Autoload\{closure}()
+ 3 [internal function]: Composer\Autoload\ClassLoader->loadClass()
+ 4 SYSTEMPATH/CodeIgniter.php(885): class_exists()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 7 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 9 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+10 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:46:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:46:17 --> Error: Class "App\Controllers\FPDF" not found
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/Controllers/ProfitReportController.php on line 17.
+ 1 VENDORPATH/composer/ClassLoader.php(576): include()
+ 2 VENDORPATH/composer/ClassLoader.php(427): Composer\Autoload\{closure}()
+ 3 [internal function]: Composer\Autoload\ClassLoader->loadClass()
+ 4 SYSTEMPATH/CodeIgniter.php(885): class_exists()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+ 7 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+ 9 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+10 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:47:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:47:04 --> ErrorException: fopen(/var/www/html/eatsy/public/assets/img/logo.png): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/ThirdParty/fpdf/fpdf.php on line 1274.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 APPPATH/ThirdParty/fpdf/fpdf.php(1274): fopen()
+ 3 APPPATH/ThirdParty/fpdf/fpdf.php(890): FPDF->_parsepng()
+ 4 APPPATH/Controllers/ProfitReportController.php(25): FPDF->Image()
+ 5 APPPATH/ThirdParty/fpdf/fpdf.php(330): App\Controllers\PDF->Header()
+ 6 APPPATH/Controllers/ProfitReportController.php(393): FPDF->AddPage()
+ 7 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->exportPdf()
+ 8 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+10 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+12 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+13 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:49:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:49:15 --> ErrorException: fopen(/var/www/html/eatsy/public/logo.png): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/ThirdParty/fpdf/fpdf.php on line 1274.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 APPPATH/ThirdParty/fpdf/fpdf.php(1274): fopen()
+ 3 APPPATH/ThirdParty/fpdf/fpdf.php(890): FPDF->_parsepng()
+ 4 APPPATH/Controllers/ProfitReportController.php(25): FPDF->Image()
+ 5 APPPATH/ThirdParty/fpdf/fpdf.php(330): App\Controllers\PDF->Header()
+ 6 APPPATH/Controllers/ProfitReportController.php(393): FPDF->AddPage()
+ 7 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->exportPdf()
+ 8 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+10 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+12 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+13 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:50:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:50:34 --> ErrorException: fopen(/var/www/html/eatsy/public/assets/image/logo.png): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/ThirdParty/fpdf/fpdf.php on line 1274.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 APPPATH/ThirdParty/fpdf/fpdf.php(1274): fopen()
+ 3 APPPATH/ThirdParty/fpdf/fpdf.php(890): FPDF->_parsepng()
+ 4 APPPATH/Controllers/ProfitReportController.php(25): FPDF->Image()
+ 5 APPPATH/ThirdParty/fpdf/fpdf.php(330): App\Controllers\PDF->Header()
+ 6 APPPATH/Controllers/ProfitReportController.php(393): FPDF->AddPage()
+ 7 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->exportPdf()
+ 8 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+10 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+12 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+13 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:50:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-03-03 14:50:59 --> ErrorException: fopen(/var/www/html/eatsy/public/app/assets/image/logo.png): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/reports/profit/export-pdf]
+in APPPATH/ThirdParty/fpdf/fpdf.php on line 1274.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 APPPATH/ThirdParty/fpdf/fpdf.php(1274): fopen()
+ 3 APPPATH/ThirdParty/fpdf/fpdf.php(890): FPDF->_parsepng()
+ 4 APPPATH/Controllers/ProfitReportController.php(25): FPDF->Image()
+ 5 APPPATH/ThirdParty/fpdf/fpdf.php(330): App\Controllers\PDF->Header()
+ 6 APPPATH/Controllers/ProfitReportController.php(393): FPDF->AddPage()
+ 7 SYSTEMPATH/CodeIgniter.php(933): App\Controllers\ProfitReportController->exportPdf()
+ 8 SYSTEMPATH/CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest()
+10 SYSTEMPATH/Boot.php(334): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH/Boot.php(67): CodeIgniter\Boot::runCodeIgniter()
+12 FCPATH/index.php(56): CodeIgniter\Boot::bootWeb()
+13 SYSTEMPATH/rewrite.php(44): require_once('/var/www/html/eatsy/public/index.php')
+DEBUG - 2025-03-03 14:51:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:56:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:56:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:56:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:56:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:56:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:56:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:57:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:57:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:58:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-03-03 14:58:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

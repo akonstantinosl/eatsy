@@ -10,7 +10,7 @@ class SaleDetailsSeeder extends Seeder
     {
         $saleDetailData = [
             [
-                'sale_detail_id' => 'SAD' . str_pad('1', 6, '0', STR_PAD_LEFT),
+                'sale_detail_id' => 'SLD' . str_pad('1', 6, '0', STR_PAD_LEFT),
                 'sale_id'        => 'SAL000001', 
                 'product_id'     => 'PDT000001', 
                 'quantity_sold'  => 5,
@@ -18,7 +18,7 @@ class SaleDetailsSeeder extends Seeder
                 'created_at'     => date('Y-m-d H:i:s')
             ],
             [
-                'sale_detail_id' => 'SAD' . str_pad('2', 6, '0', STR_PAD_LEFT),
+                'sale_detail_id' => 'SLD' . str_pad('2', 6, '0', STR_PAD_LEFT),
                 'sale_id'        => 'SAL000001',  
                 'product_id'     => 'PDT000005',  
                 'quantity_sold'  => 3,
@@ -26,7 +26,7 @@ class SaleDetailsSeeder extends Seeder
                 'created_at'     => date('Y-m-d H:i:s')
             ],
             [
-                'sale_detail_id' => 'SAD' . str_pad('3', 6, '0', STR_PAD_LEFT),
+                'sale_detail_id' => 'SLD' . str_pad('3', 6, '0', STR_PAD_LEFT),
                 'sale_id'        => 'SAL000002',
                 'product_id'     => 'PDT000008',  
                 'quantity_sold'  => 2,

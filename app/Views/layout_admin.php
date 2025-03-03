@@ -145,10 +145,15 @@
                             <li class="nav-item">
                                 <a href="<?= base_url('admin/reports/sales') ?>" class="nav-link">
                                     <i class="fas fa-cash-register nav-icon"></i>
-                                    <p>Purchase Reports</p>
+                                    <p>Sale Reports</p>
                                 </a>
                             </li>
-                            <!-- Tambahkan menu report lainnya di sini -->
+                            <li class="nav-item">
+                                <a href="<?= base_url('admin/reports/profit') ?>" class="nav-link">
+                                    <i class="fas fa-cash-register nav-icon"></i>
+                                    <p>Profit Reports</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
