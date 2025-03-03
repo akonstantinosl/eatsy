@@ -105,7 +105,7 @@
                             </li>
                             <!-- Sales -->
                             <li class="nav-item">
-                                <a href="/admin/products/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
+                                <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
                                     <i class="fas fa-cash-register nav-icon"></i>
                                     <p>Product Sales</p>
                                 </a>

@@ -129,13 +129,12 @@
                             <td><?= esc($detail['product_name']) ?></td>
                             <td><?= esc($detail['box_bought']) ?></td>
                             <td><?= esc($detail['unit_per_box']) ?></td>
-                            <td><?= esc($totalUnits) ?></td>
                             <td><?= number_format($detail['price_per_box'], 0, ',', '.') . " IDR" ?></td>
                             <td><?= number_format($totalPrice, 0, ',', '.') . " IDR" ?></td>
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td colspan="6" class="text-right"><strong>Total</strong></td>
+                        <td colspan="5" class="text-right"><strong>Total</strong></td>
                         <td><strong><?= number_format($grandTotal, 0, ',', '.') . " IDR" ?></strong></td>
                     </tr>
                 <?php endif; ?>

@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Select Products from <?= esc($supplier['supplier_name'] ?? 'Supplier') ?></h3>
+        <h3 class="card-title">Select Products for <?= esc($customer['customer_name'] ?? 'Customer') ?></h3>
     </div>
     <div class="card-body">
         <?php if (session()->has('error')): ?>
@@ -14,22 +14,22 @@
 
         <?php if (empty($products)): ?>
             <div class="alert alert-info">
-                No products found for this supplier. <a href="/admin/products/create" class="alert-link">Add products</a> first or <a href="/admin/purchases/supplier" class="alert-link">select another supplier</a>.
+                No products found in stock. <a href="/sales/customer" class="alert-link">Select another customer</a>.
             </div>
         <?php else: ?>
-            <form action="/admin/purchases" method="post" id="purchase-form">
+            <form action="/sales" method="post" id="sale-form">
                 <?= csrf_field() ?>
 
-                <input type="hidden" name="supplier_id" value="<?= esc($supplier_id) ?>">
+                <input type="hidden" name="customer_id" value="<?= esc($customer_id) ?>">
 
                 <div id="product-section">
                     <table class="table table-bordered" id="product-table">
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Box Bought</th>
-                                <th>Unit per Box</th>
-                                <th>Price per Box</th>
+                                <th>Available Stock</th>
+                                <th>Quantity</th>
+                                <th>Price per Unit</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -40,7 +40,8 @@
                                         <option value="">Select Product</option>
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= esc($product['product_id']) ?>" 
-                                                data-units="<?= esc($product['product_units_per_box'] ?? 1) ?>">
+                                                data-stock="<?= esc($product['product_stock']) ?>"
+                                                data-price="<?= esc($product['selling_price']) ?>">
                                                 <?= esc($product['product_name']) ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -48,13 +49,13 @@
                                     <input type="hidden" name="products[0][product_name]" class="product-name-input">
                                 </td>
                                 <td>
-                                    <input type="number" name="products[0][box_bought]" class="form-control box-bought" min="1" value="1" required>
+                                    <span class="available-stock">0</span>
                                 </td>
                                 <td>
-                                    <input type="number" name="products[0][unit_per_box]" class="form-control unit-per-box" min="1" value="1" required>
+                                    <input type="number" name="products[0][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="products[0][price_per_box]" class="form-control price-per-box" min="0" value="0" required>
+                                    <input type="number" name="products[0][price_per_unit]" class="form-control price-per-unit" min="0" value="0" required>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-danger btn-sm remove-product">Remove</button>
@@ -68,15 +69,26 @@
                     Add Product
                 </button>
 
+                <!-- Payment Method -->
+                <div class="form-group mt-3">
+                    <label for="payment_method">Payment Method</label>
+                    <select name="payment_method" class="form-control" required>
+                        <option value="cash">Cash</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="e-wallet">E-Wallet</option>
+                    </select>
+                </div>
+
                 <!-- Notes -->
                 <div class="form-group mt-3">
-                    <label for="purchase_notes">Notes</label>
-                    <textarea name="purchase_notes" class="form-control" rows="3"></textarea>
+                    <label for="sale_notes">Notes</label>
+                    <textarea name="sale_notes" class="form-control" rows="3"></textarea>
                 </div>
 
                 <div class="mt-3">
-                    <button type="submit" class="btn btn-primary">Save Purchase</button>
-                    <a href="/admin/purchases" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary mr-2">Complete Sale</button>
+                    <a href="/sales" class="btn btn-default">Cancel</a>
                 </div>
             </form>
         <?php endif; ?>
@@ -92,13 +104,26 @@
         const row = select.closest('.product-row');
         const productId = select.value;
         const productName = select.options[select.selectedIndex].text;
-        const unitsPerBox = select.options[select.selectedIndex].dataset.units || 1;
+        const availableStock = select.options[select.selectedIndex].dataset.stock || 0;
+        const sellingPrice = select.options[select.selectedIndex].dataset.price || 0;
         
         // Store product name in hidden input
         row.querySelector('.product-name-input').value = productName;
         
-        // Update units per box if available from data attribute
-        row.querySelector('.unit-per-box').value = unitsPerBox;
+        // Update available stock display
+        row.querySelector('.available-stock').textContent = availableStock;
+        
+        // Update price per unit if available from data attribute
+        row.querySelector('.price-per-unit').value = sellingPrice;
+        
+        // Update quantity limits based on available stock
+        const quantityInput = row.querySelector('.quantity-sold');
+        quantityInput.max = availableStock;
+        
+        // If quantity is more than stock, reduce it
+        if (parseInt(quantityInput.value) > parseInt(availableStock)) {
+            quantityInput.value = availableStock;
+        }
         
         // Track selected products to avoid duplicates
         if (productId) {
@@ -125,7 +150,8 @@
         let productOptions = '<option value="">Select Product</option>';
         <?php foreach ($products as $product): ?>
             productOptions += `<option value="<?= esc($product['product_id']) ?>" 
-                data-units="<?= esc($product['product_units_per_box'] ?? 1) ?>"
+                data-stock="<?= esc($product['product_stock']) ?>"
+                data-price="<?= esc($product['selling_price']) ?>"
                 ${selectedProducts.has("<?= esc($product['product_id']) ?>") ? 'disabled' : ''}>
                 <?= esc($product['product_name']) ?>
             </option>`;
@@ -139,13 +165,13 @@
                 <input type="hidden" name="products[${newIndex}][product_name]" class="product-name-input">
             </td>
             <td>
-                <input type="number" name="products[${newIndex}][box_bought]" class="form-control box-bought" min="1" value="1" required>
+                <span class="available-stock">0</span>
             </td>
             <td>
-                <input type="number" name="products[${newIndex}][unit_per_box]" class="form-control unit-per-box" min="1" value="1" required>
+                <input type="number" name="products[${newIndex}][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
             </td>
             <td>
-                <input type="number" name="products[${newIndex}][price_per_box]" class="form-control price-per-box" min="0" value="0" required>
+                <input type="number" name="products[${newIndex}][price_per_unit]" class="form-control price-per-unit" min="0" value="0" required>
             </td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm remove-product">Remove</button>
@@ -209,7 +235,7 @@
     });
     
     // Form validation
-    document.getElementById('purchase-form').addEventListener('submit', function(event) {
+    document.getElementById('sale-form').addEventListener('submit', function(event) {
         const productSelects = document.querySelectorAll('.product-select');
         let hasSelectedProducts = false;
         
@@ -222,6 +248,28 @@
         if (!hasSelectedProducts) {
             event.preventDefault();
             alert("Please select at least one product.");
+            return;
+        }
+        
+        // Check if quantities exceed available stock
+        let hasStockIssue = false;
+        
+        productSelects.forEach(select => {
+            if (select.value !== "") {
+                const row = select.closest('.product-row');
+                const availableStock = parseInt(select.options[select.selectedIndex].dataset.stock);
+                const quantitySold = parseInt(row.querySelector('.quantity-sold').value);
+                
+                if (quantitySold > availableStock) {
+                    hasStockIssue = true;
+                    const productName = select.options[select.selectedIndex].text;
+                    alert(`Not enough stock for ${productName}. Available: ${availableStock}.`);
+                }
+            }
+        });
+        
+        if (hasStockIssue) {
+            event.preventDefault();
         }
     });
 </script>

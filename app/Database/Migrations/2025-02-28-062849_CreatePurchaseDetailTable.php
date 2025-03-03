@@ -16,6 +16,7 @@ class CreatePurchaseDetailsTable extends Migration
             'unit_per_box'       => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
             'price_per_box'      => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
             'created_at'         => ['type' => 'DATETIME', 'null' => true],
+            'updated_at'       => ['type' => 'DATETIME', 'null' => true],
         ]);
 
         $this->forge->addPrimaryKey('purchase_detail_id');

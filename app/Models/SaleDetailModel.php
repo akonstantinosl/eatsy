@@ -6,19 +6,21 @@ use CodeIgniter\Model;
 
 class SaleDetailModel extends Model
 {
-    protected $table            = 'saledetails';
-    protected $primaryKey       = 'id';
+    protected $table            = 'sale_details';
+    protected $primaryKey       = 'sale_detail_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
-
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
-    protected array $casts = [];
-    protected array $castHandlers = [];
+    protected $allowedFields    = [
+        'sale_detail_id',
+        'sale_id',
+        'product_id',
+        'quantity_sold',
+        'price_per_unit',
+        'created_at',
+        'updated_at'
+    ];
 
     // Dates
     protected $useTimestamps = false;

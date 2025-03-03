@@ -18,7 +18,6 @@ class PurchasesSeeder extends Seeder
                 'purchase_status' => 'continue',
                 'purchase_notes'  => 'Pesanan untuk stok baru',
                 'created_at'      => date('Y-m-d H:i:s'),
-                'updated_at'      => date('Y-m-d H:i:s')
             ],
             [
                 'purchase_id'     => 'PUR' . str_pad('2', 6, '0', STR_PAD_LEFT),
@@ -29,7 +28,6 @@ class PurchasesSeeder extends Seeder
                 'purchase_status' => 'continue',
                 'purchase_notes'  => 'Pembelian rutin',
                 'created_at'      => date('Y-m-d H:i:s'),
-                'updated_at'      => date('Y-m-d H:i:s')
             ]
         ];
 

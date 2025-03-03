@@ -40,7 +40,7 @@ $routes->get('login', 'AuthController::loginPage');
 $routes->post('login', 'AuthController::login');
 $routes->get('logout', 'AuthController::logout');
 
-// Customer management
+// Customers management
 $routes->group('customers', function($routes) {
     $routes->get('', 'CustomerController::index');
     $routes->get('create', 'CustomerController::create');
@@ -48,6 +48,17 @@ $routes->group('customers', function($routes) {
     $routes->get('edit/(:segment)', 'CustomerController::edit/$1');
     $routes->post('update/(:segment)', 'CustomerController::update/$1');
     $routes->get('delete/(:segment)', 'CustomerController::delete/$1');
+});
+
+// Sales management
+$routes->group('sales', function($routes) {
+    $routes->get('', 'SaleController::index');
+    $routes->get('details/(:segment)', 'SaleController::details/$1');
+    $routes->get('customer', 'SaleController::selectCustomer');
+    $routes->post('customer', 'SaleController::storeCustomer');
+    $routes->get('products/(:segment)', 'SaleController::selectProducts/$1');
+    $routes->post('', 'SaleController::store');
+    $routes->get('update-status/(:segment)/(:segment)', 'SaleController::updateStatus/$1/$2');
 });
 
 // Admin routes group
@@ -78,7 +89,7 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     // $routes->post('products/categories/update/(:segment)', 'CategoryController::update/$1');
     // $routes->get('products/categories/delete/(:segment)', 'CategoryController::delete/$1');
 
-    // Supplier management routes
+    // Suppliers management routes
     $routes->get('suppliers', 'SupplierController::index');
     $routes->get('suppliers/create', 'SupplierController::create');
     $routes->post('suppliers/store', 'SupplierController::store');
@@ -94,14 +105,6 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('purchases/products/(:segment)', 'PurchaseController::selectProducts/$1');
     $routes->post('purchases', 'PurchaseController::store');
     $routes->get('purchases/update-status/(:segment)/(:segment)', 'PurchaseController::updateStatus/$1/$2');
-
-    $routes->get('sales', 'saleController::index');
-    $routes->get('sales/details/(:segment)', 'saleController::details/$1');
-    $routes->get('sales/customer', 'saleController::selectCustomer');
-    $routes->post('sales/customer', 'saleController::storeCustomer');
-    $routes->get('sales/products/(:segment)', 'saleController::selectProducts/$1');
-    $routes->post('sales', 'saleController::store');
-    $routes->get('sales/update-status/(:segment)/(:segment)', 'saleController::updateStatus/$1/$2');
 });
 
 // Staff routes group
