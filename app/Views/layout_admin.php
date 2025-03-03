@@ -126,6 +126,31 @@
                             <p>Suppliers</p>
                         </a>
                     </li>
+                    <!-- Reports Menu -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-chart-bar"></i>
+                            <p>
+                                Reports
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('admin/reports/purchases') ?>" class="nav-link">
+                                    <i class="fas fa-cart-plus nav-icon"></i>
+                                    <p>Purchase Reports</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('admin/reports/sales') ?>" class="nav-link">
+                                    <i class="fas fa-cash-register nav-icon"></i>
+                                    <p>Purchase Reports</p>
+                                </a>
+                            </li>
+                            <!-- Tambahkan menu report lainnya di sini -->
+                        </ul>
+                    </li>
                 </ul>
             </nav>
 

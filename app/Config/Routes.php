@@ -105,6 +105,25 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('purchases/products/(:segment)', 'PurchaseController::selectProducts/$1');
     $routes->post('purchases', 'PurchaseController::store');
     $routes->get('purchases/update-status/(:segment)/(:segment)', 'PurchaseController::updateStatus/$1/$2');
+
+    // Purchases Report
+    $routes->group('reports', ['filter' => 'admin'], function($routes) {
+        $routes->get('purchases', 'PurchaseReportController::index');
+        $routes->post('purchases/generate', 'PurchaseReportController::generateReport');
+        $routes->get('purchases/export-pdf', 'PurchaseReportController::exportPdf');
+    });
+
+    // Sales Report
+    $routes->group('reports', ['filter' => 'admin'], function($routes) {
+        $routes->get('sales', 'SalesReportController::index');
+        $routes->post('sales/generate', 'SalesReportController::generateReport');
+        $routes->get('sales/export-pdf', 'SalesReportController::exportPdf');
+    });
+
+    // Ajax Routes
+    $routes->group('ajax', ['filter' => 'admin'], function($routes) {
+        $routes->get('purchase-transactions', 'AjaxController::getPurchaseTransactions');
+    });
 });
 
 // Staff routes group
