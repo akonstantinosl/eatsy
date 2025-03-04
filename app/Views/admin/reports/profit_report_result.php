@@ -15,6 +15,9 @@
     </div>
     <div class="card-body">
         <h4><?= $periodTitle ?></h4>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> This report only includes data from completed transactions.
+        </div>
         
         <div class="table-responsive">
             <table class="table table-bordered table-striped">

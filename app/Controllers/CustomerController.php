@@ -11,7 +11,7 @@ class CustomerController extends BaseController
 
     public function __construct()
     {
-        $this->customerModel = new customerModel();
+        $this->customerModel = new CustomerModel();
     }
 
     public function index()
@@ -22,17 +22,30 @@ class CustomerController extends BaseController
         // Get current page from the request, default to 1 if not set
         $page = $this->request->getGet('page') ?? 1;
         
-        // Set items per page
-        $perPage = 10;
+        // Get entries per page (default to 10 if not set)
+        // Cast to integer to avoid type errors in the limit() method
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Get total count of active customers
-        $totalCustomers = $this->customerModel
-                         ->where('customer_status', 'active')
-                         ->countAllResults();
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
         
-        // Get paginated customers
-        $customers = $this->customerModel
-                   ->where('customer_status', 'active')
+        // Base query
+        $query = $this->customerModel->where('customer_status', 'active');
+        
+        // Apply search filter if set
+        if ($search) {
+            $query = $query->groupStart()
+                    ->like('customer_name', $search)
+                    ->orLike('customer_phone', $search)
+                    ->orLike('customer_address', $search)
+                    ->groupEnd();
+        }
+        
+        // Get total count based on filters
+        $totalCustomers = $query->countAllResults(false);
+        
+        // Get paginated customers based on filters
+        $customers = $query
                    ->limit($perPage, ($page - 1) * $perPage)
                    ->find();
         
@@ -40,18 +53,19 @@ class CustomerController extends BaseController
         $pager->setPath('customers');
         
         // Pass customers data and pager to the view
-        return view('/customers/customers_index', [
+        return view('customers/customers_index', [
             'customers' => $customers,
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalCustomers
+            'total' => $totalCustomers,
+            'search' => $search
         ]);
     }
 
     public function create()
     {
-        return view('/customers/customers_create');
+        return view('customers/customers_create');
     }
 
     public function store()
@@ -68,13 +82,13 @@ class CustomerController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Check if the phone number  already exists for active customers
-        $existingcustomer = $this->customerModel
+        // Check if the phone number already exists for active customers
+        $existingCustomer = $this->customerModel
             ->where('customer_phone', $this->request->getPost('customer_phone'))
             ->where('customer_status', 'active')
             ->first();
 
-        if ($existingcustomer) {
+        if ($existingCustomer) {
             return redirect()->back()->withInput()->with('errors', ['customer_phone' => 'Phone number is already in use by an active customer.']);
         }
 
@@ -120,7 +134,7 @@ class CustomerController extends BaseController
             return redirect()->to('/customers');
         }
 
-        return view('/customers/customers_edit', $data);
+        return view('customers/customers_edit', $data);
     }
 
     public function update($id)

@@ -23,7 +23,7 @@
                                     <span class="input-group-text">Show</span>
                                 </div>
                                 <select name="entries" id="entries" class="form-control form-control-sm" onchange="document.getElementById('filterForm').submit()">
-                                    <?php foreach ([10, 25, 50] as $option): ?>
+                                    <?php foreach ([10, 25, 50, 100] as $option): ?>
                                         <option value="<?= $option ?>" <?= $perPage == $option ? 'selected' : '' ?>><?= $option ?></option>
                                     <?php endforeach; ?>
                                 </select>
