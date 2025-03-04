@@ -15,16 +15,30 @@ require_once APPPATH . 'ThirdParty/fpdf/fpdf.php';
 class PDF extends \FPDF {
     public $periodTitle;
     
-    // Header halaman
+    // Page header
     function Header() {
-        // Judul dan periode
-        $this->SetFont('Arial', 'B', 16);
-        $this->Cell(0, 10, 'PURCHASE TRANSACTION REPORT', 0, 1, 'C');
-        $this->SetFont('Arial', '', 12);
-        $this->Cell(0, 10, $this->periodTitle, 0, 1, 'C');
-        $this->Ln(5);
+        // Logo
+        $this->Image(FCPATH . 'assets/image/logo.png', 10, 10, 30);
         
-        // Header tabel
+        // Title
+        $this->SetFont('Arial', 'B', 16);
+        $this->Cell(0, 10, 'EATSY', 0, 1, 'C');
+        $this->SetFont('Arial', '', 12);
+        $this->Cell(0, 10, 'Eat Easy Street No. 7 Bekasi', 0, 1, 'C');
+        $this->Cell(0, 10, '+1234567890 | info@eateasy.com', 0, 1, 'C');
+        $this->Line(10, $this->GetY(), 287, $this->GetY());
+        $this->Ln(10);
+        
+        // Report Title and period - ONLY on the first page
+        if ($this->PageNo() == 1) {
+            $this->SetFont('Arial', 'B', 16);
+            $this->Cell(0, 10, 'PURCHASE TRANSACTION REPORT', 0, 1, 'C');
+            $this->SetFont('Arial', '', 12);
+            $this->Cell(0, 10, $this->periodTitle, 0, 1, 'C');
+            $this->Ln(5);
+        }
+        
+        // Header tabel (on all pages)
         $this->SetFont('Arial', 'B', 10);
         $this->SetFillColor(200, 220, 255);
         $this->Cell(35, 10, 'Date', 1, 0, 'C', true);
@@ -120,6 +134,117 @@ class PDF extends \FPDF {
         // Move to the next row
         $this->SetY($startY + $maxHeight);
     }
+    
+    // Better table function for multi-line cells
+    function MultiLineCell($w, $h, $txt, $border=0, $align='J', $fill=false)
+    {
+        $cw = $this->CurrentFont['cw'];
+        if($w==0)
+            $w = $this->w-$this->rMargin-$this->x;
+        $wmax = ($w-2*$this->cMargin)*1000/$this->FontSize;
+        $s = str_replace("\r",'',$txt);
+        $nb = strlen($s);
+        if($nb>0 && $s[$nb-1]=="\n")
+            $nb--;
+        $b = 0;
+        if($border)
+        {
+            if($border==1)
+            {
+                $border = 'LTRB';
+                $b = 'LRT';
+                $b2 = 'LR';
+            }
+            else
+            {
+                $b2 = '';
+                if(strpos($border,'L')!==false)
+                    $b2 .= 'L';
+                if(strpos($border,'R')!==false)
+                    $b2 .= 'R';
+                $b = $b2;
+                if(strpos($border,'T')!==false)
+                    $b .= 'T';
+            }
+        }
+        $sep = -1;
+        $i = 0;
+        $j = 0;
+        $l = 0;
+        $ns = 0;
+        $nl = 1;
+        while($i<$nb)
+        {
+            $c = $s[$i];
+            if($c=="\n")
+            {
+                if($this->ws>0)
+                {
+                    $this->ws = 0;
+                    $this->_out('0 Tw');
+                }
+                $this->Cell($w,$h/2,substr($s,$j,$i-$j),$b,$ln=2,$align,$fill);
+                $i++;
+                $sep = -1;
+                $j = $i;
+                $l = 0;
+                $ns = 0;
+                $nl++;
+                if($border && $nl==2)
+                    $b = $b2;
+                continue;
+            }
+            if($c==' ')
+            {
+                $sep = $i;
+                $ls = $l;
+                $ns++;
+            }
+            $l += $cw[$c];
+            if($l>$wmax)
+            {
+                if($sep==-1)
+                {
+                    if($i==$j)
+                        $i++;
+                    if($this->ws>0)
+                    {
+                        $this->ws = 0;
+                        $this->_out('0 Tw');
+                    }
+                    $this->Cell($w,$h/2,substr($s,$j,$i-$j),$b,$ln=2,$align,$fill);
+                }
+                else
+                {
+                    if($align=='J')
+                    {
+                        $this->ws = ($ns>1) ? ($wmax-$ls)/1000*$this->FontSize/($ns-1) : 0;
+                        $this->_out(sprintf('%.3F Tw',$this->ws*$this->k));
+                    }
+                    $this->Cell($w,$h/2,substr($s,$j,$sep-$j),$b,$ln=2,$align,$fill);
+                    $i = $sep+1;
+                }
+                $sep = -1;
+                $j = $i;
+                $l = 0;
+                $ns = 0;
+                $nl++;
+                if($border && $nl==2)
+                    $b = $b2;
+            }
+            else
+                $i++;
+        }
+        if($this->ws>0)
+        {
+            $this->ws = 0;
+            $this->_out('0 Tw');
+        }
+        if($border && strpos($border,'B')!==false)
+            $b .= 'B';
+        $this->Cell($w,$h/2,substr($s,$j,$i-$j),$b,2,$align,$fill);
+        $this->x = $this->lMargin;
+    }
 }
 
 class PurchaseReportController extends Controller
@@ -142,9 +267,10 @@ class PurchaseReportController extends Controller
         $purchaseDetailModel = new PurchaseDetailModel();
         $productModel = new ProductModel();
         
-        // Filter berdasarkan rentang tanggal
+        // Filter berdasarkan rentang tanggal and completed status
         $purchaseQuery = $purchaseModel->where('created_at >=', $startDate . ' 00:00:00')
-                                       ->where('created_at <=', $endDate . ' 23:59:59');
+                                       ->where('created_at <=', $endDate . ' 23:59:59')
+                                       ->where('order_status', 'completed'); // Filter for completed orders only
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
@@ -158,10 +284,14 @@ class PurchaseReportController extends Controller
         
         // Jika tidak ada data, kembalikan dengan pesan error
         if (empty($purchases)) {
-            return redirect()->to('/admin/reports/purchases')->with('error', 'No purchase data found for the selected period.');
+            return redirect()->to('/admin/reports/purchases')->with('error', 'No completed purchase data found for the selected period.');
         }
         
         // Lengkapi data untuk setiap pembelian
+        $totalAmount = 0;
+        $totalItems = 0;
+        $supplierStats = [];
+        
         foreach ($purchases as $purchase) {
             $purchase_info = [
                 'purchase_id' => $purchase['purchase_id'],
@@ -171,6 +301,9 @@ class PurchaseReportController extends Controller
                 'supplier_id' => $purchase['supplier_id']
             ];
             
+            // Add to total amount
+            $totalAmount += $purchase['purchase_amount'];
+            
             // Ambil nama user berdasarkan user_id
             $user = $userModel->find($purchase['user_id']);
             $purchase_info['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
@@ -178,6 +311,17 @@ class PurchaseReportController extends Controller
             // Ambil nama supplier berdasarkan supplier_id
             $supplier = $supplierModel->find($purchase['supplier_id']);
             $purchase_info['supplier_name'] = $supplier ? $supplier['supplier_name'] : 'Unknown';
+            
+            // Track supplier statistics
+            if (!isset($supplierStats[$purchase['supplier_id']])) {
+                $supplierStats[$purchase['supplier_id']] = [
+                    'name' => $purchase_info['supplier_name'],
+                    'amount' => 0,
+                    'count' => 0
+                ];
+            }
+            $supplierStats[$purchase['supplier_id']]['amount'] += $purchase['purchase_amount'];
+            $supplierStats[$purchase['supplier_id']]['count']++;
             
             // Ambil detail produk yang dibeli
             $purchase_details = $purchaseDetailModel->where('purchase_id', $purchase['purchase_id'])->findAll();
@@ -193,6 +337,9 @@ class PurchaseReportController extends Controller
                         'quantity' => $totalUnits,
                         'amount' => $productAmount
                     ];
+                    
+                    // Add to total items
+                    $totalItems += $totalUnits;
                 }
             }
             
@@ -201,6 +348,9 @@ class PurchaseReportController extends Controller
         
         $data['start_date'] = $startDate;
         $data['end_date'] = $endDate;
+        $data['totalAmount'] = $totalAmount;
+        $data['totalItems'] = $totalItems;
+        $data['supplierStats'] = $supplierStats;
         
         // Tampilkan hasil report
         return view('admin/reports/purchases_report_result', $data);
@@ -219,9 +369,10 @@ class PurchaseReportController extends Controller
         $purchaseDetailModel = new PurchaseDetailModel();
         $productModel = new ProductModel();
         
-        // Filter berdasarkan rentang tanggal
+        // Filter berdasarkan rentang tanggal and completed status
         $purchaseQuery = $purchaseModel->where('created_at >=', $startDate . ' 00:00:00')
-                                      ->where('created_at <=', $endDate . ' 23:59:59');
+                                      ->where('created_at <=', $endDate . ' 23:59:59')
+                                      ->where('order_status', 'completed'); // Filter for completed orders only
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
@@ -239,6 +390,7 @@ class PurchaseReportController extends Controller
         // Data tabel
         $pdf->SetFont('Arial', '', 9);
         $totalAmount = 0;
+        $totalItems = 0;
         
         foreach ($purchases as $index => $purchase) {
             // Tambahkan ke total
@@ -275,6 +427,9 @@ class PurchaseReportController extends Controller
                         $totalUnits = $detail['box_bought'] * $detail['unit_per_box'];
                         $productAmount = $detail['price_per_box'] * $detail['box_bought'];
                         
+                        // Add to total items
+                        $totalItems += $totalUnits;
+                        
                         // Tampilkan semua informasi untuk setiap produk
                         $rowData = [
                             date('d/m/Y H:i', strtotime($purchase['created_at'])),
@@ -293,7 +448,8 @@ class PurchaseReportController extends Controller
         
         // Tampilkan total
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(225, 10, 'Total Amount', 1, 0, 'R');
+        $pdf->Cell(190, 10, 'TOTAL', 1, 0, 'R');
+        $pdf->Cell(35, 10, $totalItems, 1, 0, 'R');
         $pdf->Cell(35, 10, number_format($totalAmount, 0, ',', '.') . " IDR", 1, 1, 'R');
         
         // Output PDF

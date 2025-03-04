@@ -17,21 +17,43 @@ require_once APPPATH . 'ThirdParty/fpdf/fpdf.php';
 class PDF extends \FPDF
 {
     public $periodTitle;
-
+    
     // Page header
     function Header()
     {
         // Logo
         $this->Image(FCPATH . 'assets/image/logo.png', 10, 10, 30);
         
-        // Title
+        // Company Title
         $this->SetFont('Arial', 'B', 16);
         $this->Cell(0, 10, 'EATSY', 0, 1, 'C');
         $this->SetFont('Arial', '', 12);
-        $this->Cell(0, 10, 'Address: Eat Easy Street No. 7 Bekasi', 0, 1, 'C');
-        $this->Cell(0, 10, 'Phone: +1234567890 | Email: info@eateasy.com', 0, 1, 'C');
+        $this->Cell(0, 10, 'Eat Easy Street No. 7 Bekasi', 0, 1, 'C');
+        $this->Cell(0, 10, '+1234567890 | info@eateasy.com', 0, 1, 'C');
         $this->Line(10, $this->GetY(), 287, $this->GetY());
         $this->Ln(10);
+        
+        // Report Title and period - ONLY on the first page
+        if ($this->PageNo() == 1) {
+            $this->SetFont('Arial', 'B', 16);
+            $this->Cell(0, 10, 'PROFIT REPORT', 0, 1, 'C');
+            $this->SetFont('Arial', '', 12);
+            $this->Cell(0, 10, $this->periodTitle, 0, 1, 'C');
+            $this->Ln(5);
+        }
+        
+        // Add table headers on each page
+        $this->SetFont('Arial', 'B', 10);
+        $this->SetFillColor(200, 220, 255);
+        $this->Cell(70, 10, 'Product', 1, 0, 'C', true);
+        $this->Cell(30, 10, 'Sales Qty', 1, 0, 'C', true);
+        $this->Cell(45, 10, 'Sales Amount', 1, 0, 'C', true);
+        $this->Cell(30, 10, 'Purchase Qty', 1, 0, 'C', true);
+        $this->Cell(45, 10, 'Purchase Amount', 1, 0, 'C', true);
+        $this->Cell(45, 10, 'Profit', 1, 1, 'C', true);
+        
+        // Reset font for table content
+        $this->SetFont('Arial', '', 9);
     }
 
     // Page footer
@@ -41,6 +63,84 @@ class PDF extends \FPDF
         $this->SetFont('Arial', 'I', 8);
         $this->Cell(0, 10, 'Page ' . $this->PageNo() . ' of {nb}', 0, 0, 'C');
         $this->Cell(0, 10, 'Generated on: ' . date('Y-m-d H:i:s'), 0, 0, 'R');
+    }
+    
+    // Calculate height needed for a MultiCell
+    function GetMultiCellHeight($w, $h, $txt) {
+        // Store starting position
+        $startX = $this->GetX();
+        $startY = $this->GetY();
+        
+        // Output the text to calculate height
+        $this->MultiCell($w, $h, $txt);
+        
+        // Get the height
+        $height = $this->GetY() - $startY;
+        
+        // Reset position
+        $this->SetXY($startX, $startY);
+        
+        return $height;
+    }
+    
+    // Function to display row data with multi-line support
+    function RowMultiLine($data, $heights = []) {
+        // Column widths
+        $widths = [70, 30, 45, 30, 45, 45]; // Same as the col_widths in the original PDF class
+        
+        // Save initial Y position
+        $startY = $this->GetY();
+        
+        // Calculate maximum height needed for all cells
+        $maxHeight = 0;
+        
+        // First, calculate the maximum height needed
+        for ($i = 0; $i < count($data); $i++) {
+            // Use a temporary PDF object to calculate height without drawing
+            $tempPDF = new PDF('L', 'mm', 'A4');
+            $tempPDF->AddPage();
+            $tempPDF->SetFont($this->FontFamily, $this->FontStyle, $this->FontSizePt);
+            
+            // Calculate how much height this content would need
+            $startTempY = $tempPDF->GetY();
+            $tempPDF->MultiCell($widths[$i], isset($heights[$i]) ? $heights[$i] : 5, $data[$i], 0);
+            $cellHeight = $tempPDF->GetY() - $startTempY;
+            
+            // Track the maximum height
+            $maxHeight = max($maxHeight, $cellHeight);
+        }
+        
+        // Add a little padding
+        $maxHeight += 2;
+        
+        // Check if we need a page break
+        if ($startY + $maxHeight > $this->PageBreakTrigger) {
+            $this->AddPage('L');
+            $startY = $this->GetY();
+        }
+        
+        // Now draw all cells with the same height
+        $currX = $this->lMargin;
+        
+        for ($i = 0; $i < count($data); $i++) {
+            // Position at the beginning of the cell
+            $this->SetXY($currX, $startY);
+            
+            // Draw a cell with the calculated maximum height
+            $this->Cell($widths[$i], $maxHeight, '', 1, 0);
+            
+            // Position for the text (add a small margin)
+            $this->SetXY($currX + 1, $startY + 1);
+            
+            // Print the content
+            $this->MultiCell($widths[$i] - 2, isset($heights[$i]) ? $heights[$i] : 5, $data[$i], 0);
+            
+            // Move to the next cell position
+            $currX += $widths[$i];
+        }
+        
+        // Move to the next row
+        $this->SetY($startY + $maxHeight);
     }
     
     // Better table function for multi-line cells
@@ -154,8 +254,6 @@ class PDF extends \FPDF
         $this->x = $this->lMargin;
     }
 }
-
-
 
 class ProfitReportController extends Controller
 {
@@ -392,30 +490,14 @@ class ProfitReportController extends Controller
         
         // Generate PDF
         $pdf = new PDF('L', 'mm', 'A4');
+        
+        // Set the period title before adding any page
         $pdf->periodTitle = $periodTitle;
+        
         $pdf->AliasNbPages(); // For total page numbers
         $pdf->SetAutoPageBreak(true, 15);
         $pdf->AddPage();
         
-        // Override header for profit report
-        $pdf->SetFont('Arial', 'B', 16);
-        $pdf->Cell(0, 10, 'PROFIT REPORT', 0, 1, 'C');
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->Cell(0, 10, $pdf->periodTitle, 0, 1, 'C');
-        $pdf->SetFont('Arial', 'I', 10);
-        $pdf->Ln(5);
-        
-        // Table header
-        $pdf->SetFont('Arial', 'B', 10);
-        $pdf->SetFillColor(200, 220, 255);
-        $pdf->Cell(70, 10, 'Product', 1, 0, 'C', true);
-        $pdf->Cell(30, 10, 'Sales Qty', 1, 0, 'C', true);
-        $pdf->Cell(45, 10, 'Sales Amount', 1, 0, 'C', true);
-        $pdf->Cell(30, 10, 'Purchase Qty', 1, 0, 'C', true);
-        $pdf->Cell(45, 10, 'Purchase Amount', 1, 0, 'C', true);
-        $pdf->Cell(45, 10, 'Profit', 1, 1, 'C', true);
-        
-        // Table data
         $pdf->SetFont('Arial', '', 9);
         
         foreach ($profitData as $item) {
@@ -428,18 +510,13 @@ class ProfitReportController extends Controller
                 number_format($item['profit'], 0, ',', '.') . " IDR"
             ];
             
-            $pdf->Cell(70, 10, $rowData[0], 1, 0, 'L');
-            $pdf->Cell(30, 10, $rowData[1], 1, 0, 'C');
-            $pdf->Cell(45, 10, $rowData[2], 1, 0, 'R');
-            $pdf->Cell(30, 10, $rowData[3], 1, 0, 'C');
-            $pdf->Cell(45, 10, $rowData[4], 1, 0, 'R');
-            $pdf->Cell(45, 10, $rowData[5], 1, 1, 'R');
+            // Use the RowMultiLine method for better formatting
+            $pdf->RowMultiLine($rowData);
         }
         
         // Display totals
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(70, 10, 'TOTAL', 1, 0, 'L');
-        $pdf->Cell(30, 10, '', 1, 0, 'C');
+        $pdf->Cell(100, 10, 'TOTAL', 1, 0, 'L');
         $pdf->Cell(45, 10, number_format($totalSales, 0, ',', '.') . " IDR", 1, 0, 'R');
         $pdf->Cell(30, 10, '', 1, 0, 'C');
         $pdf->Cell(45, 10, number_format($totalPurchases, 0, ',', '.') . " IDR", 1, 0, 'R');
