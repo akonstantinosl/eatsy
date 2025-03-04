@@ -25,9 +25,9 @@ app.appTimezone = 'Asia/Jakarta'
 # DATABASE
 #--------------------------------------------------------------------
 database.default.hostname = localhost
-database.default.database = eatsy
-database.default.username = root
-database.default.password = 
+database.default.database = eatsyprod
+database.default.username = egaldragon
+database.default.password = iskander8884
 database.default.DBDriver = MySQLi
 database.default.DBPrefix = ''
 database.default.port = 3306
