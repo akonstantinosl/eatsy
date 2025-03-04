@@ -32,7 +32,9 @@ class AuthController extends BaseController
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
         
-        $user = $this->userModel->where('user_name', $username)->first();
+        $user = $this->userModel->where('user_name', $username)
+                               ->where('user_status', 'active')
+                               ->first();
         
         if ($user && password_verify($password, $user['user_password'])) {
             $sessionData = [
@@ -50,7 +52,16 @@ class AuthController extends BaseController
                 return redirect()->to(base_url('staff/dashboard'));
             }
         } else {
-            session()->setFlashdata('error', 'Username atau Password salah');
+            $inactiveUser = $this->userModel->where('user_name', $username)
+                                            ->where('user_status !=', 'active')
+                                            ->first();
+            
+            if ($inactiveUser) {
+                session()->setFlashdata('error', 'account_inactive');
+            } else {
+                session()->setFlashdata('error', 'invalid_credentials');
+            }
+            
             return redirect()->to(base_url('login'));
         }
     }

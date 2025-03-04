@@ -22,17 +22,43 @@ class ProductController extends BaseController
 
     public function index()
     {
-        // Get all active products with related category and supplier
+        // Set pagination configuration
+        $pager = \Config\Services::pager();
+        
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Set items per page
+        $perPage = 10;
+        
+        // Get total count of active products
+        $totalProducts = $this->productModel
+                        ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
+                        ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
+                        ->where('product_status', 'active')
+                        ->countAllResults();
+        
+        // Get paginated products with related category and supplier
         $products = $this->productModel
                     ->select('products.product_id, products.product_name, products.purchase_price, products.selling_price, products.product_stock, 
-                             product_categories.product_category_name, suppliers.supplier_name')
+                            product_categories.product_category_name, suppliers.supplier_name')
                     ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
                     ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
                     ->where('product_status', 'active') // Only get active products
-                    ->findAll();
-
-        // Pass products data to the view
-        return view('admin/products/products_index', ['products' => $products]);
+                    ->limit($perPage, ($page - 1) * $perPage)
+                    ->find();
+        
+        // Create pager links
+        $pager->setPath('admin/products');
+        
+        // Pass products data and pager to the view
+        return view('admin/products/products_index', [
+            'products' => $products,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalProducts
+        ]);
     }
 
     public function create()

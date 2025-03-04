@@ -14,16 +14,19 @@ class ProductCategoriesSeeder extends Seeder
                 'product_category_id'   => 'CAT' . str_pad('1', 6, '0', STR_PAD_LEFT),
                 'product_category_name' => 'Makanan Ringan',
                 'created_at'            => date('Y-m-d H:i:s'),
+                'updated_at'            => date('Y-m-d H:i:s'),
             ],
             [
                 'product_category_id'   => 'CAT' . str_pad('2', 6, '0', STR_PAD_LEFT),
                 'product_category_name' => 'Makanan Instan',
                 'created_at'            => date('Y-m-d H:i:s'),
+                'updated_at'            => date('Y-m-d H:i:s'),
             ],
             [
                 'product_category_id'   => 'CAT' . str_pad('3', 6, '0', STR_PAD_LEFT),
                 'product_category_name' => 'Makanan Beku',
                 'created_at'            => date('Y-m-d H:i:s'),
+                'updated_at'            => date('Y-m-d H:i:s'),
             ],
             
             // Kategori Minuman
@@ -31,16 +34,19 @@ class ProductCategoriesSeeder extends Seeder
                 'product_category_id'   => 'CAT' . str_pad('4', 6, '0', STR_PAD_LEFT),
                 'product_category_name' => 'Minuman Soda',
                 'created_at'            => date('Y-m-d H:i:s'),
+                'updated_at'            => date('Y-m-d H:i:s'),
             ],
             [
                 'product_category_id'   => 'CAT' . str_pad('5', 6, '0', STR_PAD_LEFT),
                 'product_category_name' => 'Minuman Teh',
                 'created_at'            => date('Y-m-d H:i:s'),
+                'updated_at'            => date('Y-m-d H:i:s'),
             ],
             [
                 'product_category_id'   => 'CAT' . str_pad('6', 6, '0', STR_PAD_LEFT),
                 'product_category_name' => 'Minuman Jus',
                 'created_at'            => date('Y-m-d H:i:s'),
+                'updated_at'            => date('Y-m-d H:i:s'),
             ]
         ];
 

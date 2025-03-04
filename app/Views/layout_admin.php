@@ -150,7 +150,7 @@
                             </li>
                             <li class="nav-item">
                                 <a href="<?= base_url('admin/reports/profit') ?>" class="nav-link">
-                                    <i class="fas fa-cash-register nav-icon"></i>
+                                    <i class="fas fa-money-bill-wave nav-icon"></i>
                                     <p>Profit Reports</p>
                                 </a>
                             </li>

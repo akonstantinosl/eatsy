@@ -17,11 +17,26 @@ class SaleController extends Controller
         $userModel = new UserModel();
         $customerModel = new CustomerModel();
 
-        // Get all sales data
-        $data['sales'] = $saleModel->findAll();
+        // Set pagination configuration
+        $pager = \Config\Services::pager();
+        
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Set items per page
+        $perPage = 10;
+        
+        // Get total count of sales
+        $totalSales = $saleModel->countAllResults();
+        
+        // Get paginated sales
+        $sales = $saleModel
+               ->orderBy('created_at', 'DESC')
+               ->limit($perPage, ($page - 1) * $perPage)
+               ->findAll();
 
         // Get user and customer information for each sale
-        foreach ($data['sales'] as &$sale) {
+        foreach ($sales as &$sale) {
             // Get user fullname based on user_id
             $user = $userModel->find($sale['user_id']);
             $sale['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
@@ -32,8 +47,17 @@ class SaleController extends Controller
             $sale['customer_phone'] = $customer ? $customer['customer_phone'] : 'No Phone';
         }
 
-        // Display view with sales data
-        return view('sales/sales_index', $data);
+        // Create pager links
+        $pager->setPath('sales');
+        
+        // Pass data to the view
+        return view('sales/sales_index', [
+            'sales' => $sales,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalSales
+        ]);
     }
 
     public function details($saleId)

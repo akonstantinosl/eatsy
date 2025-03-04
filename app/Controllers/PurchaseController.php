@@ -17,11 +17,26 @@ class PurchaseController extends Controller
         $userModel = new UserModel();
         $supplierModel = new SupplierModel();
 
-        // Mendapatkan semua data purchase
-        $data['purchases'] = $purchaseModel->findAll();
+        // Set pagination configuration
+        $pager = \Config\Services::pager();
+        
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Set items per page
+        $perPage = 10;
+        
+        // Get total count of purchases
+        $totalPurchases = $purchaseModel->countAllResults();
+        
+        // Get paginated purchases
+        $purchases = $purchaseModel
+                   ->orderBy('created_at', 'DESC')
+                   ->limit($perPage, ($page - 1) * $perPage)
+                   ->findAll();
 
         // Mendapatkan nama supplier, nama user dan kontak (supplier_phone) untuk setiap purchase
-        foreach ($data['purchases'] as &$purchase) {
+        foreach ($purchases as &$purchase) {
             // Ambil nama user berdasarkan user_id
             $user = $userModel->find($purchase['user_id']);
             $purchase['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
@@ -32,8 +47,17 @@ class PurchaseController extends Controller
             $purchase['supplier_phone'] = $supplier ? $supplier['supplier_phone'] : 'No Phone';
         }
 
-        // Menampilkan view dengan data pembelian
-        return view('admin/purchases/purchases_index', $data);
+        // Create pager links
+        $pager->setPath('admin/purchases');
+        
+        // Pass data to the view
+        return view('admin/purchases/purchases_index', [
+            'purchases' => $purchases,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalPurchases
+        ]);
     }
 
     public function details($purchaseId)

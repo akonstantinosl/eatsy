@@ -20,10 +20,37 @@ class UserController extends BaseController
             return redirect()->to('login');
         }
         
-        // Get only active users
-        $data['users'] = $this->userModel->where('user_status', 'active')->findAll();
+        // Set pagination configuration
+        $pager = \Config\Services::pager();
         
-        return view('admin/users/users_index', $data);
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Set items per page
+        $perPage = 10;
+        
+        // Get total count of active users
+        $totalUsers = $this->userModel
+                     ->where('user_status', 'active')
+                     ->countAllResults();
+        
+        // Get paginated users
+        $users = $this->userModel
+                ->where('user_status', 'active')
+                ->limit($perPage, ($page - 1) * $perPage)
+                ->find();
+        
+        // Create pager links
+        $pager->setPath('admin/users');
+        
+        // Pass users data and pager to the view
+        return view('admin/users/users_index', [
+            'users' => $users,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalUsers
+        ]);
     }
     
     

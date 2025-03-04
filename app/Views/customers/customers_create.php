@@ -28,7 +28,7 @@
     
         <form action="/customers/store" method="post">
             <div class="form-group">
-                <label for="customer_name">customer Name</label>
+                <label for="customer_name">Customer Name</label>
                 <input type="text" class="form-control" id="customer_name" name="customer_name" value="<?= old('customer_name') ?>" required>
             </div>
 

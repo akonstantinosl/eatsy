@@ -20,10 +20,37 @@ class SupplierController extends BaseController
             return redirect()->to('login');
         }
 
-        // Get active suppliers
-        $data['suppliers'] = $this->supplierModel->where('supplier_status', 'active')->findAll();
-
-        return view('admin/suppliers/suppliers_index', $data);
+        // Set pagination configuration
+        $pager = \Config\Services::pager();
+        
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Set items per page
+        $perPage = 10;
+        
+        // Get total count of active suppliers
+        $totalSuppliers = $this->supplierModel
+                         ->where('supplier_status', 'active')
+                         ->countAllResults();
+        
+        // Get paginated suppliers
+        $suppliers = $this->supplierModel
+                   ->where('supplier_status', 'active')
+                   ->limit($perPage, ($page - 1) * $perPage)
+                   ->find();
+        
+        // Create pager links
+        $pager->setPath('admin/suppliers');
+        
+        // Pass suppliers data and pager to the view
+        return view('admin/suppliers/suppliers_index', [
+            'suppliers' => $suppliers,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalSuppliers
+        ]);
     }
 
     public function create()

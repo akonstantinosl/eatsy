@@ -16,11 +16,37 @@ class CustomerController extends BaseController
 
     public function index()
     {
-
-        // Get active customers
-        $data['customers'] = $this->customerModel->where('customer_status', 'active')->findAll();
-
-        return view('/customers/customers_index', $data);
+        // Set pagination configuration
+        $pager = \Config\Services::pager();
+        
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Set items per page
+        $perPage = 10;
+        
+        // Get total count of active customers
+        $totalCustomers = $this->customerModel
+                         ->where('customer_status', 'active')
+                         ->countAllResults();
+        
+        // Get paginated customers
+        $customers = $this->customerModel
+                   ->where('customer_status', 'active')
+                   ->limit($perPage, ($page - 1) * $perPage)
+                   ->find();
+        
+        // Create pager links
+        $pager->setPath('customers');
+        
+        // Pass customers data and pager to the view
+        return view('/customers/customers_index', [
+            'customers' => $customers,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalCustomers
+        ]);
     }
 
     public function create()

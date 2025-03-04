@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'EatsyMart' ?></title>
+    <title><?= $title ?? 'Eatsy' ?></title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
@@ -31,7 +31,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">EatsyMart</a>
+            <a class="navbar-brand" href="/">Eatsy</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -65,18 +65,18 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h4>EatsyMart</h4>
+                    <h4>Eatsy</h4>
                     <p>Sistem manajemen ritel yang efisien dan mudah digunakan.</p>
                 </div>
                 <div class="col-md-6">
                     <h4>Contact Us</h4>
-                    <p>Email: info@eatsymart.com</p>
+                    <p>Email: info@eateasy.com</p>
                     <p>Phone: +123-456-7890</p>
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="col-md-12 text-center">
-                    <p>&copy; <?= date('Y') ?> EatsyMart. All rights reserved.</p>
+                    <p>&copy; <?= date('Y') ?> Eatsy. All rights reserved.</p>
                 </div>
             </div>
         </div>
