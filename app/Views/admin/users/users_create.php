@@ -17,30 +17,55 @@
                 <div class="col-md-9">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" value="<?= old('username') ?>" required>
+                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" id="username" name="username" value="<?= old('username') ?>" required>
+                        <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
+                            <div class="invalid-feedback">
+                                <?= session('errors')['username'] ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" id="password" name="password" required>
+                        <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
+                            <div class="invalid-feedback">
+                                <?= session('errors')['password'] ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
-                        <input type="text" class="form-control" id="fullname" name="fullname" value="<?= old('fullname') ?>" required>
+                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" id="fullname" name="fullname" value="<?= old('fullname') ?>" required>
+                        <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
+                            <div class="invalid-feedback">
+                                <?= session('errors')['fullname'] ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="<?= old('phone') ?>">
+                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" id="phone" name="phone" value="<?= old('phone') ?>">
+                        <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
+                            <div class="invalid-feedback">
+                                <?= session('errors')['phone'] ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="role">Role</label>
-                        <select class="form-control" id="role" name="role" required>
+                        <select class="form-control <?= session()->has('errors') && isset(session('errors')['role']) ? 'is-invalid' : '' ?>" id="role" name="role" required>
                             <option value="admin" <?= old('role') == 'admin' ? 'selected' : '' ?>>Admin</option>
                             <option value="staff" <?= old('role') == 'staff' ? 'selected' : '' ?>>Staff</option>
                         </select>
+                        <?php if (session()->has('errors') && isset(session('errors')['role'])): ?>
+                            <div class="invalid-feedback">
+                                <?= session('errors')['role'] ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -52,8 +77,13 @@
                                 alt="Preview" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;">
                         </div>
                         <div class="custom-file mt-3">
-                            <input type="file" class="custom-file-input" id="photo" name="photo" accept="image/*" onchange="previewImage()">
+                            <input type="file" class="custom-file-input <?= session()->has('errors') && isset(session('errors')['photo']) ? 'is-invalid' : '' ?>" id="photo" name="photo" accept="image/*" onchange="previewImage()">
                             <label class="custom-file-label" for="photo">Choose file</label>
+                            <?php if (session()->has('errors') && isset(session('errors')['photo'])): ?>
+                                <div class="invalid-feedback">
+                                    <?= session('errors')['photo'] ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                         <small class="text-muted">Leave blank to use default photo</small>
                     </div>
@@ -107,14 +137,14 @@
         
         // Display SweetAlert for validation errors if they exist
         <?php if (session()->has('errors')): ?>
-            let errorMessage = '';
-            <?php foreach (session('errors') as $error): ?>
-                errorMessage += '<?= $error ?><br>';
+            let errorMessages = [];
+            <?php foreach (session('errors') as $field => $error): ?>
+                errorMessages.push('<?= esc($error) ?>');
             <?php endforeach; ?>
             
             Swal.fire({
-                title: 'Error!',
-                html: errorMessage,
+                title: 'Validation Error',
+                html: errorMessages.join('<br>'),
                 icon: 'error',
                 confirmButtonColor: '#3085d6',
                 confirmButtonText: 'OK'

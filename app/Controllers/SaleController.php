@@ -23,17 +23,46 @@ class SaleController extends Controller
         // Get current page from the request, default to 1 if not set
         $page = $this->request->getGet('page') ?? 1;
         
-        // Set items per page
-        $perPage = 10;
+        // Get entries per page (default to 10 if not set)
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Get total count of sales
-        $totalSales = $saleModel->countAllResults();
+        // Validasi perPage hanya boleh 10, 25, atau 50
+        if (!in_array($perPage, [10, 25, 50])) {
+            $perPage = 10;
+        }
         
-        // Get paginated sales
-        $sales = $saleModel
-               ->orderBy('created_at', 'DESC')
-               ->limit($perPage, ($page - 1) * $perPage)
-               ->findAll();
+        // Get status filter (if any)
+        $statusFilter = $this->request->getGet('status');
+        
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
+        
+        // Base query
+        $query = $saleModel;
+        
+        // Apply status filter if set
+        if ($statusFilter && in_array($statusFilter, ['pending', 'processing', 'completed', 'cancelled'])) {
+            $query = $query->where('transaction_status', $statusFilter);
+        }
+        
+        // Prepare to join tables for search
+        if ($search) {
+            $query = $query->join('users', 'sales.user_id = users.user_id')
+                          ->join('customers', 'sales.customer_id = customers.customer_id')
+                          ->groupStart()
+                            ->like('users.user_fullname', $search) // Seller search
+                            ->orLike('customers.customer_name', $search) // Customer search
+                            ->orLike('customers.customer_phone', $search) // Contact search
+                          ->groupEnd();
+        }
+        
+        // Get total count based on filters
+        $totalSales = $query->countAllResults(false);
+        
+        // Get paginated sales based on filters
+        $sales = $query->orderBy('sales.created_at', 'DESC')
+                    ->limit($perPage, ($page - 1) * $perPage)
+                    ->findAll();
 
         // Get user and customer information for each sale
         foreach ($sales as &$sale) {
@@ -56,7 +85,9 @@ class SaleController extends Controller
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalSales
+            'total' => $totalSales,
+            'statusFilter' => $statusFilter,
+            'search' => $search
         ]);
     }
 

@@ -28,25 +28,49 @@ class ProductController extends BaseController
         // Get current page from the request, default to 1 if not set
         $page = $this->request->getGet('page') ?? 1;
         
-        // Set items per page
-        $perPage = 10;
+        // Get entries per page (default to 10 if not set)
+        // Cast to integer to avoid type errors in the limit() method
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Get total count of active products
-        $totalProducts = $this->productModel
-                        ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
-                        ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
-                        ->where('product_status', 'active')
-                        ->countAllResults();
+        // Get category filter (if any)
+        $categoryFilter = $this->request->getGet('category');
         
-        // Get paginated products with related category and supplier
-        $products = $this->productModel
-                    ->select('products.product_id, products.product_name, products.purchase_price, products.selling_price, products.product_stock, 
-                            product_categories.product_category_name, suppliers.supplier_name')
-                    ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
-                    ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
-                    ->where('product_status', 'active') // Only get active products
-                    ->limit($perPage, ($page - 1) * $perPage)
-                    ->find();
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
+        
+        // Base query with joins
+        $query = $this->productModel
+                ->select('products.product_id, products.product_name, products.purchase_price, products.selling_price, 
+                        products.product_stock, product_categories.product_category_name, 
+                        product_categories.product_category_id, suppliers.supplier_name, suppliers.supplier_id')
+                ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
+                ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
+                ->where('product_status', 'active');
+        
+        // Apply category filter if set
+        if ($categoryFilter) {
+            $query = $query->where('products.product_category_id', $categoryFilter);
+        }
+        
+        // Apply search filter if set
+        if ($search) {
+            $query = $query->groupStart()
+                    ->like('products.product_name', $search)
+                    ->orLike('product_categories.product_category_name', $search)
+                    ->orLike('suppliers.supplier_name', $search)
+                    ->groupEnd();
+        }
+        
+        // Get total count based on filters
+        $totalProducts = $query->countAllResults(false);
+        
+        // Get paginated products based on filters
+        $products = $query
+                ->limit($perPage, ($page - 1) * $perPage)
+                ->find();
+        
+        // Get all product categories for the filter dropdown
+        $categories = $this->categoryModel->findAll();
         
         // Create pager links
         $pager->setPath('/products');
@@ -54,10 +78,13 @@ class ProductController extends BaseController
         // Pass products data and pager to the view
         return view('/products/products_index', [
             'products' => $products,
+            'categories' => $categories,
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalProducts
+            'total' => $totalProducts,
+            'categoryFilter' => $categoryFilter,
+            'search' => $search
         ]);
     }
 
@@ -188,7 +215,7 @@ class ProductController extends BaseController
 
         $this->productModel->update($productId, $data);
 
-        session()->setFlashdata('success', 'Product successfully deactivated');
+        session()->setFlashdata('success', 'Product successfully Inactivated');
         return redirect()->to('/products');
     }
 }

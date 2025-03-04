@@ -5,7 +5,7 @@
     <div class="card-header">
         <h3 class="card-title">Edit Product</h3>
         <div class="card-tools">
-            <a href="/admin/products" class="btn btn-sm" style="background-color: #5a6268; color: white;">
+            <a href="/products" class="btn btn-sm" style="background-color: #5a6268; color: white;">
                 <i class="fas fa-arrow-left"></i> Back to Products
             </a>
         </div>
@@ -21,7 +21,7 @@
             </div>
         <?php endif; ?>
 
-        <form action="/admin/products/update/<?= $product['product_id'] ?>" method="post">
+        <form action="/products/update/<?= $product['product_id'] ?>" method="post">
             <div class="form-group">
                 <label for="product_name">Product Name</label>
                 <input type="text" class="form-control" id="product_name" name="product_name" value="<?= old('product_name', $product['product_name']) ?>" required>
@@ -60,7 +60,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary mr-2">Update</button>
-            <a href="/admin/products" class="btn btn-default">Cancel</a>
+            <a href="/products" class="btn btn-default">Cancel</a>
         </form>
     </div>
 </div>

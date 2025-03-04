@@ -105,13 +105,25 @@ class UserController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Check if phone number exists for active users (ignoring inactive ones)
-        $existingUser = $this->userModel->where('user_phone', $this->request->getPost('phone'))
-                                        ->where('user_status', 'active')
-                                        ->first();
+        // Periksa apakah username sudah ada (untuk user yang aktif)
+        $existingUsername = $this->userModel->where('user_name', $this->request->getPost('username'))
+                                           ->where('user_status', 'active')
+                                           ->first();
+                                        
+        if ($existingUsername) {
+            return redirect()->back()->withInput()->with('errors', ['username' => 'Username is already in use by an active user.']);
+        }
 
-        if ($existingUser) {
-            return redirect()->back()->withInput()->with('errors', ['phone' => 'Phone number is already in use by an active user.']);
+        // Periksa apakah nomor telepon sudah ada (untuk user yang aktif)
+        $phone = $this->request->getPost('phone');
+        if (!empty($phone)) {
+            $existingPhone = $this->userModel->where('user_phone', $phone)
+                                           ->where('user_status', 'active')
+                                           ->first();
+                                        
+            if ($existingPhone) {
+                return redirect()->back()->withInput()->with('errors', ['phone' => 'Phone number is already in use by an active user.']);
+            }
         }
 
         // Generate user ID
@@ -196,19 +208,33 @@ class UserController extends BaseController
             'status' => 'required|in_list[active,inactive]'
         ];
 
-        // Check if phone number exists for active users (ignoring inactive ones)
-        if ($this->request->getPost('phone') != $user['user_phone']) {
-            $existingUser = $this->userModel->where('user_phone', $this->request->getPost('phone'))
-                                            ->where('user_status', 'active')
-                                            ->first();
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
 
-            if ($existingUser) {
-                return redirect()->back()->withInput()->with('errors', ['phone' => 'Phone number is already in use by an active user.']);
+        // Periksa apakah username sudah ada (untuk user lain yang aktif)
+        if ($this->request->getPost('username') !== $user['user_name']) {
+            $existingUsername = $this->userModel->where('user_name', $this->request->getPost('username'))
+                                               ->where('user_status', 'active')
+                                               ->where('user_id !=', $id)
+                                               ->first();
+                                            
+            if ($existingUsername) {
+                return redirect()->back()->withInput()->with('errors', ['username' => 'Username is already in use by another active user.']);
             }
         }
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        // Periksa apakah nomor telepon sudah ada (untuk user lain yang aktif)
+        $phone = $this->request->getPost('phone');
+        if (!empty($phone) && $phone !== $user['user_phone']) {
+            $existingPhone = $this->userModel->where('user_phone', $phone)
+                                           ->where('user_status', 'active')
+                                           ->where('user_id !=', $id)
+                                           ->first();
+                                        
+            if ($existingPhone) {
+                return redirect()->back()->withInput()->with('errors', ['phone' => 'Phone number is already in use by another active user.']);
+            }
         }
 
         $role = $this->request->getPost('role');

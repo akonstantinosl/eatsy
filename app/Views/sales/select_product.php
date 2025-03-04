@@ -55,7 +55,7 @@
                                     <input type="number" name="products[0][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="products[0][price_per_unit]" class="form-control price-per-unit" min="0" value="0" required>
+                                    <span class="price-per-unit">0</span>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-danger btn-sm remove-product">Remove</button>
@@ -113,8 +113,8 @@
         // Update available stock display
         row.querySelector('.available-stock').textContent = availableStock;
         
-        // Update price per unit if available from data attribute
-        row.querySelector('.price-per-unit').value = sellingPrice;
+        // Update price per unit (now a span, not an input)
+        row.querySelector('.price-per-unit').textContent = sellingPrice;
         
         // Update quantity limits based on available stock
         const quantityInput = row.querySelector('.quantity-sold');
@@ -171,7 +171,7 @@
                 <input type="number" name="products[${newIndex}][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
             </td>
             <td>
-                <input type="number" name="products[${newIndex}][price_per_unit]" class="form-control price-per-unit" min="0" value="0" required>
+                <span class="price-per-unit">0</span>
             </td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm remove-product">Remove</button>
