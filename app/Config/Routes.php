@@ -40,14 +40,14 @@ $routes->get('login', 'AuthController::loginPage');
 $routes->post('login', 'AuthController::login');
 $routes->get('logout', 'AuthController::logout');
 
-// Customers management
-$routes->group('customers', function($routes) {
-    $routes->get('', 'CustomerController::index');
-    $routes->get('create', 'CustomerController::create');
-    $routes->post('store', 'CustomerController::store');
-    $routes->get('edit/(:segment)', 'CustomerController::edit/$1');
-    $routes->post('update/(:segment)', 'CustomerController::update/$1');
-    $routes->get('delete/(:segment)', 'CustomerController::delete/$1');
+// Products management
+$routes->group('products', function($routes) {
+    $routes->get('', 'ProductController::index');
+    $routes->get('create', 'ProductController::create');
+    $routes->post('store', 'ProductController::store');
+    $routes->get('edit/(:segment)', 'ProductController::edit/$1'); 
+    $routes->post('update/(:segment)', 'ProductController::update/$1'); 
+    $routes->get('delete/(:segment)', 'ProductController::delete/$1');
 });
 
 // Sales management
@@ -61,6 +61,16 @@ $routes->group('sales', function($routes) {
     $routes->get('update-status/(:segment)/(:segment)', 'SaleController::updateStatus/$1/$2');
 });
 
+// Customers management
+$routes->group('customers', function($routes) {
+    $routes->get('', 'CustomerController::index');
+    $routes->get('create', 'CustomerController::create');
+    $routes->post('store', 'CustomerController::store');
+    $routes->get('edit/(:segment)', 'CustomerController::edit/$1');
+    $routes->post('update/(:segment)', 'CustomerController::update/$1');
+    $routes->get('delete/(:segment)', 'CustomerController::delete/$1');
+});
+
 // Admin routes group
 $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('dashboard', 'HomeController::adminDashboard');
@@ -72,14 +82,6 @@ $routes->group('admin', ['filter' => 'admin'], function($routes) {
     $routes->get('users/edit/(:segment)', 'UserController::edit/$1'); 
     $routes->post('users/update/(:segment)', 'UserController::update/$1'); 
     $routes->get('users/delete/(:segment)', 'UserController::delete/$1'); 
-
-    // Products management
-    $routes->get('products', 'ProductController::index');
-    $routes->get('products/create', 'ProductController::create');
-    $routes->post('products/store', 'ProductController::store');
-    $routes->get('products/edit/(:segment)', 'ProductController::edit/$1'); 
-    $routes->post('products/update/(:segment)', 'ProductController::update/$1'); 
-    $routes->get('products/delete/(:segment)', 'ProductController::delete/$1');
     
     // Product Categories management
     // $routes->get('products/categories', 'CategoryController::index');

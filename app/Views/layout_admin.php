@@ -84,7 +84,7 @@
                         <ul class="nav nav-treeview">
                             <!-- All Products -->
                             <li class="nav-item">
-                                <a href="/admin/products" class="nav-link <?= (current_url() == base_url('admin/products')) ? 'active' : '' ?>">
+                                <a href="/products" class="nav-link <?= (current_url() == base_url('admin/products')) ? 'active' : '' ?>">
                                     <i class="fas fa-boxes nav-icon"></i>
                                     <p>All Products</p>
                                 </a>
@@ -200,7 +200,7 @@
             <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
-                    <?php if (session()->getFlashdata('success')): ?>
+                    <!-- <?php if (session()->getFlashdata('success')): ?>
                     <div class="alert alert-success alert-dismissible">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                         <?= session()->getFlashdata('success') ?>
@@ -212,7 +212,7 @@
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                         <?= session()->getFlashdata('error') ?>
                     </div>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
                     
                     <?= $this->renderSection('content') ?>
                 </div>
@@ -234,6 +234,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <!-- Sweet Alert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Additional scripts -->
     <?= $this->renderSection('scripts') ?>
 </body>

@@ -26,17 +26,38 @@ class UserController extends BaseController
         // Get current page from the request, default to 1 if not set
         $page = $this->request->getGet('page') ?? 1;
         
-        // Set items per page
-        $perPage = 10;
+        // Get entries per page (default to 10 if not set)
+        // Cast to integer to avoid type errors in the limit() method
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Get total count of active users
-        $totalUsers = $this->userModel
-                     ->where('user_status', 'active')
-                     ->countAllResults();
+        // Get role filter (if any)
+        $roleFilter = $this->request->getGet('role');
         
-        // Get paginated users
-        $users = $this->userModel
-                ->where('user_status', 'active')
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
+        
+        // Base query
+        $query = $this->userModel->where('user_status', 'active');
+        
+        // Apply role filter if set
+        if ($roleFilter && in_array($roleFilter, ['admin', 'staff'])) {
+            $query = $query->where('user_role', $roleFilter);
+        }
+        
+        // Apply search filter if set
+        if ($search) {
+            $query = $query->groupStart()
+                    ->like('user_name', $search)
+                    ->orLike('user_fullname', $search)
+                    ->orLike('user_phone', $search)
+                    ->groupEnd();
+        }
+        
+        // Get total count based on filters
+        $totalUsers = $query->countAllResults(false);
+        
+        // Get paginated users based on filters
+        $users = $query
                 ->limit($perPage, ($page - 1) * $perPage)
                 ->find();
         
@@ -49,10 +70,11 @@ class UserController extends BaseController
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalUsers
+            'total' => $totalUsers,
+            'roleFilter' => $roleFilter,
+            'search' => $search
         ]);
     }
-    
     
     public function create()
     {
@@ -108,7 +130,10 @@ class UserController extends BaseController
 
         // Upload photo if available
         $photo = $this->request->getFile('photo');
-        $photoName = 'default.png';
+        
+        // Set default photo name based on user role
+        $role = $this->request->getPost('role');
+        $photoName = ($role === 'admin') ? 'default_admin.png' : 'default_staff.png';
 
         if ($photo && $photo->isValid() && !$photo->hasMoved()) {
             $newName = $userId . '.' . $photo->getExtension();
@@ -123,16 +148,15 @@ class UserController extends BaseController
             'user_fullname' => $this->request->getPost('fullname'),
             'user_phone' => $this->request->getPost('phone'),
             'user_photo' => $photoName,
-            'user_role' => $this->request->getPost('role'),
+            'user_role' => $role,
             'user_status' => $this->request->getPost('status'),
             'created_at' => date('Y-m-d H:i:s')
         ];
 
         $this->userModel->insert($data);
-        session()->setFlashdata('success', 'User berhasil ditambahkan');
+        session()->setFlashdata('success', 'User successfully added');
         return redirect()->to('admin/users');
     }
-
 
     public function edit($id)
     {
@@ -143,7 +167,7 @@ class UserController extends BaseController
         $data['user'] = $this->userModel->find($id);
         
         if (!$data['user']) {
-            session()->setFlashdata('error', 'User tidak ditemukan');
+            session()->setFlashdata('error', 'User not found');
             return redirect()->to('admin/users');
         }
         
@@ -159,7 +183,7 @@ class UserController extends BaseController
         $user = $this->userModel->find($id);
 
         if (!$user) {
-            session()->setFlashdata('error', 'User tidak ditemukan');
+            session()->setFlashdata('error', 'User not found');
             return redirect()->to('admin/users');
         }
 
@@ -187,11 +211,13 @@ class UserController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        $role = $this->request->getPost('role');
+        
         $data = [
             'user_name' => $this->request->getPost('username'),
             'user_fullname' => $this->request->getPost('fullname'),
             'user_phone' => $this->request->getPost('phone'),
-            'user_role' => $this->request->getPost('role'),
+            'user_role' => $role,
             'user_status' => $this->request->getPost('status'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -204,9 +230,13 @@ class UserController extends BaseController
             $data['user_photo'] = $newName;
             
             // Delete old photo if not default
-            if ($user['user_photo'] != 'default.png' && file_exists(ROOTPATH . 'public/uploads/users/' . $user['user_photo'])) {
+            if ($user['user_photo'] != 'default_admin.png' && $user['user_photo'] != 'default_staff.png' && 
+                file_exists(ROOTPATH . 'public/uploads/users/' . $user['user_photo'])) {
                 unlink(ROOTPATH . 'public/uploads/users/' . $user['user_photo']);
             }
+        } else if ($user['user_role'] != $role) {
+            // If role changed and no new photo uploaded, update to appropriate default photo
+            $data['user_photo'] = ($role === 'admin') ? 'default_admin.png' : 'default_staff.png';
         }
 
         // Update password if needed
@@ -215,42 +245,41 @@ class UserController extends BaseController
         }
 
         $this->userModel->update($id, $data);
-        session()->setFlashdata('success', 'User berhasil diperbarui');
+        session()->setFlashdata('success', 'User successfully updated');
         return redirect()->to('admin/users');
     }
     
     public function delete($id)
-{
-    if (!session()->get('logged_in') || session()->get('user_role') != 'admin') {
-        return redirect()->to('login');
-    }
+    {
+        if (!session()->get('logged_in') || session()->get('user_role') != 'admin') {
+            return redirect()->to('login');
+        }
 
-    // Find the user by their ID
-    $user = $this->userModel->find($id);
+        // Find the user by their ID
+        $user = $this->userModel->find($id);
 
-    if (!$user) {
-        session()->setFlashdata('error', 'User tidak ditemukan');
+        if (!$user) {
+            session()->setFlashdata('error', 'User not found');
+            return redirect()->to('admin/users');
+        }
+
+        // Don't allow deletion of the currently logged-in user
+        if ($user['user_id'] == session()->get('user_id')) {
+            session()->setFlashdata('error', 'Cannot inactivate the account currently in use');
+            return redirect()->to('admin/users');
+        }
+
+        // Set the user status to inactive instead of deleting the user
+        $data = [
+            'user_status' => 'inactive',
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        // Update the user's status to inactive
+        $this->userModel->update($id, $data);
+
+        // Set a success message
+        session()->setFlashdata('success', 'User successfully inactivated');
         return redirect()->to('admin/users');
     }
-
-    // Don't allow deletion of the currently logged-in user
-    if ($user['user_id'] == session()->get('user_id')) {
-        session()->setFlashdata('error', 'Tidak dapat menghapus akun yang sedang digunakan');
-        return redirect()->to('admin/users');
-    }
-
-    // Set the user status to inactive instead of deleting the user
-    $data = [
-        'user_status' => 'inactive',
-        'updated_at' => date('Y-m-d H:i:s')
-    ];
-
-    // Update the user's status to inactive
-    $this->userModel->update($id, $data);
-
-    // Set a success message
-    session()->setFlashdata('success', 'User berhasil dinonaktifkan');
-    return redirect()->to('admin/users');
-}
-
 }

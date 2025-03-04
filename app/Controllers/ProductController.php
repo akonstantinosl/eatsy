@@ -49,10 +49,10 @@ class ProductController extends BaseController
                     ->find();
         
         // Create pager links
-        $pager->setPath('admin/products');
+        $pager->setPath('/products');
         
         // Pass products data and pager to the view
-        return view('admin/products/products_index', [
+        return view('/products/products_index', [
             'products' => $products,
             'pager' => $pager,
             'currentPage' => $page,
@@ -70,7 +70,7 @@ class ProductController extends BaseController
         $suppliers = $this->supplierModel->where('supplier_status', 'active')->findAll();
 
         // Pass categories and suppliers to the view
-        return view('admin/products/products_create', [
+        return view('/products/products_create', [
             'categories' => $categories,
             'suppliers' => $suppliers
         ]);
@@ -116,7 +116,7 @@ class ProductController extends BaseController
         $this->productModel->insert($data);
 
         // Redirect back to the product list with success message
-        return redirect()->to('/admin/products')->with('success', 'Product added successfully.');
+        return redirect()->to('/products')->with('success', 'Product added successfully.');
     }
 
     public function edit($productId)
@@ -135,7 +135,7 @@ class ProductController extends BaseController
         $suppliers = $this->supplierModel->where('supplier_status', 'active')->findAll();
 
         // Pass product data and category/supplier list to the view
-        return view('admin/products/products_edit', [
+        return view('/products/products_edit', [
             'product' => $product,
             'categories' => $categories,
             'suppliers' => $suppliers
@@ -167,7 +167,7 @@ class ProductController extends BaseController
         $this->productModel->update($productId, $data);
 
         // Redirect back to the product list
-        return redirect()->to('/admin/products')->with('success', 'Product updated successfully.');
+        return redirect()->to('/products')->with('success', 'Product updated successfully.');
     }
 
     // Delete function to set the product status as inactive instead of deleting it
@@ -177,7 +177,7 @@ class ProductController extends BaseController
         $product = $this->productModel->find($productId);
 
         if (!$product) {
-            return redirect()->to('/admin/products')->with('error', 'Product not found');
+            return redirect()->to('/products')->with('error', 'Product not found');
         }
 
         // Set the product status to inactive instead of deleting it
@@ -189,6 +189,6 @@ class ProductController extends BaseController
         $this->productModel->update($productId, $data);
 
         session()->setFlashdata('success', 'Product successfully deactivated');
-        return redirect()->to('/admin/products');
+        return redirect()->to('/products');
     }
 }
