@@ -319,11 +319,31 @@ class PurchaseController extends Controller
         $db = \Config\Database::connect();
         $db->transStart();
         
-        // Update the purchase status
-        $purchaseModel->update($purchaseId, [
+        // Prepare update data
+        $updateData = [
             'order_status' => $newStatus,
             'updated_at' => date('Y-m-d H:i:s')
-        ]);
+        ];
+        
+        // If cancelling, add the cancel notes
+        if ($newStatus === 'cancelled') {
+            // Check for cancel notes from either POST or GET
+            $cancelNotes = $this->request->getPost('cancel_notes');
+            if (empty($cancelNotes)) {
+                $cancelNotes = $this->request->getGet('cancel_notes');
+            }
+            
+            // If cancel notes provided, append them to existing notes or set them as notes
+            if (!empty($cancelNotes)) {
+                $existingNotes = $purchase['purchase_notes'] ?? '';
+                $updateData['purchase_notes'] = $existingNotes 
+                    ? $existingNotes . "\n\n" . $cancelNotes
+                    : $cancelNotes;
+            }
+        }
+        
+        // Update the purchase status
+        $purchaseModel->update($purchaseId, $updateData);
         
         // If status is completed, update product stock and price
         if ($newStatus === 'completed') {

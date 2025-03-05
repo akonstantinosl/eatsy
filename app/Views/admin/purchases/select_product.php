@@ -66,10 +66,10 @@
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="products[0][price_per_box]" class="form-control price-per-box" min="0" value="0" required>
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">IDR</span>
                                         </div>
+                                        <input type="number" name="products[0][price_per_box]" class="form-control price-per-box" min="0" value="0" required>
                                     </div>
                                 </td>
                                 <td class="text-right">
@@ -117,7 +117,7 @@
                     <a href="/admin/purchases/supplier" class="btn btn-secondary mr-2">
                         <i class="fas fa-truck mr-1"></i> Change Supplier
                     </a>
-                    <a href="/admin/purchases" class="btn btn-default">
+                    <a href="/admin/purchases" class="btn btn-default" id="cancelPurchaseBtn">
                         <i class="fas fa-times mr-1"></i> Cancel
                     </a>
                 </div>
@@ -254,7 +254,7 @@
                 </td>
                 <td class="text-right">
                     <div class="price-display">
-                        IDR <span class="total-price">0</span>
+                        <span class="total-price">0</span> IDR
                     </div>
                 </td>
                 <td class="text-center">
@@ -392,7 +392,8 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, continue',
-                    cancelButtonText: 'No, I\'ll fix it'
+                    cancelButtonText: 'No, I\'ll fix it',
+                    reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.submit();
@@ -401,8 +402,41 @@
                 return;
             }
             
-            // If all validation passes, submit the form
-            this.submit();
+            // If all validation passes, show confirmation dialog
+            Swal.fire({
+                title: 'Save Purchase',
+                text: 'Are you sure you want to save this purchase order?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, save purchase',
+                cancelButtonText: 'No, review again',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form
+                    this.submit();
+                }
+            });
+        });
+        
+        // Add cancel button confirmation
+        $('#cancelPurchaseBtn').click(function(event) {
+            event.preventDefault();
+            
+            Swal.fire({
+                title: 'Cancel Purchase',
+                text: 'Are you sure you want to cancel this purchase? All product selections will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'No, keep editing',
+                cancelButtonText: 'Yes, cancel purchase',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+                    // Navigate to the purchases page
+                    window.location.href = '/admin/purchases';
+                }
+            });
         });
         
         // Calculate row total when inputs change
@@ -448,12 +482,6 @@
         const formattedGrandTotal = new Intl.NumberFormat('id-ID').format(grandTotal);
         $('#grand-total').text(formattedGrandTotal);
     }
-    
-    // Additional styling for the page
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add tooltips to helpful elements
-        $('[data-toggle="tooltip"]').tooltip();
-    });
 </script>
 
 <style>

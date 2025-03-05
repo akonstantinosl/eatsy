@@ -284,11 +284,11 @@ class SaleController extends Controller
             return redirect()->back()->with('error', 'Failed to add sale.');
         }
 
-        // Store sale details in session for display
-        session()->setFlashdata('sale_details', $saleDetails);
-        session()->setFlashdata('success', 'Sale successfully added with ID: ' . $saleId);
+        // Store success message in flash data
+        session()->setFlashdata('success', "Sale successfully added with ID: {$saleId}");
 
-        return redirect()->to('/sales');
+        // Redirect to sale details page instead of index
+        return redirect()->to("/sales/details/{$saleId}");
     }
 
     public function updateStatus($saleId, $newStatus)

@@ -384,8 +384,8 @@
                 return;
             }
             
-            // Check if quantities exceed available stock
-            let hasStockIssue = false;
+// Check if quantities exceed available stock
+let hasStockIssue = false;
             let errorMessage = '';
             
             $('.product-select').each(function() {
@@ -413,8 +413,41 @@
                 return;
             }
             
-            // If all validation passes, submit the form
-            this.submit();
+            // If all validation passes, show confirmation dialog
+            Swal.fire({
+                title: 'Complete Sale',
+                text: 'Are you sure you want to complete this sale?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, complete sale',
+                cancelButtonText: 'No, review again',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form
+                    this.submit();
+                }
+            });
+        });
+        
+        // Add cancel button confirmation
+        $('a[href="/sales"]').click(function(event) {
+            event.preventDefault();
+            
+            Swal.fire({
+                title: 'Cancel Sale',
+                text: 'Are you sure you want to cancel this sale? All product selections will be lost.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'No, keep editing',
+                cancelButtonText: 'Yes, cancel sale',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+                    // Navigate to the sales page
+                    window.location.href = '/sales';
+                }
+            });
         });
         
         // Calculate row total when inputs change
