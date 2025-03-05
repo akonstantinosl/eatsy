@@ -60,7 +60,7 @@ class SaleController extends Controller
         $totalSales = $query->countAllResults(false);
         
         // Get paginated sales based on filters
-        $sales = $query->orderBy('sales.created_at', 'DESC')
+        $sales = $query->orderBy('sales.updated_at', 'DESC')
                     ->limit($perPage, ($page - 1) * $perPage)
                     ->findAll();
 
@@ -258,7 +258,8 @@ class SaleController extends Controller
                 'product_id' => $product['product_id'],
                 'quantity_sold' => $quantitySold,
                 'price_per_unit' => $pricePerUnit,
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
 
             // Add to total amount

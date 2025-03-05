@@ -40,7 +40,7 @@
                         if (empty($sale['products'])) {
                             ?>
                             <tr>
-                                <td><?= date('d/m/Y H:i', strtotime($sale['created_at'])) ?></td>
+                                <td><?= date('d/m/Y H:i', strtotime($sale['updated_at'])) ?></td>
                                 <td><?= esc($sale['user_fullname']) ?></td>
                                 <td><?= esc($sale['customer_name']) ?></td>
                                 <td>No products</td>
@@ -52,7 +52,7 @@
                             // Show each product on a separate row with repeated sale information
                             foreach ($sale['products'] as $index => $product): ?>
                                 <tr>
-                                    <td><?= date('d/m/Y H:i', strtotime($sale['created_at'])) ?></td>
+                                    <td><?= date('d/m/Y H:i', strtotime($sale['updated_at'])) ?></td>
                                     <td><?= esc($sale['user_fullname']) ?></td>
                                     <td><?= esc($sale['customer_name']) ?></td>
                                     <td><?= esc($product['product_name']) ?></td>

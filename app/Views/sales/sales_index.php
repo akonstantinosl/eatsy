@@ -103,7 +103,7 @@
                     ?>
                         <tr>
                             <td><?= $startIndex + $index ?></td>
-                            <td><?= date('d F Y, H:i', strtotime($sale['created_at'])) ?></td> 
+                            <td><?= date('d F Y, H:i', strtotime($sale['updated_at'])) ?></td>
                             <td><?= esc($sale['user_fullname']) ?></td>
                             <td><?= esc($sale['customer_name']) ?></td>
                             <td><?= esc($sale['customer_phone']) ?></td>

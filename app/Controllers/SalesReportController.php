@@ -268,8 +268,8 @@ class SalesReportController extends Controller
         $productModel = new ProductModel();
         
         // Filter by date range and completed status
-        $saleQuery = $saleModel->where('created_at >=', $startDate . ' 00:00:00')
-                              ->where('created_at <=', $endDate . ' 23:59:59')
+        $saleQuery = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
+                              ->where('updated_at <=', $endDate . ' 23:59:59')
                               ->where('transaction_status', 'completed'); // Filter for completed sales only
         
         // Set period title
@@ -295,7 +295,7 @@ class SalesReportController extends Controller
         foreach ($sales as $sale) {
             $sale_info = [
                 'sale_id' => $sale['sale_id'],
-                'created_at' => $sale['created_at'],
+                'updated_at' => $sale['updated_at'],
                 'sale_amount' => $sale['sale_amount'],
                 'user_id' => $sale['user_id'],
                 'customer_id' => $sale['customer_id'],
@@ -371,8 +371,8 @@ class SalesReportController extends Controller
         $productModel = new ProductModel();
         
         // Filter by date range and completed status
-        $saleQuery = $saleModel->where('created_at >=', $startDate . ' 00:00:00')
-                              ->where('created_at <=', $endDate . ' 23:59:59')
+        $saleQuery = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
+                              ->where('updated_at <=', $endDate . ' 23:59:59')
                               ->where('transaction_status', 'completed'); // Filter for completed sales only
         
         // Set period title
@@ -411,7 +411,7 @@ class SalesReportController extends Controller
             // If no products, display empty row
             if (empty($sale_details)) {
                 $rowData = [
-                    date('d/m/Y H:i', strtotime($sale['created_at'])),
+                    date('d/m/Y H:i', strtotime($sale['updated_at'])),
                     $userFullname,
                     $customerName,
                     'No products',
@@ -432,7 +432,7 @@ class SalesReportController extends Controller
                         
                         // Display all information for each product
                         $rowData = [
-                            date('d/m/Y H:i', strtotime($sale['created_at'])),
+                            date('d/m/Y H:i', strtotime($sale['updated_at'])),
                             $userFullname,
                             $customerName,
                             $product['product_name'],

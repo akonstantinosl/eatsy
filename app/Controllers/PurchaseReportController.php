@@ -268,8 +268,8 @@ class PurchaseReportController extends Controller
         $productModel = new ProductModel();
         
         // Filter berdasarkan rentang tanggal and completed status
-        $purchaseQuery = $purchaseModel->where('created_at >=', $startDate . ' 00:00:00')
-                                       ->where('created_at <=', $endDate . ' 23:59:59')
+        $purchaseQuery = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
+                                       ->where('updated_at <=', $endDate . ' 23:59:59')
                                        ->where('order_status', 'completed'); // Filter for completed orders only
         
         // Set period title
@@ -295,7 +295,7 @@ class PurchaseReportController extends Controller
         foreach ($purchases as $purchase) {
             $purchase_info = [
                 'purchase_id' => $purchase['purchase_id'],
-                'created_at' => $purchase['created_at'],
+                'updated_at' => $purchase['updated_at'],
                 'purchase_amount' => $purchase['purchase_amount'],
                 'user_id' => $purchase['user_id'],
                 'supplier_id' => $purchase['supplier_id']
@@ -370,8 +370,8 @@ class PurchaseReportController extends Controller
         $productModel = new ProductModel();
         
         // Filter berdasarkan rentang tanggal and completed status
-        $purchaseQuery = $purchaseModel->where('created_at >=', $startDate . ' 00:00:00')
-                                      ->where('created_at <=', $endDate . ' 23:59:59')
+        $purchaseQuery = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
+                                      ->where('updated_at <=', $endDate . ' 23:59:59')
                                       ->where('order_status', 'completed'); // Filter for completed orders only
         
         // Set period title
@@ -410,7 +410,7 @@ class PurchaseReportController extends Controller
             // Jika tidak ada produk, tampilkan baris kosong
             if (empty($purchase_details)) {
                 $rowData = [
-                    date('d/m/Y H:i', strtotime($purchase['created_at'])),
+                    date('d/m/Y H:i', strtotime($purchase['updated_at'])),
                     $userFullname,
                     $supplierName,
                     'No products',
@@ -432,7 +432,7 @@ class PurchaseReportController extends Controller
                         
                         // Tampilkan semua informasi untuk setiap produk
                         $rowData = [
-                            date('d/m/Y H:i', strtotime($purchase['created_at'])),
+                            date('d/m/Y H:i', strtotime($purchase['updated_at'])),
                             $userFullname,
                             $supplierName,
                             $product['product_name'],

@@ -37,7 +37,7 @@
                     </tr>
                     <tr>
                         <th>Date:</th>
-                        <td><?= date('d M Y H:i', strtotime($purchase['created_at'])) ?></td>
+                        <td><?= date('d M Y H:i', strtotime($purchase['updated_at'])) ?></td>
                     </tr>
                     <tr>
                         <th>Status:</th>

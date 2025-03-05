@@ -279,14 +279,14 @@ class ProfitReportController extends Controller
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
 
         // Get sales data based on filter - ONLY COMPLETED TRANSACTIONS
-        $sales = $saleModel->where('created_at >=', $startDate . ' 00:00:00')
-                           ->where('created_at <=', $endDate . ' 23:59:59')
+        $sales = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
+                           ->where('updated_at <=', $endDate . ' 23:59:59')
                            ->where('transaction_status', 'completed') // Filter for completed sales only
                            ->findAll();
 
         // Get purchases data based on filter - ONLY COMPLETED ORDERS
-        $purchases = $purchaseModel->where('created_at >=', $startDate . ' 00:00:00')
-                                  ->where('created_at <=', $endDate . ' 23:59:59')
+        $purchases = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
+                                  ->where('updated_at <=', $endDate . ' 23:59:59')
                                   ->where('order_status', 'completed') // Filter for completed purchases only
                                   ->findAll();
 
@@ -402,14 +402,14 @@ class ProfitReportController extends Controller
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
         
         // Get sales data based on filter - ONLY COMPLETED TRANSACTIONS
-        $sales = $saleModel->where('created_at >=', $startDate . ' 00:00:00')
-                           ->where('created_at <=', $endDate . ' 23:59:59')
+        $sales = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
+                           ->where('updated_at <=', $endDate . ' 23:59:59')
                            ->where('transaction_status', 'completed') // Filter for completed sales only
                            ->findAll();
 
         // Get purchases data based on filter - ONLY COMPLETED ORDERS
-        $purchases = $purchaseModel->where('created_at >=', $startDate . ' 00:00:00')
-                                  ->where('created_at <=', $endDate . ' 23:59:59')
+        $purchases = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
+                                  ->where('updated_at <=', $endDate . ' 23:59:59')
                                   ->where('order_status', 'completed') // Filter for completed purchases only
                                   ->findAll();
 

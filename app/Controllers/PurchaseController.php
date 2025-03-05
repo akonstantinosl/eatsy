@@ -60,7 +60,7 @@ class PurchaseController extends Controller
         $totalPurchases = $query->countAllResults(false);
         
         // Get paginated purchases based on filters
-        $purchases = $query->orderBy('purchases.created_at', 'DESC')
+        $purchases = $query->orderBy('purchases.updated_at', 'DESC')
                     ->limit($perPage, ($page - 1) * $perPage)
                     ->findAll();
 
@@ -252,7 +252,8 @@ class PurchaseController extends Controller
                 'box_bought' => $boxBought,
                 'unit_per_box' => $product['unit_per_box'],
                 'price_per_box' => $pricePerBox,
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
 
             // Add to total amount
