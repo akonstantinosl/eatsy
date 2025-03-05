@@ -1,4 +1,8 @@
-<?= $this->extend('layout_admin') ?>
+<?php if (session()->get('user_role') == 'admin'): ?>
+    <?= $this->extend('layout_admin') ?>
+<?php elseif (session()->get('user_role') == 'staff'): ?>
+    <?= $this->extend('layout_staff') ?>
+<?php endif; ?>
 
 <?= $this->section('content') ?>
 <div class="card">

@@ -23,25 +23,54 @@ class PurchaseController extends Controller
         // Get current page from the request, default to 1 if not set
         $page = $this->request->getGet('page') ?? 1;
         
-        // Set items per page
-        $perPage = 10;
+        // Get entries per page (default to 10 if not set)
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Get total count of purchases
-        $totalPurchases = $purchaseModel->countAllResults();
+        // Validate perPage to only be 10, 25, 50, or 100
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
         
-        // Get paginated purchases
-        $purchases = $purchaseModel
-                   ->orderBy('created_at', 'DESC')
-                   ->limit($perPage, ($page - 1) * $perPage)
-                   ->findAll();
+        // Get status filter (if any)
+        $statusFilter = $this->request->getGet('status');
+        
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
+        
+        // Base query
+        $query = $purchaseModel;
+        
+        // Apply status filter if set
+        if ($statusFilter && in_array($statusFilter, ['pending', 'ordered', 'completed', 'cancelled'])) {
+            $query = $query->where('order_status', $statusFilter);
+        }
+        
+        // Prepare to join tables for search
+        if ($search) {
+            $query = $query->join('users', 'purchases.user_id = users.user_id')
+                          ->join('suppliers', 'purchases.supplier_id = suppliers.supplier_id')
+                          ->groupStart()
+                            ->like('users.user_fullname', $search) // Buyer search
+                            ->orLike('suppliers.supplier_name', $search) // Supplier search
+                            ->orLike('suppliers.supplier_phone', $search) // Contact search
+                          ->groupEnd();
+        }
+        
+        // Get total count based on filters
+        $totalPurchases = $query->countAllResults(false);
+        
+        // Get paginated purchases based on filters
+        $purchases = $query->orderBy('purchases.created_at', 'DESC')
+                    ->limit($perPage, ($page - 1) * $perPage)
+                    ->findAll();
 
-        // Mendapatkan nama supplier, nama user dan kontak (supplier_phone) untuk setiap purchase
+        // Get user and supplier information for each purchase
         foreach ($purchases as &$purchase) {
-            // Ambil nama user berdasarkan user_id
+            // Get buyer name based on user_id
             $user = $userModel->find($purchase['user_id']);
             $purchase['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
 
-            // Ambil nama supplier berdasarkan supplier_id
+            // Get supplier name and phone based on supplier_id
             $supplier = $supplierModel->find($purchase['supplier_id']);
             $purchase['supplier_name'] = $supplier ? $supplier['supplier_name'] : 'Unknown';
             $purchase['supplier_phone'] = $supplier ? $supplier['supplier_phone'] : 'No Phone';
@@ -56,7 +85,9 @@ class PurchaseController extends Controller
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalPurchases
+            'total' => $totalPurchases,
+            'statusFilter' => $statusFilter,
+            'search' => $search
         ]);
     }
 

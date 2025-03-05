@@ -16,21 +16,22 @@
 
                 <input type="hidden" name="customer_id" value="<?= esc($customer_id) ?>">
 
-                <div id="product-section">
-                    <table class="table table-bordered" id="product-table">
-                        <thead>
+                <div id="product-section" class="table-responsive">
+                    <table class="table table-bordered table-striped" id="product-table">
+                        <thead class="thead-light">
                             <tr>
-                                <th>Product</th>
-                                <th>Available Stock</th>
-                                <th>Quantity</th>
-                                <th>Price per Unit</th>
-                                <th>Action</th>
+                                <th style="width: 35%">Product</th>
+                                <th style="width: 15%">Available Stock</th>
+                                <th style="width: 15%">Quantity</th>
+                                <th style="width: 20%">Price per Unit</th>
+                                <th style="width: 10%">Total</th>
+                                <th style="width: 5%">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr id="product-row-0" class="product-row">
                                 <td>
-                                    <select name="products[0][product_id]" class="form-control product-select select2" required>
+                                    <select name="products[0][product_id]" class="form-control product-select" required>
                                         <option value="">Select Product</option>
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= esc($product['product_id']) ?>" 
@@ -42,23 +43,50 @@
                                     </select>
                                     <input type="hidden" name="products[0][product_name]" class="product-name-input">
                                 </td>
-                                <td>
-                                    <span class="available-stock">0</span>
+                                <td class="text-center">
+                                    <div class="stock-display">
+                                        <span class="available-stock">0</span>
+                                    </div>
                                 </td>
                                 <td>
-                                    <input type="number" name="products[0][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
+                                    <div class="input-group">
+                                        <input type="number" name="products[0][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">unit</span>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>
+                                <td class="text-center">
+                                    <div class="price-display">
+                                        <span class="price-per-unit">0</span> IDR
+                                    </div>
                                     <input type="hidden" name="products[0][price_per_unit]" class="price-per-unit-input" value="0">
-                                    <span class="price-per-unit">0</span>
                                 </td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm remove-product">
+                                <td class="text-right">
+                                    <div class="price-display">
+                                        <span class="total-price">0</span> IDR
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-danger btn-sm remove-product" title="Remove product">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
                         </tbody>
+                        <tfoot>
+                            <tr class="bg-light">
+                                <td colspan="4" class="text-right font-weight-bold pr-3">
+                                    <span style="line-height: 38px;">Grand Total:</span>
+                                </td>
+                                <td class="text-right font-weight-bold">
+                                    <div class="price-display grand-total-display">
+                                        <span id="grand-total">0</span> IDR
+                                    </div>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
 
@@ -80,7 +108,7 @@
                 <!-- Notes -->
                 <div class="form-group mt-3">
                     <label for="sale_notes">Notes</label>
-                    <textarea name="sale_notes" class="form-control" rows="3"></textarea>
+                    <textarea name="sale_notes" class="form-control" rows="3" placeholder="Additional information about this sale..."></textarea>
                 </div>
 
                 <div class="mt-4 d-flex">
@@ -102,6 +130,13 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<!-- Include Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     // Track selected products to prevent duplicates
     const selectedProducts = new Set();
@@ -110,7 +145,6 @@
     // Initialize Select2 for all product selects
     function initSelect2(element) {
         $(element).select2({
-            theme: 'bootstrap',
             placeholder: 'Search for a product...',
             allowClear: true,
             width: '100%',
@@ -139,8 +173,9 @@
         // Update available stock display
         row.find('.available-stock').text(availableStock);
         
-        // Update price per unit (in both span and hidden input)
-        row.find('.price-per-unit').text(sellingPrice);
+        // Update price per unit display and hidden input
+        const formattedPrice = new Intl.NumberFormat('id-ID').format(sellingPrice);
+        row.find('.price-per-unit').text(formattedPrice);
         row.find('.price-per-unit-input').val(sellingPrice);
         
         // Update quantity limits based on available stock
@@ -167,6 +202,10 @@
             // Disable this option in other selects
             updateAvailableOptions();
         }
+        
+        // Calculate total for this row
+        calculateRowTotal(row);
+        updateGrandTotal();
     }
     
     // Update available options in all selects
@@ -187,6 +226,70 @@
             currentSelect.select2('destroy');
             initSelect2(currentSelect);
         });
+    }
+    
+    // Add product button functionality
+    function addProductRow() {
+        const newRow = $(`
+            <tr id="product-row-${rowCount}" class="product-row">
+                <td>
+                    <select name="products[${rowCount}][product_id]" class="form-control product-select" required>
+                        <option value="">Select Product</option>
+                        <?php foreach ($products as $product): ?>
+                            <option value="<?= esc($product['product_id']) ?>" 
+                                data-stock="<?= esc($product['product_stock']) ?>"
+                                data-price="<?= esc($product['selling_price']) ?>">
+                                <?= esc($product['product_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="products[${rowCount}][product_name]" class="product-name-input">
+                </td>
+                <td class="text-center">
+                    <div class="stock-display">
+                        <span class="available-stock">0</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="products[${rowCount}][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text">unit</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="price-display">
+                        <span class="price-per-unit">0</span> IDR
+                    </div>
+                    <input type="hidden" name="products[${rowCount}][price_per_unit]" class="price-per-unit-input" value="0">
+                </td>
+                <td class="text-right">
+                    <div class="price-display">
+                        <span class="total-price">0</span> IDR
+                    </div>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm remove-product" title="Remove product">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
+        
+        // Append the new row
+        $('#product-table tbody').append(newRow);
+        
+        // Initialize Select2 for the new select
+        initSelect2(newRow.find('.product-select'));
+        
+        // Update available options
+        updateAvailableOptions();
+        
+        // Increment row counter
+        rowCount++;
+        
+        return newRow;
     }
     
     // Initialize page
@@ -219,6 +322,10 @@
                 row.find('.quantity-sold').val('1').attr('max', '');
                 row.find('.price-per-unit').text('0');
                 row.find('.price-per-unit-input').val('0');
+                row.find('.total-price').text('0');
+                
+                // Update grand total
+                updateGrandTotal();
                 
                 return;
             }
@@ -234,54 +341,24 @@
             
             // Update all selects
             updateAvailableOptions();
+            
+            // Renumber remaining rows to keep indices sequential
+            $('.product-row').each(function(index) {
+                $(this).attr('id', `product-row-${index}`);
+                $(this).find('[name^="products["]').each(function() {
+                    const name = $(this).attr('name');
+                    const newName = name.replace(/products\[\d+\]/, `products[${index}]`);
+                    $(this).attr('name', newName);
+                });
+            });
+            
+            // Update grand total
+            updateGrandTotal();
         });
         
-        // Add product button
+        // Add product button click handler
         $('#add-product').click(function() {
-            const newRow = $(`
-                <tr id="product-row-${rowCount}" class="product-row">
-                    <td>
-                        <select name="products[${rowCount}][product_id]" class="form-control product-select select2" required>
-                            <option value="">Select Product</option>
-                            <?php foreach ($products as $product): ?>
-                                <option value="<?= esc($product['product_id']) ?>" 
-                                    data-stock="<?= esc($product['product_stock']) ?>"
-                                    data-price="<?= esc($product['selling_price']) ?>">
-                                    <?= esc($product['product_name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <input type="hidden" name="products[${rowCount}][product_name]" class="product-name-input">
-                    </td>
-                    <td>
-                        <span class="available-stock">0</span>
-                    </td>
-                    <td>
-                        <input type="number" name="products[${rowCount}][quantity_sold]" class="form-control quantity-sold" min="1" value="1" required>
-                    </td>
-                    <td>
-                        <input type="hidden" name="products[${rowCount}][price_per_unit]" class="price-per-unit-input" value="0">
-                        <span class="price-per-unit">0</span>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm remove-product">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `);
-            
-            // Append the new row
-            $('#product-table tbody').append(newRow);
-            
-            // Initialize Select2 for the new select
-            initSelect2(newRow.find('.product-select'));
-            
-            // Update available options
-            updateAvailableOptions();
-            
-            // Increment row counter
-            rowCount++;
+            addProductRow();
         });
         
         // Form validation
@@ -340,6 +417,16 @@
             this.submit();
         });
         
+        // Calculate row total when inputs change
+        $(document).on('input', '.quantity-sold', function() {
+            const row = $(this).closest('.product-row');
+            calculateRowTotal(row);
+            updateGrandTotal();
+            
+            // Check stock limits
+            checkStockLimits($(this));
+        });
+        
         // Display SweetAlert for flash messages if they exist
         <?php if (session()->getFlashdata('error')): ?>
             Swal.fire({
@@ -350,14 +437,15 @@
             });
         <?php endif; ?>
     });
-    // Add event listener for quantity changes
-    $(document).on('input', '.quantity-sold', function() {
-        const row = $(this).closest('.product-row');
+    
+    // Function to check stock limits
+    function checkStockLimits(input) {
+        const row = input.closest('.product-row');
         const productSelect = row.find('.product-select');
         
         if (productSelect.val() !== "") {
             const availableStock = parseInt(productSelect.find('option:selected').data('stock'));
-            const quantitySold = parseInt($(this).val());
+            const quantitySold = parseInt(input.val());
             
             if (quantitySold > availableStock) {
                 const productName = productSelect.find('option:selected').text();
@@ -369,61 +457,227 @@
                     confirmButtonText: 'Adjust to maximum'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $(this).val(availableStock);
+                        input.val(availableStock);
+                        calculateRowTotal(row);
+                        updateGrandTotal();
                     }
                 });
             }
         }
-    });
+    }
+    
+    // Function to calculate and display row total
+    function calculateRowTotal(row) {
+        const quantitySold = parseInt(row.find('.quantity-sold').val()) || 0;
+        const pricePerUnit = parseFloat(row.find('.price-per-unit-input').val()) || 0;
+        const totalPrice = quantitySold * pricePerUnit;
+        
+        // Format the total price with thousands separator
+        const formattedPrice = new Intl.NumberFormat('id-ID').format(totalPrice);
+        row.find('.total-price').text(formattedPrice);
+    }
+    
+    // Function to calculate and update the grand total
+    function updateGrandTotal() {
+        let grandTotal = 0;
+        
+        $('.product-row').each(function() {
+            const quantitySold = parseInt($(this).find('.quantity-sold').val()) || 0;
+            const pricePerUnit = parseFloat($(this).find('.price-per-unit-input').val()) || 0;
+            grandTotal += quantitySold * pricePerUnit;
+        });
+        
+        // Format the grand total with thousands separator
+        const formattedGrandTotal = new Intl.NumberFormat('id-ID').format(grandTotal);
+        $('#grand-total').text(formattedGrandTotal);
+    }
 </script>
 
 <style>
-    /* Select2 Styling */
-    .select2-container--bootstrap .select2-selection--single {
+    /* Select2 Styling Fixes */
+    .select2-container {
+        display: block;
+        width: 100% !important;
+    }
+    
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        padding: 6px 12px;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 24px;
+        padding-left: 0;
+        padding-right: 20px;
+        color: #495057;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+        width: 30px;
+    }
+    
+    .select2-dropdown {
+        border-color: #80bdff;
+        border-radius: 0.25rem;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 6px 12px;
         height: 38px;
-        padding: 8px 12px;
-        font-size: 14px;
     }
     
-    .select2-container--bootstrap .select2-selection--single .select2-selection__arrow {
-        top: 6px;
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
     
-    .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background-color: #007bff;
     }
     
-    .select2-container--bootstrap .select2-search--dropdown .select2-search__field {
-        padding: 8px;
-        border-radius: 4px;
+    /* Table styling */
+    .table {
+        margin-bottom: 0;
     }
     
-    /* Table styling */
     .table th {
         background-color: #f4f6f9;
+        vertical-align: middle;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+    }
+    
+    .table tfoot {
+        background-color: #f8f9fa;
+        border-top: 2px solid #dee2e6;
+    }
+    
+    .table tfoot td {
+        padding: 12px 8px;
+    }
+    
+    .table tbody tr:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    /* Make table responsive */
+    .table-responsive {
+        border-radius: 0.25rem;
+        overflow: hidden;
     }
     
     /* Card styling */
     .card {
         box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+        border-radius: 0.3rem;
+    }
+    
+    /* Button styling */
+    .btn {
+        border-radius: 0.25rem;
+    }
+    
+    /* Input styling */
+    .form-control {
+        border-radius: 0.25rem;
+    }
+    
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    /* Input group styling */
+    .input-group-text {
+        background-color: #f4f6f9;
+        border-color: #ced4da;
+        font-size: 0.9rem;
+    }
+    
+    /* Stock display styling */
+    .stock-display {
+        background-color: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        font-weight: 600;
+        display: inline-block;
+        min-width: 60px;
     }
     
     /* Available stock display */
     .available-stock {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        background-color: #f8f9fa;
-        border-radius: 0.25rem;
         font-weight: 600;
     }
     
-    /* Price display */
-    .price-per-unit {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
+    /* Price display styling */
+    .price-display {
         background-color: #f8f9fa;
-        border-radius: 0.25rem;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
         font-weight: 600;
+        display: inline-block;
+        min-width: 120px;
+        width: 100%;
+        text-align: right;
+    }
+    
+    .grand-total-display {
+        background-color: #e8f4ff;
+        border-color: #b8daff;
+        width: 100%;
+        min-width: 120px;
+    }
+    
+    /* Total price display */
+    .total-price, .price-per-unit {
+        font-weight: 600;
+    }
+    
+    /* Grand total styling */
+    #grand-total {
+        font-size: 1.1rem;
+        color: #007bff;
+    }
+    
+    /* Animation for adding new rows */
+    @keyframes highlightRow {
+        0% {background-color: rgba(0, 123, 255, 0.1);}
+        100% {background-color: transparent;}
+    }
+    
+    .product-row:last-child {
+        animation: highlightRow 1.5s ease;
+    }
+    
+    /* Improve spacing in rows */
+    .product-row td {
+        vertical-align: middle;
+        padding: 10px 8px;
+    }
+    
+    /* Memperbaiki posisi vertical dari label Grand Total */
+    tfoot tr td span {
+        vertical-align: middle;
+    }
+    
+    /* Tambahan padding untuk label text Grand Total */
+    tfoot td.text-right.font-weight-bold.pr-3 {
+        padding-right: 15px !important;
     }
 </style>
 <?= $this->endSection() ?>

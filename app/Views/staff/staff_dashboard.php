@@ -2,6 +2,57 @@
 
 <?= $this->section('content') ?>
 <div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Staff Dashboard</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="icon fas fa-info"></i> Welcome, <?= session()->get('user_name') ?>!</h5>
+                    Welcome to the Eatsy staff dashboard. From here you can process sales, add customers, and check your daily tasks.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info"><i class="fas fa-money-bill-wave"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Today's Revenue</span>
+                                <span class="info-box-number"><?= number_format($todayRevenue ?? 0, 0, ',', '.') ?> IDR</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="fas fa-cash-register"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Transactions Today</span>
+                                <span class="info-box-number"><?= $todaySales ?? 0 ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout callout-success">
+                    <h5>Today's Tasks</h5>
+                    <ul>
+                        <li>Process customer transactions</li>
+                        <li>Check inventory levels and restock shelves</li>
+                        <li>Report any discrepancies in stock counts</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
+
+<div class="row">
     <div class="col-lg-4 col-6">
         <!-- small box -->
         <div class="small-box bg-info">
@@ -191,58 +242,6 @@
             <div class="card-footer text-center">
                 <a href="/customers" class="text-primary">View All Customers</a>
             </div>
-        </div>
-        <!-- /.card -->
-    </div>
-    <!-- /.col -->
-</div>
-<!-- /.row -->
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Staff Dashboard</h3>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <h5><i class="icon fas fa-info"></i> Welcome, <?= session()->get('user_name') ?>!</h5>
-                    Welcome to the EatsyMart staff dashboard. From here you can process sales, manage inventory, and check your daily tasks.
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-info"><i class="fas fa-money-bill-wave"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Today's Revenue</span>
-                                <span class="info-box-number"><?= number_format($todayRevenue ?? 0, 0, ',', '.') ?> IDR</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="info-box">
-                            <span class="info-box-icon bg-success"><i class="fas fa-cash-register"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Transactions Today</span>
-                                <span class="info-box-number"><?= $todaySales ?? 0 ?></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="callout callout-success">
-                    <h5>Today's Tasks</h5>
-                    <ul>
-                        <li>Process customer transactions</li>
-                        <li>Check inventory levels and restock shelves</li>
-                        <li>Monitor expiry dates of products</li>
-                        <li>Report any discrepancies in stock counts</li>
-                    </ul>
-                </div>
-            </div>
-            <!-- /.card-body -->
         </div>
         <!-- /.card -->
     </div>

@@ -26,17 +26,29 @@ class SupplierController extends BaseController
         // Get current page from the request, default to 1 if not set
         $page = $this->request->getGet('page') ?? 1;
         
-        // Set items per page
-        $perPage = 10;
+        // Get entries per page (default to 10 if not set)
+        // Cast to integer to avoid type errors in the limit() method
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Get total count of active suppliers
-        $totalSuppliers = $this->supplierModel
-                         ->where('supplier_status', 'active')
-                         ->countAllResults();
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
+        
+        // Base query
+        $query = $this->supplierModel->where('supplier_status', 'active');
+        
+        // Apply search filter if set
+        if ($search) {
+            $query = $query->groupStart()
+                    ->like('supplier_name', $search)
+                    ->orLike('supplier_phone', $search)
+                    ->groupEnd();
+        }
+        
+        // Get total count based on filters
+        $totalSuppliers = $query->countAllResults(false);
         
         // Get paginated suppliers
-        $suppliers = $this->supplierModel
-                   ->where('supplier_status', 'active')
+        $suppliers = $query
                    ->limit($perPage, ($page - 1) * $perPage)
                    ->find();
         
@@ -49,7 +61,8 @@ class SupplierController extends BaseController
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalSuppliers
+            'total' => $totalSuppliers,
+            'search' => $search
         ]);
     }
 
