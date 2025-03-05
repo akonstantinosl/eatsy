@@ -128,7 +128,7 @@ class SupplierController extends BaseController
         ];
 
         $this->supplierModel->insert($data);
-        session()->setFlashdata('success', 'Supplier berhasil ditambahkan');
+        session()->setFlashdata('success', 'Supplier successfully added');
         return redirect()->to('admin/suppliers');
     }
 
@@ -141,7 +141,7 @@ class SupplierController extends BaseController
         $data['supplier'] = $this->supplierModel->find($id);
 
         if (!$data['supplier']) {
-            session()->setFlashdata('error', 'Supplier tidak ditemukan');
+            session()->setFlashdata('error', 'Supplier not found');
             return redirect()->to('admin/suppliers');
         }
 
@@ -157,7 +157,7 @@ class SupplierController extends BaseController
         $supplier = $this->supplierModel->find($id);
 
         if (!$supplier) {
-            session()->setFlashdata('error', 'Supplier tidak ditemukan');
+            session()->setFlashdata('error', 'Supplier not found');
             return redirect()->to('admin/suppliers');
         }
 
@@ -195,7 +195,7 @@ class SupplierController extends BaseController
         ];
 
         $this->supplierModel->update($id, $data);
-        session()->setFlashdata('success', 'Supplier berhasil diperbarui');
+        session()->setFlashdata('success', 'Supplier successfully updated');
         return redirect()->to('admin/suppliers');
     }
 
@@ -221,7 +221,7 @@ class SupplierController extends BaseController
     
         $this->supplierModel->update($id, $data);
     
-        session()->setFlashdata('success', 'Supplier successfully deactivated');
+        session()->setFlashdata('success', 'Supplier successfully Inactivated');
         return redirect()->to('admin/suppliers');
     }    
 }

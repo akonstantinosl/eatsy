@@ -12,7 +12,7 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form action="/admin/users/store" method="post" enctype="multipart/form-data">
+        <form id="addUserForm" action="/admin/users/store" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-9">
                     <div class="form-group">
@@ -94,8 +94,8 @@
                 <input type="hidden" name="status" value="active"> <!-- Hidden input for status -->
             </div>
             
-            <button type="submit" class="btn btn-primary mr-2">Save</button>
-            <a href="/admin/users" class="btn btn-default">Cancel</a>
+            <button type="button" id="saveBtn" class="btn btn-primary mr-2">Save</button>
+            <a href="/admin/users" id="cancelBtn" class="btn btn-default">Cancel</a>
         </form>
     </div>
     <!-- /.card-body -->
@@ -103,6 +103,7 @@
 <!-- /.card -->
 
 <script>
+    // Preview Image
     function previewImage() {
         const preview = document.getElementById('preview-image');
         const file = document.getElementById('photo').files[0];
@@ -120,21 +121,49 @@
             preview.src = '<?= base_url('assets/image/') ?>' + (role === 'admin' ? 'default_admin.png' : 'default_staff.png');
         }
     }
-    
-    // Update preview image when role changes
-    document.getElementById('role').addEventListener('change', function() {
-        if (!document.getElementById('photo').files[0]) {
-            const role = this.value;
-            document.getElementById('preview-image').src = '<?= base_url('assets/image/') ?>' + 
-                (role === 'admin' ? 'default_admin.png' : 'default_staff.png');
-        }
-    });
-    
-    // Initialize BS Custom File Input
+
     document.addEventListener('DOMContentLoaded', function() {
-        // For AdminLTE/Bootstrap custom file input
         bsCustomFileInput.init();
-        
+
+        // Save Button Confirmation
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Are you sure you want to save?',
+                text: 'You can review and edit the information before saving.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, save it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('addUserForm').submit();
+                }
+            });
+        });
+
+        // Cancel Button Confirmation
+        document.getElementById('cancelBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Are you sure you want to cancel?',
+                text: 'Any changes you made will not be saved!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'Continue editing',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/admin/users';  // Redirect back to users page
+                }
+            });
+        });
+
         // Display SweetAlert for validation errors if they exist
         <?php if (session()->has('errors')): ?>
             let errorMessages = [];
@@ -150,7 +179,7 @@
                 confirmButtonText: 'OK'
             });
         <?php endif; ?>
-        
+
         // Display SweetAlert for success message if it exists
         <?php if (session()->has('success')): ?>
             Swal.fire({

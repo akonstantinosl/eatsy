@@ -108,8 +108,8 @@
             </div>
 
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary mr-2">Update</button>
-                <a href="/admin/users" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-primary mr-2" id="saveBtn">Update</button>
+                <a href="/admin/users" class="btn btn-default" id="cancelBtn">Cancel</a>
             </div>
         </form>
     </div>
@@ -147,10 +147,49 @@
                 (role === 'admin' ? 'default_admin.png' : 'default_staff.png');
         }
     });
-    
+
+    // SweetAlert for Save Button Confirmation
+    document.getElementById('saveBtn').addEventListener('click', function(event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure you want to update this user?',
+            text: 'You can review and edit the information before saving.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('form').submit();
+            }
+        });
+    });
+
+    // SweetAlert for Cancel Button Confirmation
+    document.getElementById('cancelBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure you want to cancel?',
+            text: 'Any changes you made will not be saved!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'Continue editing',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/admin/users';  // Redirect back to users page
+            }
+        });
+    });
+
     // Initialize BS Custom File Input
     document.addEventListener('DOMContentLoaded', function() {
-        // For AdminLTE/Bootstrap custom file input
         bsCustomFileInput.init();
         
         // Display SweetAlert for validation errors if they exist

@@ -321,7 +321,7 @@
         // Display SweetAlert for flash messages if they exist
         <?php if (session()->getFlashdata('success')): ?>
             Swal.fire({
-                title: 'Berhasil!',
+                title: 'Success!',
                 text: '<?= session()->getFlashdata('success') ?>',
                 icon: 'success',
             });

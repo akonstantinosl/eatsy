@@ -117,7 +117,7 @@ class CustomerController extends BaseController
         ];
 
         $this->customerModel->insert($data);
-        session()->setFlashdata('success', 'Customer berhasil ditambahkan');
+        session()->setFlashdata('success', 'Customer successfully added');
         return redirect()->to('/customers');
     }
 
@@ -130,7 +130,7 @@ class CustomerController extends BaseController
         $data['customer'] = $this->customerModel->find($id);
 
         if (!$data['customer']) {
-            session()->setFlashdata('error', 'Customer tidak ditemukan');
+            session()->setFlashdata('error', 'Customer not found');
             return redirect()->to('/customers');
         }
 
@@ -146,7 +146,7 @@ class CustomerController extends BaseController
         $customer = $this->customerModel->find($id);
 
         if (!$customer) {
-            session()->setFlashdata('error', 'Customer tidak ditemukan');
+            session()->setFlashdata('error', 'Customer not found');
             return redirect()->to('/customers');
         }
 
@@ -184,7 +184,7 @@ class CustomerController extends BaseController
         ];
 
         $this->customerModel->update($id, $data);
-        session()->setFlashdata('success', 'Customer berhasil diperbarui');
+        session()->setFlashdata('success', 'Customer sucessfully updated');
         return redirect()->to('/customers');
     }
 

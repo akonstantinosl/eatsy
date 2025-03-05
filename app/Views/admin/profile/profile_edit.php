@@ -12,50 +12,50 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form action="/profile/update" method="post" enctype="multipart/form-data">
+        <form id="profileForm" action="/profile/update" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-9">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" 
+                        <input type="text" class="form-control <?= session()->has('validation_errors') && isset(session('validation_errors')['username']) ? 'is-invalid' : '' ?>" 
                             id="username" name="username" value="<?= old('username', $user['user_name']) ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
+                        <?php if (session()->has('validation_errors') && isset(session('validation_errors')['username'])): ?>
                             <div class="invalid-feedback">
-                                <?= session('errors')['username'] ?>
+                                <?= session('validation_errors')['username'] ?>
                             </div>
                         <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" 
+                        <input type="password" class="form-control <?= session()->has('validation_errors') && isset(session('validation_errors')['password']) ? 'is-invalid' : '' ?>" 
                             id="password" name="password">
                         <small class="text-muted">Leave blank to keep current password</small>
-                        <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
+                        <?php if (session()->has('validation_errors') && isset(session('validation_errors')['password'])): ?>
                             <div class="invalid-feedback">
-                                <?= session('errors')['password'] ?>
+                                <?= session('validation_errors')['password'] ?>
                             </div>
                         <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" 
+                        <input type="text" class="form-control <?= session()->has('validation_errors') && isset(session('validation_errors')['fullname']) ? 'is-invalid' : '' ?>" 
                             id="fullname" name="fullname" value="<?= old('fullname', $user['user_fullname']) ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
+                        <?php if (session()->has('validation_errors') && isset(session('validation_errors')['fullname'])): ?>
                             <div class="invalid-feedback">
-                                <?= session('errors')['fullname'] ?>
+                                <?= session('validation_errors')['fullname'] ?>
                             </div>
                         <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" 
+                        <input type="text" class="form-control <?= session()->has('validation_errors') && isset(session('validation_errors')['phone']) ? 'is-invalid' : '' ?>" 
                             id="phone" name="phone" value="<?= old('phone', $user['user_phone']) ?>">
-                        <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
+                        <?php if (session()->has('validation_errors') && isset(session('validation_errors')['phone'])): ?>
                             <div class="invalid-feedback">
-                                <?= session('errors')['phone'] ?>
+                                <?= session('validation_errors')['phone'] ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -75,12 +75,12 @@
                                 alt="User Photo" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;">
                         </div>
                         <div class="custom-file mt-3">
-                            <input type="file" class="custom-file-input <?= session()->has('errors') && isset(session('errors')['photo']) ? 'is-invalid' : '' ?>" 
+                            <input type="file" class="custom-file-input <?= session()->has('validation_errors') && isset(session('validation_errors')['photo']) ? 'is-invalid' : '' ?>" 
                                 id="photo" name="photo" accept="image/*" onchange="previewImage()">
                             <label class="custom-file-label" for="photo">Choose new photo</label>
-                            <?php if (session()->has('errors') && isset(session('errors')['photo'])): ?>
+                            <?php if (session()->has('validation_errors') && isset(session('validation_errors')['photo'])): ?>
                                 <div class="invalid-feedback">
-                                    <?= session('errors')['photo'] ?>
+                                    <?= session('validation_errors')['photo'] ?>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -90,8 +90,8 @@
             </div>
 
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary mr-2">Update Profile</button>
-                <a href="/admin/dashboard" class="btn btn-default">Cancel</a>
+                <button type="button" id="updateProfileBtn" class="btn btn-primary mr-2">Update Profile</button>
+                <button type="button" id="cancelBtn" class="btn btn-default">Cancel</button>
             </div>
         </form>
     </div>
@@ -123,10 +123,48 @@
         // For AdminLTE/Bootstrap custom file input
         bsCustomFileInput.init();
         
+        // Handle Update Profile button click
+        document.getElementById('updateProfileBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Update Profile?',
+                text: 'Are you sure you want to update your profile information?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true // This will reverse the button positions
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('profileForm').submit();
+                }
+            });
+        });
+        
+        // Handle Cancel button click
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Cancel Updates?',
+                text: 'Any changes you made will not be saved!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel!',
+                cancelButtonText: 'Continue editing',
+                reverseButtons: true // This will reverse the button positions
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '<?= session()->get('user_role') == 'admin' ? '/admin/dashboard' : '/staff/dashboard' ?>';
+                }
+            });
+        });
+        
         // Display SweetAlert for validation errors if they exist
-        <?php if (session()->has('errors')): ?>
+        <?php if (session()->has('validation_errors')): ?>
             let errorMessages = [];
-            <?php foreach (session('errors') as $field => $error): ?>
+            <?php foreach (session('validation_errors') as $field => $error): ?>
                 errorMessages.push('<?= esc($error) ?>');
             <?php endforeach; ?>
             
@@ -139,14 +177,26 @@
             });
         <?php endif; ?>
         
+        // Display SweetAlert for error message if it exists
+        <?php if (session()->has('swal_error')): ?>
+            Swal.fire({
+                title: 'Error!',
+                text: '<?= session()->getFlashdata('swal_error') ?>',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+        
         // Display SweetAlert for success message if it exists
-        <?php if (session()->has('success')): ?>
+        <?php if (session()->has('swal_success')): ?>
             Swal.fire({
                 title: 'Success!',
-                text: '<?= session()->getFlashdata('success') ?>',
+                text: '<?= session()->getFlashdata('swal_success') ?>',
                 icon: 'success',
                 timer: 3000,
-                timerProgressBar: true
+                timerProgressBar: true,
+                showConfirmButton: false
             });
         <?php endif; ?>
     });

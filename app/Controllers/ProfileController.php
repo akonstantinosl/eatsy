@@ -24,7 +24,7 @@ class ProfileController extends BaseController
         $data['user'] = $this->userModel->find($userId);
         
         if (!$data['user']) {
-            session()->setFlashdata('error', 'User profile not found');
+            session()->setFlashdata('swal_error', 'User profile not found');
             
             // Redirect based on user role
             if (session()->get('user_role') == 'admin') {
@@ -52,7 +52,7 @@ class ProfileController extends BaseController
         $user = $this->userModel->find($userId);
 
         if (!$user) {
-            session()->setFlashdata('error', 'User profile not found');
+            session()->setFlashdata('swal_error', 'User profile not found');
             
             // Redirect based on user role
             if (session()->get('user_role') == 'admin') {
@@ -70,7 +70,8 @@ class ProfileController extends BaseController
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            // Using SweetAlert2 for validation errors
+            return redirect()->back()->withInput()->with('validation_errors', $this->validator->getErrors());
         }
 
         // Check if username already exists for another active user
@@ -81,7 +82,8 @@ class ProfileController extends BaseController
                                               ->first();
                                           
             if ($existingUsername) {
-                return redirect()->back()->withInput()->with('errors', ['username' => 'Username is already in use by another active user.']);
+                $errors = ['username' => 'Username is already in use by another active user.'];
+                return redirect()->back()->withInput()->with('validation_errors', $errors);
             }
         }
 
@@ -94,7 +96,8 @@ class ProfileController extends BaseController
                                           ->first();
                                       
             if ($existingPhone) {
-                return redirect()->back()->withInput()->with('errors', ['phone' => 'Phone number is already in use by another active user.']);
+                $errors = ['phone' => 'Phone number is already in use by another active user.'];
+                return redirect()->back()->withInput()->with('validation_errors', $errors);
             }
         }
         
@@ -134,7 +137,8 @@ class ProfileController extends BaseController
             session()->set('user_photo', $data['user_photo']);
         }
         
-        session()->setFlashdata('success', 'Your profile has been successfully updated');
+        // Set SweetAlert2 success message
+        session()->setFlashdata('swal_success', 'Your profile has been successfully updated');
         
         // Redirect based on user role
         if (session()->get('user_role') == 'admin') {
