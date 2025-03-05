@@ -1,129 +1,95 @@
 <?= $this->extend('layout_admin') ?>
 
 <?= $this->section('content') ?>
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Add New User</h3>
-        <div class="card-tools">
-            <a href="/admin/users" class="btn btn-sm" style="background-color: #5a6268; color: white;">
-                <i class="fas fa-arrow-left"></i> Back to Users
-            </a>
-        </div>
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">Add New Product</h3>
     </div>
-    <!-- /.card-header -->
     <div class="card-body">
-        <form id="addUserForm" action="/admin/users/store" method="post" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-9">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" id="username" name="username" value="<?= old('username') ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['username'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" id="password" name="password" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['password'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="fullname">Full Name</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" id="fullname" name="fullname" value="<?= old('fullname') ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['fullname'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" id="phone" name="phone" value="<?= old('phone') ?>">
-                        <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['phone'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="role">Role</label>
-                        <select class="form-control <?= session()->has('errors') && isset(session('errors')['role']) ? 'is-invalid' : '' ?>" id="role" name="role" required>
-                            <option value="admin" <?= old('role') == 'admin' ? 'selected' : '' ?>>Admin</option>
-                            <option value="staff" <?= old('role') == 'staff' ? 'selected' : '' ?>>Staff</option>
-                        </select>
-                        <?php if (session()->has('errors') && isset(session('errors')['role'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['role'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
-                <div class="col-md-3">
-                    <div class="form-group text-center">
-                        <label>Profile Photo</label>
-                        <div class="mt-2 mb-3">
-                            <img id="preview-image" src="<?= base_url('assets/image/default_staff.png') ?>" 
-                                alt="Preview" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;">
-                        </div>
-                        <div class="custom-file mt-3">
-                            <input type="file" class="custom-file-input <?= session()->has('errors') && isset(session('errors')['photo']) ? 'is-invalid' : '' ?>" id="photo" name="photo" accept="image/*" onchange="previewImage()">
-                            <label class="custom-file-label" for="photo">Choose file</label>
-                            <?php if (session()->has('errors') && isset(session('errors')['photo'])): ?>
-                                <div class="invalid-feedback">
-                                    <?= session('errors')['photo'] ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <small class="text-muted">Leave blank to use default photo</small>
-                    </div>
-                </div>
-            </div>
-            
+        <form id="addProductForm" action="/products/store" method="post">
+            <?= csrf_field() ?>
+
             <div class="form-group">
-                <input type="hidden" name="status" value="active"> <!-- Hidden input for status -->
+                <label for="product_name">Product Name</label>
+                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['product_name']) ? 'is-invalid' : '' ?>" id="product_name" name="product_name" value="<?= old('product_name') ?>" required>
+                <?php if (session()->has('errors') && isset(session('errors')['product_name'])): ?>
+                    <div class="invalid-feedback">
+                        <?= session('errors')['product_name'] ?>
+                    </div>
+                <?php endif; ?>
             </div>
-            
+
+            <div class="form-group">
+                <label for="product_category_id">Category</label>
+                <select class="form-control select2" id="product_category_id" name="product_category_id" required>
+                    <option value="">Select Category</option>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= $category['product_category_id'] ?>" <?= old('product_category_id') == $category['product_category_id'] ? 'selected' : '' ?>>
+                            <?= $category['product_category_name'] ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="supplier_id">Supplier</label>
+                <select class="form-control select2" id="supplier_id" name="supplier_id" required>
+                    <option value="">Select Supplier</option>
+                    <?php foreach ($suppliers as $supplier): ?>
+                        <option value="<?= $supplier['supplier_id'] ?>" <?= old('supplier_id') == $supplier['supplier_id'] ? 'selected' : '' ?>>
+                            <?= $supplier['supplier_name'] ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
             <button type="button" id="saveBtn" class="btn btn-primary mr-2">Save</button>
-            <a href="/admin/users" id="cancelBtn" class="btn btn-default">Cancel</a>
+            <a href="/products" id="cancelBtn" class="btn btn-default">Cancel</a>
         </form>
     </div>
-    <!-- /.card-body -->
 </div>
-<!-- /.card -->
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
 <script>
-    // Preview Image
-    function previewImage() {
-        const preview = document.getElementById('preview-image');
-        const file = document.getElementById('photo').files[0];
-        const reader = new FileReader();
-        
-        reader.onloadend = function() {
-            preview.src = reader.result;
-        }
-        
-        if (file) {
-            reader.readAsDataURL(file);
-        } else {
-            // Show default image based on selected role
-            const role = document.getElementById('role').value;
-            preview.src = '<?= base_url('assets/image/') ?>' + (role === 'admin' ? 'default_admin.png' : 'default_staff.png');
-        }
-    }
+    $(document).ready(function() {
+        // Initialize Select2 for category and supplier dropdowns with search functionality
+        $('#product_category_id').select2({
+            theme: 'bootstrap',
+            placeholder: 'Search for a category...',
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "No category found";
+                },
+                searching: function() {
+                    return "Searching...";
+                }
+            },
+            escapeMarkup: function(markup) {
+                return markup;
+            }
+        });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        bsCustomFileInput.init();
+        $('#supplier_id').select2({
+            theme: 'bootstrap',
+            placeholder: 'Search for a supplier...',
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "No supplier found";
+                },
+                searching: function() {
+                    return "Searching...";
+                }
+            },
+            escapeMarkup: function(markup) {
+                return markup;
+            }
+        });
 
         // Save Button Confirmation
         document.getElementById('saveBtn').addEventListener('click', function() {
@@ -139,7 +105,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('addUserForm').submit();
+                    document.getElementById('addProductForm').submit();
                 }
             });
         });
@@ -159,7 +125,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/admin/users';  // Redirect back to users page
+                    window.location.href = '/products';  // Redirect back to products page
                 }
             });
         });
