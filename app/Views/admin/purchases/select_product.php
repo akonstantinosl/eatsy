@@ -21,6 +21,8 @@
                 <?= csrf_field() ?>
 
                 <input type="hidden" name="supplier_id" value="<?= esc($supplier_id) ?>">
+                <!-- Add hidden field for updated_at -->
+                <input type="hidden" name="updated_at" id="updated_at" value="<?= date('Y-m-d H:i:s') ?>">
 
                 <div id="product-section" class="table-responsive">
                     <table class="table table-bordered table-striped" id="product-table">
@@ -280,6 +282,122 @@
         return newRow;
     }
     
+    // Function to calculate and display row total
+    function calculateRowTotal(row) {
+        const boxBought = parseInt(row.find('.box-bought').val()) || 0;
+        const pricePerBox = parseFloat(row.find('.price-per-box').val()) || 0;
+        const totalPrice = boxBought * pricePerBox;
+        
+        // Format the total price with thousands separator
+        const formattedPrice = new Intl.NumberFormat('id-ID').format(totalPrice);
+        row.find('.total-price').text(formattedPrice);
+    }
+    
+    // Function to calculate and update the grand total
+    function updateGrandTotal() {
+        let grandTotal = 0;
+        
+        $('.product-row').each(function() {
+            const boxBought = parseInt($(this).find('.box-bought').val()) || 0;
+            const pricePerBox = parseFloat($(this).find('.price-per-box').val()) || 0;
+            grandTotal += boxBought * pricePerBox;
+        });
+        
+        // Format the grand total with thousands separator
+        const formattedGrandTotal = new Intl.NumberFormat('id-ID').format(grandTotal);
+        $('#grand-total').text(formattedGrandTotal);
+    }
+    
+    // Form validation
+    $('#purchase-form').submit(function(event) {
+        event.preventDefault();
+        
+        // Check if at least one product is selected
+        let hasSelectedProducts = false;
+        $('.product-select').each(function() {
+            if ($(this).val() !== "") {
+                hasSelectedProducts = true;
+                return false; // break the loop
+            }
+        });
+        
+        if (!hasSelectedProducts) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Please select at least one product.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Check for empty price fields
+        let hasEmptyPrices = false;
+        $('.product-select').each(function() {
+            if ($(this).val() !== "") {
+                const row = $(this).closest('.product-row');
+                const pricePerBox = parseFloat(row.find('.price-per-box').val());
+                
+                if (pricePerBox === 0) {
+                    hasEmptyPrices = true;
+                    return false; // break the loop
+                }
+            }
+        });
+        
+        if (hasEmptyPrices) {
+            Swal.fire({
+                title: 'Price Warning',
+                text: 'Some products have a price of 0. Do you want to continue?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, continue',
+                cancelButtonText: 'No, I\'ll fix it',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitForm();
+                }
+            });
+            return;
+        }
+        
+        // If all validation passes, show confirmation dialog
+        Swal.fire({
+            title: 'Save Purchase',
+            text: 'Are you sure you want to save this purchase order?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, save purchase',
+            cancelButtonText: 'No, review again',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                submitForm();
+            }
+        });
+    });
+
+    // Function to submit the form
+    function submitForm() {
+        // Format date in local timezone
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const localDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        
+        // Update the timestamp before submission
+        $('#updated_at').val(localDateTime);
+        
+        // Submit the form
+        $('#purchase-form')[0].submit();
+    }
+    
     // Initialize page
     $(document).ready(function() {
         // Initialize Select2 for existing product selects
@@ -348,77 +466,6 @@
             addProductRow();
         });
         
-        // Form validation
-        $('#purchase-form').submit(function(event) {
-            event.preventDefault();
-            
-            // Check if at least one product is selected
-            let hasSelectedProducts = false;
-            $('.product-select').each(function() {
-                if ($(this).val() !== "") {
-                    hasSelectedProducts = true;
-                    return false; // break the loop
-                }
-            });
-            
-            if (!hasSelectedProducts) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Please select at least one product.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
-            
-            // Check for empty price fields
-            let hasEmptyPrices = false;
-            $('.product-select').each(function() {
-                if ($(this).val() !== "") {
-                    const row = $(this).closest('.product-row');
-                    const pricePerBox = parseFloat(row.find('.price-per-box').val());
-                    
-                    if (pricePerBox === 0) {
-                        hasEmptyPrices = true;
-                        return false; // break the loop
-                    }
-                }
-            });
-            
-            if (hasEmptyPrices) {
-                Swal.fire({
-                    title: 'Price Warning',
-                    text: 'Some products have a price of 0. Do you want to continue?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, continue',
-                    cancelButtonText: 'No, I\'ll fix it',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.submit();
-                    }
-                });
-                return;
-            }
-            
-            // If all validation passes, show confirmation dialog
-            Swal.fire({
-                title: 'Save Purchase',
-                text: 'Are you sure you want to save this purchase order?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, save purchase',
-                cancelButtonText: 'No, review again',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Submit the form
-                    this.submit();
-                }
-            });
-        });
-        
         // Add cancel button confirmation
         $('#cancelPurchaseBtn').click(function(event) {
             event.preventDefault();
@@ -456,32 +503,6 @@
             });
         <?php endif; ?>
     });
-    
-    // Function to calculate and display row total
-    function calculateRowTotal(row) {
-        const boxBought = parseInt(row.find('.box-bought').val()) || 0;
-        const pricePerBox = parseFloat(row.find('.price-per-box').val()) || 0;
-        const totalPrice = boxBought * pricePerBox;
-        
-        // Format the total price with thousands separator
-        const formattedPrice = new Intl.NumberFormat('id-ID').format(totalPrice);
-        row.find('.total-price').text(formattedPrice);
-    }
-    
-    // Function to calculate and update the grand total
-    function updateGrandTotal() {
-        let grandTotal = 0;
-        
-        $('.product-row').each(function() {
-            const boxBought = parseInt($(this).find('.box-bought').val()) || 0;
-            const pricePerBox = parseFloat($(this).find('.price-per-box').val()) || 0;
-            grandTotal += boxBought * pricePerBox;
-        });
-        
-        // Format the grand total with thousands separator
-        const formattedGrandTotal = new Intl.NumberFormat('id-ID').format(grandTotal);
-        $('#grand-total').text(formattedGrandTotal);
-    }
 </script>
 
 <style>
