@@ -30,10 +30,34 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout" role="button">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                <!-- User Dropdown Menu -->
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <?php
+                        // Determine if the photo is a default one stored in assets/image or a user-uploaded one
+                        $userPhoto = session()->get('user_photo');
+                        $photoPath = (in_array($userPhoto, ['default_admin.png', 'default_staff.png']))
+                            ? base_url('assets/image/' . $userPhoto)
+                            : base_url('uploads/users/' . $userPhoto);
+                        ?>
+                        <img src="<?= $photoPath ?>" class="user-image img-circle elevation-2" alt="User Image">
+                        <span class="d-none d-md-inline"><?= session()->get('user_name') ?></span>
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <!-- User image -->
+                        <li class="user-header bg-primary">
+                            <img src="<?= $photoPath ?>" class="img-circle elevation-2" alt="User Image">
+                            <p>
+                                <?= session()->get('user_fullname') ?>
+                                <small><?= ucfirst(session()->get('user_role')) ?></small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                        <a href="/profile/edit" class="btn btn-default btn-flat">Profile</a>
+                            <a href="/logout" class="btn btn-default btn-flat float-right">Sign out</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>
@@ -50,115 +74,109 @@
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="<?= $photoPath ?>" class="img-circle elevation-2" alt="User Image">
+                    </div>
                     <div class="info">
-                        <a href="#" class="d-block"><?= session()->get('user_name') ?> (Admin)</a>
+                    <a href="/profile/edit" class="d-block"><?= session()->get('user_name') ?> (Admin)</a>
                     </div>
                 </div>
 
-            <!-- Sidebar Menu -->
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <li class="nav-item">
-                        <a href="/admin/dashboard" class="nav-link <?= (current_url() == base_url('admin/dashboard')) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="/admin/dashboard" class="nav-link <?= (current_url() == base_url('admin/dashboard')) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="/admin/users" class="nav-link <?= (strpos(current_url(), base_url('admin/users')) !== false) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Users</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="/admin/users" class="nav-link <?= (strpos(current_url(), base_url('admin/users')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Users</p>
+                            </a>
+                        </li>
 
-                    <!-- Products Menu -->
-                    <li class="nav-item has-treeview <?= (strpos(current_url(), base_url('admin/products')) !== false) ? 'menu-open' : '' ?>">
-                        <a href="#" class="nav-link <?= (strpos(current_url(), base_url('admin/products')) !== false) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-cube"></i>
-                            <p>
-                                Products
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <!-- All Products -->
-                            <li class="nav-item">
-                                <a href="/products" class="nav-link <?= (current_url() == base_url('admin/products')) ? 'active' : '' ?>">
-                                    <i class="fas fa-boxes nav-icon"></i>
-                                    <p>All Products</p>
-                                </a>
-                            </li>
-                            <!-- Categories -->
-                            <!-- <li class="nav-item">
-                                <a href="/admin/products/categories" class="nav-link <?= (current_url() == base_url('admin/products/categories')) ? 'active' : '' ?>">
-                                    <i class="fas fa-tags nav-icon"></i>
-                                    <p>Product Categories</p>
-                                </a>
-                            </li> -->
-                            <!-- Product Purchase -->
-                            <li class="nav-item">
-                                <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
-                                    <i class="fas fa-cart-plus nav-icon"></i>
-                                    <p>Product Purchases</p>
-                                </a>
-                            </li>
-                            <!-- Sales -->
-                            <li class="nav-item">
-                                <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
-                                    <i class="fas fa-cash-register nav-icon"></i>
-                                    <p>Product Sales</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                        <!-- Products Menu -->
+                        <li class="nav-item has-treeview <?= (strpos(current_url(), base_url('admin/products')) !== false) ? 'menu-open' : '' ?>">
+                            <a href="#" class="nav-link <?= (strpos(current_url(), base_url('admin/products')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-cube"></i>
+                                <p>
+                                    Products
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <!-- All Products -->
+                                <li class="nav-item">
+                                    <a href="/products" class="nav-link <?= (current_url() == base_url('admin/products')) ? 'active' : '' ?>">
+                                        <i class="fas fa-boxes nav-icon"></i>
+                                        <p>All Products</p>
+                                    </a>
+                                </li>
+                                <!-- Product Purchase -->
+                                <li class="nav-item">
+                                    <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
+                                        <i class="fas fa-cart-plus nav-icon"></i>
+                                        <p>Product Purchases</p>
+                                    </a>
+                                </li>
+                                <!-- Sales -->
+                                <li class="nav-item">
+                                    <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
+                                        <i class="fas fa-cash-register nav-icon"></i>
+                                        <p>Product Sales</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>Customers</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>Customers</p>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-truck"></i>
-                            <p>Suppliers</p>
-                        </a>
-                    </li>
-                    <!-- Reports Menu -->
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-bar"></i>
-                            <p>
-                                Reports
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="<?= base_url('admin/reports/purchases') ?>" class="nav-link">
-                                    <i class="fas fa-cart-plus nav-icon"></i>
-                                    <p>Purchase Reports</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="<?= base_url('admin/reports/sales') ?>" class="nav-link">
-                                    <i class="fas fa-cash-register nav-icon"></i>
-                                    <p>Sale Reports</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="<?= base_url('admin/reports/profit') ?>" class="nav-link">
-                                    <i class="fas fa-money-bill-wave nav-icon"></i>
-                                    <p>Profit Reports</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-
+                        <li class="nav-item">
+                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>Suppliers</p>
+                            </a>
+                        </li>
+                        <!-- Reports Menu -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <p>
+                                    Reports
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="<?= base_url('admin/reports/purchases') ?>" class="nav-link">
+                                        <i class="fas fa-cart-plus nav-icon"></i>
+                                        <p>Purchase Reports</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('admin/reports/sales') ?>" class="nav-link">
+                                        <i class="fas fa-cash-register nav-icon"></i>
+                                        <p>Sale Reports</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('admin/reports/profit') ?>" class="nav-link">
+                                        <i class="fas fa-money-bill-wave nav-icon"></i>
+                                        <p>Profit Reports</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
             </div>
@@ -234,6 +252,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <!-- BS Custom File Input -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bs-custom-file-input/1.3.4/bs-custom-file-input.min.js"></script>
     <!-- Sweet Alert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Include Select2 CSS dan JS files -->

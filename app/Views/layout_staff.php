@@ -30,10 +30,34 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout" role="button">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                <!-- User Dropdown Menu -->
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <?php
+                        // Determine if the photo is a default one stored in assets/image or a user-uploaded one
+                        $userPhoto = session()->get('user_photo') ?? 'default_staff.png';
+                        $photoPath = (in_array($userPhoto, ['default_admin.png', 'default_staff.png']))
+                            ? base_url('assets/image/' . $userPhoto)
+                            : base_url('uploads/users/' . $userPhoto);
+                        ?>
+                        <img src="<?= $photoPath ?>" class="user-image img-circle elevation-2" alt="User Image">
+                        <span class="d-none d-md-inline"><?= session()->get('user_name') ?></span>
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <!-- User image -->
+                        <li class="user-header bg-primary">
+                            <img src="<?= $photoPath ?>" class="img-circle elevation-2" alt="User Image">
+                            <p>
+                                <?= session()->get('user_fullname') ?>
+                                <small>Staff</small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <a href="/profile/edit" class="btn btn-default btn-flat">Profile</a>
+                            <a href="/logout" class="btn btn-default btn-flat float-right">Sign out</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>
@@ -50,8 +74,11 @@
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="<?= $photoPath ?>" class="img-circle elevation-2" alt="User Image" style="width: 34px; height: 34px; object-fit: cover;">
+                    </div>
                     <div class="info">
-                        <a href="#" class="d-block"><?= session()->get('user_name') ?> (Staff)</a>
+                        <a href="/profile/edit" class="d-block"><?= session()->get('user_name') ?> (Staff)</a>
                     </div>
                 </div>
 
@@ -158,6 +185,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <!-- BS Custom File Input -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bs-custom-file-input/1.3.4/bs-custom-file-input.min.js"></script>
+    <!-- Sweet Alert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Additional scripts -->
     <?= $this->renderSection('scripts') ?>
 </body>

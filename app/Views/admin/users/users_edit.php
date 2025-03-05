@@ -74,19 +74,8 @@
                         <?php endif; ?>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select class="form-control <?= session()->has('errors') && isset(session('errors')['status']) ? 'is-invalid' : '' ?>" 
-                            id="status" name="status" required>
-                            <option value="active" <?= (old('status', $user['user_status']) == 'active') ? 'selected' : '' ?>>Active</option>
-                            <option value="inactive" <?= (old('status', $user['user_status']) == 'inactive') ? 'selected' : '' ?>>Inactive</option>
-                        </select>
-                        <?php if (session()->has('errors') && isset(session('errors')['status'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['status'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+                    <!-- Hidden Status Field - Keeps the current value -->
+                    <input type="hidden" name="status" value="<?= old('status', $user['user_status']) ?>">
                 </div>
                 
                 <div class="col-md-3">
@@ -100,7 +89,8 @@
                                 : base_url('uploads/users/' . $user['user_photo']);
                             ?>
                             <img id="preview-image" src="<?= $photoPath ?>" 
-                                alt="User Photo" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;">
+                                alt="User Photo" class="img-circle elevation-2" style="width: 150px; height: 150px; object-fit: cover;"
+                                onerror="this.onerror=null; this.src='<?= base_url('assets/image/default_staff.png') ?>';">
                         </div>
                         <div class="custom-file mt-3">
                             <input type="file" class="custom-file-input <?= session()->has('errors') && isset(session('errors')['photo']) ? 'is-invalid' : '' ?>" 

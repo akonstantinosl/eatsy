@@ -92,11 +92,19 @@
                 <tbody>
                     <?php 
                     $startIndex = ($currentPage - 1) * $perPage + 1;
+                    $displayIndex = 0;
+                    $currentUserId = session()->get('user_id');
+                    
                     if (!empty($users)): 
                         foreach ($users as $index => $user): 
+                            // Skip the current logged-in user
+                            if ($user['user_id'] == $currentUserId) {
+                                continue;
+                            }
+                            $displayIndex++;
                     ?>
                         <tr>
-                            <td><?= $startIndex + $index ?></td>
+                            <td><?= $startIndex + $displayIndex - 1 ?></td>
                             <td><?= $user['user_name'] ?></td>
                             <td><?= $user['user_fullname'] ?></td>
                             <td><?= $user['user_phone'] ?></td>
@@ -112,18 +120,24 @@
                                     <a href="/admin/users/edit/<?= $user['user_id'] ?>" class="btn btn-warning btn-sm mr-2">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <?php if ($user['user_id'] != session()->get('user_id')): ?>
                                     <button type="button" class="btn btn-danger btn-sm btn-inactive" data-userid="<?= $user['user_id'] ?>" data-username="<?= $user['user_fullname'] ?>">
                                         <i class="fas fa-trash"></i> Inactive
                                     </button>
-                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
                     <?php 
                         endforeach; 
-                    else: 
+                        
+                        // If no users are displayed after filtering out the current user
+                        if ($displayIndex == 0):
                     ?>
+                        <tr>
+                            <td colspan="6" class="text-center">No other active users found</td>
+                        </tr>
+                    <?php endif; ?>
+                    
+                    <?php else: ?>
                         <tr>
                             <td colspan="6" class="text-center">No active users found</td>
                         </tr>
@@ -137,7 +151,17 @@
             <div class="row">
                 <div class="col-sm-12 col-md-5">
                     <div class="dataTables_info" role="status" aria-live="polite">
-                        Showing <?= $startIndex ?> to <?= min($startIndex + count($users) - 1, $total) ?> of <?= $total ?> entries
+                        <?php 
+                        // Adjust the total count by subtracting 1 for the current user
+                        $adjustedTotal = $total;
+                        if (in_array($currentUserId, array_column($users, 'user_id'))) {
+                            $adjustedTotal = $total - 1;
+                        }
+                        
+                        // Show count excluding the current user
+                        $displayedEnd = min($startIndex + $displayIndex - 1, $adjustedTotal);
+                        ?>
+                        Showing <?= $displayIndex > 0 ? $startIndex : 0 ?> to <?= $displayedEnd ?> of <?= $adjustedTotal ?> entries
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-7">
@@ -153,6 +177,9 @@
                             // Create the query string
                             $queryString = http_build_query($queryParams);
                             $queryPrefix = !empty($queryString) ? '&' : '';
+                            
+                            // Calculate total pages based on adjusted total
+                            $totalPages = ceil($adjustedTotal / $perPage);
                             ?>
                         
                             <?php if ($currentPage > 1): ?>
@@ -166,7 +193,6 @@
                             <?php endif; ?>
                             
                             <?php 
-                            $totalPages = ceil($total / $perPage);
                             $maxPagesToShow = 5;
                             $startPage = max(1, min($currentPage - floor($maxPagesToShow / 2), $totalPages - $maxPagesToShow + 1));
                             $endPage = min($startPage + $maxPagesToShow - 1, $totalPages);

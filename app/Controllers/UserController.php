@@ -36,8 +36,13 @@ class UserController extends BaseController
         // Get search term (if any)
         $search = $this->request->getGet('search');
         
-        // Base query
-        $query = $this->userModel->where('user_status', 'active');
+        // Get current user ID
+        $currentUserId = session()->get('user_id');
+        
+        // Base query - exclude the current user from the results
+        $query = $this->userModel
+            ->where('user_status', 'active')
+            ->where('user_id !=', $currentUserId);
         
         // Apply role filter if set
         if ($roleFilter && in_array($roleFilter, ['admin', 'staff'])) {
@@ -97,8 +102,7 @@ class UserController extends BaseController
             'password' => 'required|min_length[6]',
             'fullname' => 'required',
             'phone' => 'permit_empty|numeric|min_length[10]',
-            'role' => 'required|in_list[admin,staff]',
-            'status' => 'required|in_list[active,inactive]'
+            'role' => 'required|in_list[admin,staff]'
         ];
 
         if (!$this->validate($rules)) {
@@ -148,7 +152,9 @@ class UserController extends BaseController
         $photoName = ($role === 'admin') ? 'default_admin.png' : 'default_staff.png';
 
         if ($photo && $photo->isValid() && !$photo->hasMoved()) {
-            $newName = $userId . '.' . $photo->getExtension();
+            // Generate a random string for the filename to avoid conflicts
+            $randomStr = bin2hex(random_bytes(8)); // 16 character random string
+            $newName = $userId . '_' . $randomStr . '.' . $photo->getExtension();
             $photo->move(ROOTPATH . 'public/uploads/users', $newName);
             $photoName = $newName;
         }
@@ -161,7 +167,7 @@ class UserController extends BaseController
             'user_phone' => $this->request->getPost('phone'),
             'user_photo' => $photoName,
             'user_role' => $role,
-            'user_status' => $this->request->getPost('status'),
+            'user_status' => 'active', // Automatically set status to active
             'created_at' => date('Y-m-d H:i:s')
         ];
 
@@ -251,7 +257,10 @@ class UserController extends BaseController
         // Upload photo if available
         $photo = $this->request->getFile('photo');
         if ($photo && $photo->isValid() && !$photo->hasMoved()) {
-            $newName = $user['user_id'] . '.' . $photo->getExtension();
+            // Generate a random string for the filename to avoid conflicts
+            $randomStr = bin2hex(random_bytes(8)); // 16 character random string
+            $newName = $user['user_id'] . '_' . $randomStr . '.' . $photo->getExtension();
+            
             $photo->move(ROOTPATH . 'public/uploads/users', $newName);
             $data['user_photo'] = $newName;
             

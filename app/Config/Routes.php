@@ -40,6 +40,12 @@ $routes->get('login', 'AuthController::loginPage');
 $routes->post('login', 'AuthController::login');
 $routes->get('logout', 'AuthController::logout');
 
+// User profile routes (accessible to both admin and staff)
+$routes->group('profile', ['filter' => 'auth'], function($routes) {
+    $routes->get('edit', 'ProfileController::edit');
+    $routes->post('update', 'ProfileController::update');
+});
+
 // Products management
 $routes->group('products', function($routes) {
     $routes->get('', 'ProductController::index');

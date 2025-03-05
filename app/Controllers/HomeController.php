@@ -12,6 +12,41 @@ use App\Models\PurchaseModel;
 
 class HomeController extends BaseController
 {
+    protected $userModel;
+    
+    public function __construct()
+    {
+        $this->userModel = new UserModel();
+    }
+    
+    /**
+     * Load user data into session for consistent display across layouts
+     */
+    protected function loadUserData()
+    {
+        // Get user data for navbar and sidebar if not already in session
+        if (!session()->get('user_fullname') || !session()->get('user_photo')) {
+            $userData = $this->userModel->find(session()->get('user_id'));
+            if ($userData) {
+                // Store user data in session
+                session()->set('user_fullname', $userData['user_fullname']);
+                
+                // Set default photo based on user role if none exists
+                if (empty($userData['user_photo'])) {
+                    $defaultPhoto = (session()->get('user_role') == 'admin') ? 'default_admin.png' : 'default_staff.png';
+                    session()->set('user_photo', $defaultPhoto);
+                } else {
+                    session()->set('user_photo', $userData['user_photo']);
+                }
+            } else {
+                // Set default values if user data not found
+                session()->set('user_fullname', session()->get('user_name'));
+                $defaultPhoto = (session()->get('user_role') == 'admin') ? 'default_admin.png' : 'default_staff.png';
+                session()->set('user_photo', $defaultPhoto);
+            }
+        }
+    }
+    
     public function index()
     {
         return view('landing_page');
@@ -23,8 +58,10 @@ class HomeController extends BaseController
             return redirect()->to('login');
         }
         
+        // Load user data into session
+        $this->loadUserData();
+        
         // Initialize models
-        $userModel = new UserModel();
         $supplierModel = new SupplierModel();
         $customerModel = new CustomerModel();
         $productModel = new ProductModel();
@@ -32,7 +69,7 @@ class HomeController extends BaseController
         $purchaseModel = new PurchaseModel();
         
         // Get counts for dashboard widgets
-        $data['totalUsers'] = $userModel->countAll();
+        $data['totalUsers'] = $this->userModel->countAll();
         $data['totalSuppliers'] = $supplierModel->countAll();
         $data['totalCustomers'] = $customerModel->countAll();
         $data['totalProducts'] = $productModel->countAll();
@@ -72,6 +109,9 @@ class HomeController extends BaseController
         if (!session()->get('logged_in') || session()->get('user_role') != 'staff') {
             return redirect()->to('login');
         }
+        
+        // Load user data into session
+        $this->loadUserData();
         
         // Initialize models
         $customerModel = new CustomerModel();
