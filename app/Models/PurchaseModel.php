@@ -16,12 +16,12 @@ class PurchaseModel extends Model
         'purchase_id', 
         'supplier_id', 
         'user_id', 
-        'purchase_date', 
         'purchase_amount', 
         'order_status', 
         'purchase_status', 
         'purchase_notes', 
-        'created_at'
+        'created_at',
+        'updated_at'
     ];
 
     // Dates

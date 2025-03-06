@@ -28,10 +28,10 @@
                     <table class="table table-bordered table-striped" id="product-table">
                         <thead class="thead-light">
                             <tr>
-                                <th style="width: 45%">Product</th>
+                                <th style="width: 40%">Product</th>
                                 <th style="width: 15%">Quantity</th>
-                                <th style="width: 22%">Price per Unit</th>
-                                <th style="width: 18%">Total</th>
+                                <th style="width: 22%">Purchase Price</th>
+                                <th style="width: 15%">Unit Price</th>
                                 <th style="width: 8%">Action</th>
                             </tr>
                         </thead>
@@ -61,12 +61,12 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">IDR</span>
                                         </div>
-                                        <input type="number" name="products[0][price_per_unit]" class="form-control price-per-unit" min="0" value="0" required>
+                                        <input type="number" name="products[0][purchase_price]" class="form-control purchase-price" min="0" value="0" required>
                                     </div>
                                 </td>
                                 <td class="text-right">
-                                    <div class="price-display">
-                                    <span class="total-price">0</span> IDR
+                                    <div class="price-display read-only-field">
+                                        <span class="unit-price">0</span> IDR
                                     </div>
                                 </td>
                                 <td class="text-center">
@@ -78,15 +78,15 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-light">
-                                <td colspan="3" class="text-right font-weight-bold pr-3">
-                                    <span style="line-height: 38px;">Grand Total:</span>
+                                <td colspan="2" class="text-right font-weight-bold pr-3">
+                                    <span style="line-height: 38px;">Grand Total</span>
                                 </td>
                                 <td class="text-right font-weight-bold">
                                     <div class="price-display grand-total-display text-right">
                                         <span id="grand-total">0</span> IDR
                                     </div>
                                 </td>
-                                <td></td>
+                                <td colspan="2"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -175,8 +175,8 @@
             updateAvailableOptions();
         }
         
-        // Calculate total for this row
-        calculateRowTotal(row);
+        // Calculate unit price for this row
+        calculateUnitPrice(row);
         updateGrandTotal();
     }
     
@@ -228,12 +228,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">IDR</span>
                         </div>
-                        <input type="number" name="products[${rowCount}][price_per_unit]" class="form-control price-per-unit" min="0" value="0" required>
+                        <input type="number" name="products[${rowCount}][purchase_price]" class="form-control purchase-price" min="0" value="0" required>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="price-display">
-                        <span class="total-price">0</span> IDR
+                        <span class="unit-price">0</span> IDR
                     </div>
                 </td>
                 <td class="text-center">
@@ -259,15 +259,15 @@
         return newRow;
     }
     
-    // Function to calculate and display row total
-    function calculateRowTotal(row) {
-        const quantityBought = parseInt(row.find('.quantity-bought').val()) || 0;
-        const pricePerUnit = parseFloat(row.find('.price-per-unit').val()) || 0;
-        const totalPrice = quantityBought * pricePerUnit;
+    // Function to calculate and display unit price
+    function calculateUnitPrice(row) {
+        const quantityBought = parseInt(row.find('.quantity-bought').val()) || 1;
+        const purchasePrice = parseFloat(row.find('.purchase-price').val()) || 0;
+        const unitPrice = quantityBought > 0 ? purchasePrice / quantityBought : 0;
         
-        // Format the total price with thousands separator
-        const formattedPrice = new Intl.NumberFormat('id-ID').format(totalPrice);
-        row.find('.total-price').text(formattedPrice);
+        // Format the unit price with thousands separator
+        const formattedPrice = new Intl.NumberFormat('id-ID').format(unitPrice);
+        row.find('.unit-price').text(formattedPrice);
     }
 
     // Function to calculate and update the grand total
@@ -275,9 +275,8 @@
         let grandTotal = 0;
         
         $('.product-row').each(function() {
-            const quantityBought = parseInt($(this).find('.quantity-bought').val()) || 0;
-            const pricePerUnit = parseFloat($(this).find('.price-per-unit').val()) || 0;
-            grandTotal += quantityBought * pricePerUnit;
+            const purchasePrice = parseFloat($(this).find('.purchase-price').val()) || 0;
+            grandTotal += purchasePrice;
         });
         
         // Format the grand total with thousands separator
@@ -313,9 +312,9 @@
         $('.product-select').each(function() {
             if ($(this).val() !== "") {
                 const row = $(this).closest('.product-row');
-                const pricePerUnit = parseFloat(row.find('.price-per-unit').val());
+                const purchasePrice = parseFloat(row.find('.purchase-price').val());
                 
-                if (pricePerUnit === 0) {
+                if (purchasePrice === 0) {
                     hasEmptyPrices = true;
                     return false; // break the loop
                 }
@@ -402,8 +401,8 @@
             // Clear the fields
             select.val('').trigger('change');
             row.find('.quantity-bought').val('1');
-            row.find('.price-per-unit').val('0');
-            row.find('.total-price').text('0');
+            row.find('.purchase-price').val('0');
+            row.find('.unit-price').text('0');
             
             // Update grand total
             updateGrandTotal();
@@ -462,10 +461,10 @@
             });
         });
         
-        // Calculate row total when inputs change
-        $(document).on('input', '.quantity-bought, .price-per-unit', function() {
+        // Calculate unit price when inputs change
+        $(document).on('input', '.quantity-bought, .purchase-price', function() {
             const row = $(this).closest('.product-row');
-            calculateRowTotal(row);
+            calculateUnitPrice(row);
             updateGrandTotal();
         });
         
@@ -611,8 +610,8 @@
         border-color: #b8daff;
     }
     
-    /* Total price display */
-    .total-price {
+    /* Unit price display */
+    .unit-price {
         font-weight: 600;
     }
     
@@ -636,6 +635,22 @@
     .product-row td {
         vertical-align: middle;
         padding: 10px 8px;
+    }
+    /* Read-only field styling */
+    .read-only-field {
+        background-color: #e9ecef;
+        color: #495057;
+        border: 1px solid #ced4da;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+
+    .read-only-field:before {
+        display: block;
+        font-size: 0.7rem;
+        color: #6c757d;
+        font-weight: normal;
+        margin-bottom: 3px;
     }
 </style>
 <?= $this->endSection() ?>

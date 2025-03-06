@@ -77,10 +77,10 @@ class PurchaseController extends Controller
         // Apply search filter if set
         if ($search) {
             $query = $query->groupStart()
-                          ->like('users.user_fullname', $search) // Buyer search
-                          ->orLike('suppliers.supplier_name', $search) // Supplier search
-                          ->orLike('suppliers.supplier_phone', $search) // Contact search
-                          ->groupEnd();
+                        ->like('users.user_fullname', $search) // Buyer search
+                        ->orLike('suppliers.supplier_name', $search) // Supplier search
+                        ->orLike('suppliers.supplier_phone', $search) // Contact search
+                        ->groupEnd();
         }
         
         // Get total count based on filters
@@ -130,9 +130,32 @@ class PurchaseController extends Controller
         // Create pager links
         $pager->setPath('admin/purchases');
         
-        // Get newly created or updated purchase IDs from flash data
-        $newPurchaseId = session()->getFlashdata('new_purchase_id');
-        $updatedPurchaseId = session()->getFlashdata('updated_purchase_id');
+        // Inisialisasi waktu sekarang untuk perbandingan
+        $currentTime = new \DateTime();
+        
+        // Persiapkan array untuk menampung ID pembelian baru dan diperbarui
+        $newPurchaseIds = [];
+        $updatedPurchaseIds = [];
+        
+        // Loop melalui semua pembelian untuk memeriksa timestamp
+        foreach ($purchases as $purchase) {
+            $updatedAt = new \DateTime($purchase['updated_at']);
+            $interval = $currentTime->diff($updatedAt);
+            
+            // Konversi interval ke menit
+            $minutesDiff = $interval->days * 24 * 60 + $interval->h * 60 + $interval->i;
+            
+            // Jika pembelian diperbarui dalam 5 menit terakhir
+            if ($minutesDiff <= 5) {
+                if ($purchase['order_status'] === 'pending') {
+                    // Tandai sebagai pembelian baru
+                    $newPurchaseIds[] = $purchase['purchase_id'];
+                } else if (in_array($purchase['order_status'], ['cancelled', 'ordered', 'completed'])) {
+                    // Tandai sebagai pembelian diperbarui
+                    $updatedPurchaseIds[] = $purchase['purchase_id'];
+                }
+            }
+        }
         
         // Pass data to the view
         return view('admin/purchases/purchases_index', [
@@ -145,8 +168,8 @@ class PurchaseController extends Controller
             'search' => $search,
             'sortField' => $sortField,
             'sortDir' => $sortDir,
-            'newPurchaseId' => $newPurchaseId,
-            'updatedPurchaseId' => $updatedPurchaseId
+            'newPurchaseIds' => $newPurchaseIds,
+            'updatedPurchaseIds' => $updatedPurchaseIds
         ]);
     }
 
@@ -310,11 +333,10 @@ class PurchaseController extends Controller
                 continue; // Skip if product not found
             }
 
-            // Calculate the total price for each product - FIXED VARIABLE NAMES
+            // Get the purchase price directly from the input - UPDATED
             $quantityBought = (int)$product['quantity_bought'];
-            $pricePerUnit = (float)$product['price_per_unit'];
-            $totalPrice = $quantityBought * $pricePerUnit;
-
+            $purchasePrice = (float)$product['purchase_price'];
+            
             // Generate unique purchase detail ID
             $purchaseDetailId = 'PUD' . str_pad($purchaseDetailNumber++, 6, '0', STR_PAD_LEFT);
 
@@ -326,7 +348,7 @@ class PurchaseController extends Controller
                     'purchase_id' => $purchaseId,
                     'product_id' => $product['product_id'],
                     'quantity_bought' => $quantityBought,
-                    'price_per_unit' => $pricePerUnit,
+                    'purchase_price' => $purchasePrice, // Store the total purchase price
                     'created_at' => $currentTimestamp,
                     'updated_at' => $currentTimestamp
                 ]);
@@ -338,14 +360,14 @@ class PurchaseController extends Controller
             }
 
             // Add to total amount
-            $totalAmount += $totalPrice;
+            $totalAmount += $purchasePrice;
 
             // Add product detail for the view - UPDATED FIELD NAMES
             $purchaseDetails[] = [
                 'product_name' => $productData['product_name'],
                 'quantity_bought' => $quantityBought,
-                'price_per_unit' => $pricePerUnit,
-                'total_price' => $totalPrice
+                'purchase_price' => $purchasePrice,
+                'unit_price' => $quantityBought > 0 ? $purchasePrice / $quantityBought : 0
             ];
         }
 
@@ -454,7 +476,7 @@ class PurchaseController extends Controller
         }
         
         // Set flash data for highlighting updated purchase
-        session()->setFlashdata('updated_purchase_id', $purchaseId);
+        session()->setFlashdata('updated_purchase_id', $purchaseId, 300);
         
         return redirect()->to('/admin/purchases/details/' . $purchaseId)
             ->with('success', 'Purchase status updated to ' . ucfirst($newStatus));
@@ -476,29 +498,47 @@ class PurchaseController extends Controller
                 continue; // Skip if product not found
             }
             
-            // Calculate new units to add to stock - UPDATED FIELD NAMES
+            // Calculate new units to add to stock
             $newUnits = $detail['quantity_bought']; 
             
-            // Calculate total purchase cost for this item - UPDATED FIELD NAMES
-            $purchaseCost = $detail['quantity_bought'] * $detail['price_per_unit'];
+            // Calculate unit price (buying_price is per unit)
+            $unitPrice = $detail['quantity_bought'] > 0 ? 
+                $detail['purchase_price'] / $detail['quantity_bought'] : 0;
+                
+            // Calculate the current total value of inventory
+            $currentStock = $product['product_stock'];
+            $currentTotalValue = $product['buying_price'] * $currentStock;
             
-            // Calculate the new average purchase price
-            $currentTotalValue = $product['purchase_price'] * $product['product_stock'];
-            $newTotalValue = $currentTotalValue + $purchaseCost;
-            $newTotalUnits = $product['product_stock'] + $newUnits;
+            // Calculate the total value of new purchase
+            $newPurchaseValue = $unitPrice * $newUnits;
             
-            // Guard against division by zero
-            $newAveragePrice = $newTotalUnits > 0 ? $newTotalValue / $newTotalUnits : 0;
+            // Calculate new total stock
+            $newTotalStock = $currentStock + $newUnits;
             
-            // Update the product
+            // Calculate new weighted average buying price
+            $newAverageBuyingPrice = 0;
+            if ($newTotalStock > 0) {
+                $newAverageBuyingPrice = ($currentTotalValue + $newPurchaseValue) / $newTotalStock;
+            } else {
+                $newAverageBuyingPrice = $unitPrice; // Fallback if somehow stock is still 0
+            }
+            
+            // Update the product with new stock and buying price
             $productModel->update($detail['product_id'], [
-                'product_stock' => $newTotalUnits,
-                'purchase_price' => $newAveragePrice,
+                'product_stock' => $newTotalStock,
+                'buying_price' => $newAverageBuyingPrice,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+            
+            // Log the update for debugging
+            log_message('info', "Product ID: {$detail['product_id']} updated - " .
+                            "Previous Stock: {$currentStock}, New Stock: {$newTotalStock}, " .
+                            "Unit Price of Purchase: {$unitPrice}, " .
+                            "Previous Buying Price: {$product['buying_price']}, " .
+                            "New Average Buying Price: {$newAverageBuyingPrice}");
         }
         
         // Log the stock update activity
-        log_message('info', "Product stock updated for purchase ID: {$purchaseId}");
+        log_message('info', "Product stock and prices updated for purchase ID: {$purchaseId}");
     }
 }

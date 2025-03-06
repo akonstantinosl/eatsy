@@ -141,7 +141,7 @@
                         <th>#</th>
                         <th>Product Name</th>
                         <th class="text-center">Quantity</th>
-                        <th class="text-center">Price per Unit</th>
+                        <th class="text-center">Unit Price</th>
                         <th class="text-right">Total Price</th>
                     </tr>
                 </thead>
@@ -154,14 +154,16 @@
                         <?php $grandTotal = 0; ?>
                         <?php foreach ($purchase_details as $index => $detail): ?>
                             <?php 
-                                $totalPrice = $detail['quantity_bought'] * $detail['price_per_unit'];
+                                // Calculate unit price by dividing total purchase price by quantity
+                                $unitPrice = $detail['purchase_price'] / $detail['quantity_bought'];
+                                $totalPrice = $detail['purchase_price']; // Purchase price is already the total
                                 $grandTotal += $totalPrice;
                             ?>
                             <tr>
                                 <td><?= $index + 1 ?></td>
                                 <td><?= esc($detail['product_name']) ?></td>
                                 <td class="text-center"><?= $detail['quantity_bought'] ?></td>
-                                <td class="text-center"><?= number_format($detail['price_per_unit'], 0, ',', '.') ?> IDR</td>
+                                <td class="text-center"><?= number_format($unitPrice, 0, ',', '.') ?> IDR</td>
                                 <td class="text-right"><?= number_format($totalPrice, 0, ',', '.') ?> IDR</td>
                             </tr>
                         <?php endforeach; ?>
@@ -169,7 +171,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="4" class="text-right font-weight-bold">Grand Total:</td>
+                        <td colspan="4" class="text-right font-weight-bold">Grand Total</td>
                         <td class="text-right font-weight-bold"><?= number_format($grandTotal, 0, ',', '.') ?> IDR</td>
                     </tr>
                 </tfoot>

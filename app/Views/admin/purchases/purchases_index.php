@@ -152,8 +152,8 @@
                     if (!empty($purchases)): 
                         foreach ($purchases as $index => $purchase): 
                             // Check if this is a newly created or updated purchase
-                            $isNewPurchase = isset($newPurchaseId) && $purchase['purchase_id'] == $newPurchaseId;
-                            $isUpdatedPurchase = isset($updatedPurchaseId) && $purchase['purchase_id'] == $updatedPurchaseId;
+                            $isNewPurchase = isset($newPurchaseIds) && in_array($purchase['purchase_id'], $newPurchaseIds);
+                            $isUpdatedPurchase = isset($updatedPurchaseIds) && in_array($purchase['purchase_id'], $updatedPurchaseIds);
                             $rowClass = $isNewPurchase ? 'table-success' : ($isUpdatedPurchase ? 'table-info' : '');
                     ?>
                         <tr class="<?= $rowClass ?>">
@@ -193,14 +193,16 @@
                                 <span class="badge <?= $statusClass ?>"><?= $statusText ?></span> 
                             </td>
                             <td>
-                                <a href="/admin/purchases/details/<?= esc($purchase['purchase_id']) ?>" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
-                                <?php if($isNewPurchase): ?>
-                                    <span class="badge badge-success ml-2">NEW</span>
-                                <?php elseif($isUpdatedPurchase): ?>
-                                    <span class="badge badge-info ml-2">UPDATED</span>
-                                <?php endif; ?>
+                                <div class="d-flex align-items-center">
+                                    <a href="/admin/purchases/details/<?= esc($purchase['purchase_id']) ?>" class="btn btn-info btn-sm mr-2">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <?php if($isNewPurchase): ?>
+                                        <span class="badge badge-success">NEW</span>
+                                    <?php elseif($isUpdatedPurchase): ?>
+                                        <span class="badge badge-info">UPDATED</span>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php 

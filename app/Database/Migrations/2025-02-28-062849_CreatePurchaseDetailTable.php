@@ -13,7 +13,7 @@ class CreatePurchaseDetailsTable extends Migration
             'purchase_id'        => ['type' => 'VARCHAR', 'constraint' => 20],
             'product_id'         => ['type' => 'VARCHAR', 'constraint' => 20],
             'quantity_bought'    => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
-            'price_per_unit'      => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
+            'purchase_price'    => ['type' => 'FLOAT', 'constraint' => 20, 'default' => 0],
             'created_at'         => ['type' => 'DATETIME', 'null' => true],
             'updated_at'       => ['type' => 'DATETIME', 'null' => true],
         ]);
