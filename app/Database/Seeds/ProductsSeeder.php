@@ -13,7 +13,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('1', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Chitato 80g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 10000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000001', 
@@ -25,7 +25,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('2', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Taro 75g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 7000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000001',
@@ -37,7 +37,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('3', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Lays Original 75g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 9500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000001',
@@ -49,7 +49,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('4', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Qtela Singkong 85g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000001',
@@ -61,7 +61,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('5', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Pringles Original 107g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 18000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000001',
@@ -75,7 +75,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('6', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Indomie Goreng 85g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 3500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000002',  
@@ -87,7 +87,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('7', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Mie Sedaap Goreng 90g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 3300,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000002',  
@@ -99,7 +99,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('8', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Indomie Soto 75g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 3200,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000002',  
@@ -111,7 +111,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('9', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Pop Mie Ayam 75g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 6000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000002',  
@@ -123,7 +123,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('10', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Buristo Beef 100g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000002',  
@@ -137,7 +137,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('11', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Ayam Fillet 1kg',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 40000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000003',  
@@ -149,7 +149,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('12', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Daging Sapi 500g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 70000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000003',  
@@ -161,7 +161,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('13', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Nugget Ayam 500g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 30000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000003',  
@@ -173,7 +173,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('14', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Bakso Sapi 300g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 25000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000003',  
@@ -185,7 +185,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('15', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Sosis Ayam 500g',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 22000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000003',  
@@ -199,7 +199,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('16', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Coca-Cola 330ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 7500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000004',  
@@ -211,7 +211,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('17', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Pepsi 330ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 7500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000004',  
@@ -223,7 +223,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('18', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Sprite 390ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000004',  
@@ -235,7 +235,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('19', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Fanta 390ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000004',  
@@ -247,7 +247,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('20', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'A&W Root Beer 330ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000004',  
@@ -261,7 +261,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('21', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Teh Botol Sosro 450ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 5000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000005',  
@@ -273,7 +273,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('22', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Teh Pucuk Harum 350ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 4500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000005', 
@@ -285,7 +285,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('23', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Teh Kotak 300ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 5000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000005', 
@@ -297,7 +297,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('24', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Teh Gelas 200ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 2500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000005', 
@@ -309,7 +309,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('25', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Fruit Tea 350ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 5500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000005', 
@@ -323,7 +323,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('26', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Buavita Jeruk 250ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000006',  
@@ -335,7 +335,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('27', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Minute Maid Pulpy 350ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 9000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000006', 
@@ -347,7 +347,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('28', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'UC1000 Vitamin Orange 140ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8000,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000006', 
@@ -359,7 +359,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('29', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Floridina 350ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 6500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000006', 
@@ -371,7 +371,7 @@ class ProductsSeeder extends Seeder
             [
                 'product_id'         => 'PDT' . str_pad('30', 6, '0', STR_PAD_LEFT),
                 'product_name'       => 'Buavita Mangga 250ml',  
-                'purchase_price'     => 0,
+                'buying_price'       => 0,
                 'selling_price'      => 8500,
                 'product_stock'      => 0,
                 'product_category_id'=> 'CAT000006', 

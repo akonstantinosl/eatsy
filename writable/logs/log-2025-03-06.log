@@ -331,3 +331,67 @@ DEBUG - 2025-03-06 10:25:50 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2025-03-06 10:28:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-03-06 10:28:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2025-03-06 10:28:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-03-06 11:58:34 --> mysqli_sql_exception: Unknown column 'purchase_price' in 'field list' in /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php:327
+Stack trace:
+#0 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php(327): mysqli->query()
+#1 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseBuilder.php(1841): CodeIgniter\Database\BaseConnection->query()
+#4 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseBuilder.php(2230): CodeIgniter\Database\BaseBuilder->batchExecute()
+#5 /var/www/html/eatsy/app/Database/Seeds/ProductsSeeder.php(385): CodeIgniter\Database\BaseBuilder->insertBatch()
+#6 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/Seeder.php(147): App\Database\Seeds\ProductsSeeder->run()
+#7 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Commands/Database/Seed.php(79): CodeIgniter\Database\Seeder->call()
+#8 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Commands.php(70): CodeIgniter\Commands\Database\Seed->run()
+#9 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Console.php(48): CodeIgniter\CLI\Commands->run()
+#10 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(360): CodeIgniter\CLI\Console->run()
+#11 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(104): CodeIgniter\Boot::runCommand()
+#12 /var/www/html/eatsy/spark(84): CodeIgniter\Boot::bootSpark()
+#13 {main}
+ERROR - 2025-03-06 12:02:00 --> Error connecting to the database: mysqli_sql_exception: Unknown database 'eatsydev' in /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php:201
+Stack trace:
+#0 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php(201): mysqli->real_connect()
+#1 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect()
+#2 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#3 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query()
+#4 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+#5 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MigrationRunner.php(758): CodeIgniter\Database\BaseConnection->tableExists()
+#6 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MigrationRunner.php(162): CodeIgniter\Database\MigrationRunner->ensureTable()
+#7 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Commands/Database/Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest()
+#8 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Commands.php(70): CodeIgniter\Commands\Database\Migrate->run()
+#9 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Console.php(48): CodeIgniter\CLI\Commands->run()
+#10 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(360): CodeIgniter\CLI\Console->run()
+#11 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(104): CodeIgniter\Boot::runCommand()
+#12 /var/www/html/eatsy/spark(84): CodeIgniter\Boot::bootSpark()
+#13 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Unknown database 'eatsydev' in /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php:246
+Stack trace:
+#0 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect()
+#1 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(620): CodeIgniter\Database\BaseConnection->initialize()
+#2 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query()
+#3 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+#4 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MigrationRunner.php(758): CodeIgniter\Database\BaseConnection->tableExists()
+#5 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MigrationRunner.php(162): CodeIgniter\Database\MigrationRunner->ensureTable()
+#6 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Commands/Database/Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest()
+#7 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Commands.php(70): CodeIgniter\Commands\Database\Migrate->run()
+#8 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Console.php(48): CodeIgniter\CLI\Commands->run()
+#9 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(360): CodeIgniter\CLI\Console->run()
+#10 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(104): CodeIgniter\Boot::runCommand()
+#11 /var/www/html/eatsy/spark(84): CodeIgniter\Boot::bootSpark()
+#12 {main}
+ERROR - 2025-03-06 12:02:28 --> mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`eatsydev`.`products`, CONSTRAINT `products_product_category_id_foreign` FOREIGN KEY (`product_category_id`) REFERENCES `product_categories` (`product_category_id`) ON DELETE CASCADE ON UPDATE) in /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php:327
+Stack trace:
+#0 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/MySQLi/Connection.php(327): mysqli->query()
+#1 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(738): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseConnection.php(652): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseBuilder.php(1841): CodeIgniter\Database\BaseConnection->query()
+#4 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/BaseBuilder.php(2230): CodeIgniter\Database\BaseBuilder->batchExecute()
+#5 /var/www/html/eatsy/app/Database/Seeds/ProductsSeeder.php(385): CodeIgniter\Database\BaseBuilder->insertBatch()
+#6 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Database/Seeder.php(147): App\Database\Seeds\ProductsSeeder->run()
+#7 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Commands/Database/Seed.php(79): CodeIgniter\Database\Seeder->call()
+#8 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Commands.php(70): CodeIgniter\Commands\Database\Seed->run()
+#9 /var/www/html/eatsy/vendor/codeigniter4/framework/system/CLI/Console.php(48): CodeIgniter\CLI\Commands->run()
+#10 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(360): CodeIgniter\CLI\Console->run()
+#11 /var/www/html/eatsy/vendor/codeigniter4/framework/system/Boot.php(104): CodeIgniter\Boot::runCommand()
+#12 /var/www/html/eatsy/spark(84): CodeIgniter\Boot::bootSpark()
+#13 {main}

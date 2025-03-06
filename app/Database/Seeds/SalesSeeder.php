@@ -9,14 +9,13 @@ class SalesSeeder extends Seeder
     public function run()
     {
         $data = [
-            // 10 transaksi dengan status completed
             [
                 'sale_id'           => 'SAL' . str_pad('1', 6, '0', STR_PAD_LEFT),
                 'customer_id'       => 'CUS000001',
                 'user_id'           => 'USR000001',
-                'sale_amount'       => 0, // Akan diupdate berdasarkan sale_details
+                'sale_amount'       => 0, 
                 'payment_method'    => 'cash',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'processing',
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembelian tunai oleh pelanggan tetap',
                 'created_at'        => '2025-01-05 10:15:00',
@@ -28,7 +27,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000002',
                 'sale_amount'       => 0,
                 'payment_method'    => 'credit_card',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'pending',
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembayaran dengan kartu kredit BCA',
                 'created_at'        => '2025-01-06 14:20:00',
@@ -40,7 +39,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000001',
                 'sale_amount'       => 0,
                 'payment_method'    => 'debit_card',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'processing',
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembelian rutin bulanan',
                 'created_at'        => '2025-01-08 09:45:00',
@@ -52,7 +51,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000003',
                 'sale_amount'       => 0,
                 'payment_method'    => 'e-wallet',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'cancelled', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembayaran menggunakan GoPay',
                 'created_at'        => '2025-01-10 16:30:00',
@@ -64,7 +63,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000002',
                 'sale_amount'       => 0,
                 'payment_method'    => 'cash',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'pending', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembelian untuk stok toko',
                 'created_at'        => '2025-01-12 11:20:00',
@@ -76,7 +75,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000001',
                 'sale_amount'       => 0,
                 'payment_method'    => 'credit_card',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'processing', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembayaran dengan kartu kredit Mandiri',
                 'created_at'        => '2025-01-15 13:10:00',
@@ -88,7 +87,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000003',
                 'sale_amount'       => 0,
                 'payment_method'    => 'e-wallet',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'cancelled', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembayaran menggunakan OVO',
                 'created_at'        => '2025-01-18 10:05:00',
@@ -100,7 +99,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000002',
                 'sale_amount'       => 0,
                 'payment_method'    => 'debit_card',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'pending', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembelian untuk event perusahaan',
                 'created_at'        => '2025-01-20 15:40:00',
@@ -112,7 +111,7 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000001',
                 'sale_amount'       => 0,
                 'payment_method'    => 'cash',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'processing', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembelian dengan diskon loyalitas',
                 'created_at'        => '2025-01-22 09:30:00',
@@ -124,14 +123,12 @@ class SalesSeeder extends Seeder
                 'user_id'           => 'USR000003',
                 'sale_amount'       => 0,
                 'payment_method'    => 'e-wallet',
-                'transaction_status'=> 'completed',
+                'transaction_status'=> 'cancelled', 
                 'sale_status'       => 'continue',
                 'sale_notes'        => 'Pembayaran menggunakan Dana',
                 'created_at'        => '2025-01-25 14:15:00',
                 'updated_at'        => '2025-01-25 14:30:00',
             ],
-            
-            // 10 transaksi dengan status processing
             [
                 'sale_id'           => 'SAL' . str_pad('11', 6, '0', STR_PAD_LEFT),
                 'customer_id'       => 'CUS000002',
@@ -252,8 +249,6 @@ class SalesSeeder extends Seeder
                 'created_at'        => '2025-02-04 15:30:00',
                 'updated_at'        => '2025-02-04 15:30:00',
             ],
-            
-            // 5 transaksi dengan status pending
             [
                 'sale_id'           => 'SAL' . str_pad('21', 6, '0', STR_PAD_LEFT),
                 'customer_id'       => 'CUS000007',
@@ -314,8 +309,6 @@ class SalesSeeder extends Seeder
                 'created_at'        => '2025-02-09 13:30:00',
                 'updated_at'        => '2025-02-09 13:30:00',
             ],
-            
-            // 5 transaksi dengan status cancelled
             [
                 'sale_id'           => 'SAL' . str_pad('26', 6, '0', STR_PAD_LEFT),
                 'customer_id'       => 'CUS000025',
