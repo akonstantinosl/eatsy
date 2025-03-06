@@ -38,11 +38,37 @@ class ProductController extends BaseController
         // Get search term (if any)
         $search = $this->request->getGet('search');
         
+        // Get sort field and direction
+        $sortField = $this->request->getGet('sort') ?? 'created_at';
+        $sortDir = $this->request->getGet('dir') ?? 'desc';
+        
+        // Validate sort field to prevent SQL injection
+        $validSortFields = [
+            'product_name',
+            'product_category_name',
+            'supplier_name',
+            'product_stock',
+            'buying_price',
+            'selling_price',
+            'created_at',
+            'updated_at'
+        ];
+        
+        if (!in_array($sortField, $validSortFields)) {
+            $sortField = 'created_at';
+        }
+        
+        // Validate sort direction
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+        
         // Base query with joins
         $query = $this->productModel
-                ->select('products.product_id, products.product_name, products.purchase_price, products.selling_price, 
-                        products.product_stock, product_categories.product_category_name, 
-                        product_categories.product_category_id, suppliers.supplier_name, suppliers.supplier_id')
+                ->select('products.product_id, products.product_name, products.buying_price, products.selling_price, 
+                        products.product_stock, products.created_at, products.updated_at, 
+                        product_categories.product_category_name, product_categories.product_category_id, 
+                        suppliers.supplier_name, suppliers.supplier_id')
                 ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
                 ->join('suppliers', 'suppliers.supplier_id = products.supplier_id')
                 ->where('product_status', 'active');
@@ -64,6 +90,25 @@ class ProductController extends BaseController
         // Get total count based on filters
         $totalProducts = $query->countAllResults(false);
         
+        // Handle sorting based on table columns
+        if ($sortField === 'product_name') {
+            $query = $query->orderBy('products.product_name', $sortDir);
+        } elseif ($sortField === 'product_category_name') {
+            $query = $query->orderBy('product_categories.product_category_name', $sortDir);
+        } elseif ($sortField === 'supplier_name') {
+            $query = $query->orderBy('suppliers.supplier_name', $sortDir);
+        } elseif ($sortField === 'product_stock') {
+            $query = $query->orderBy('products.product_stock', $sortDir);
+        } elseif ($sortField === 'buying_price') {
+            $query = $query->orderBy('products.buying_price', $sortDir);
+        } elseif ($sortField === 'selling_price') {
+            $query = $query->orderBy('products.selling_price', $sortDir);
+        } elseif ($sortField === 'created_at') {
+            $query = $query->orderBy('products.created_at', $sortDir);
+        } else {
+            $query = $query->orderBy('products.updated_at', $sortDir);
+        }
+        
         // Get paginated products based on filters
         $products = $query
                 ->limit($perPage, ($page - 1) * $perPage)
@@ -75,6 +120,10 @@ class ProductController extends BaseController
         // Create pager links
         $pager->setPath('/products');
         
+        // Get newly created or updated product IDs from flash data
+        $newProductId = session()->getFlashdata('new_product_id');
+        $updatedProductId = session()->getFlashdata('updated_product_id');
+        
         // Pass products data and pager to the view
         return view('/products/products_index', [
             'products' => $products,
@@ -84,7 +133,11 @@ class ProductController extends BaseController
             'perPage' => $perPage,
             'total' => $totalProducts,
             'categoryFilter' => $categoryFilter,
-            'search' => $search
+            'search' => $search,
+            'sortField' => $sortField,
+            'sortDir' => $sortDir,
+            'newProductId' => $newProductId,
+            'updatedProductId' => $updatedProductId
         ]);
     }
 
@@ -135,6 +188,7 @@ class ProductController extends BaseController
             'product_category_id' => $productCategoryId,
             'supplier_id' => $supplierId,
             'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
             'product_status' => 'active', // Default status as active
             'product_stock' => 0, // Default stock to 0
         ];
@@ -142,8 +196,12 @@ class ProductController extends BaseController
         // Insert the new product into the database
         $this->productModel->insert($data);
 
+        // Set flash data to highlight the new product
+        session()->setFlashdata('success', 'Product added successfully.');
+        session()->setFlashdata('new_product_id', $productId);
+
         // Redirect back to the product list with success message
-        return redirect()->to('/products')->with('success', 'Product added successfully.');
+        return redirect()->to('/products');
     }
 
     public function edit($productId)
@@ -177,9 +235,8 @@ class ProductController extends BaseController
         $supplierId = $this->request->getPost('supplier_id');
         $sellingPrice = $this->request->getPost('selling_price');
 
-        // Validate if the required fields are not empty and are greater than 0
-        if (empty($productName) || empty($sellingPrice) || $sellingPrice <= 0) {
-            return redirect()->back()->with('error', 'Product name and selling price must be greater than 0.');
+        if (empty($productName) || $sellingPrice === null || $sellingPrice < 0) {
+            return redirect()->back()->with('error', 'Product name is required and selling price cannot be negative.');
         }
 
         // Prepare data for update
@@ -188,13 +245,18 @@ class ProductController extends BaseController
             'product_category_id' => $productCategoryId,
             'supplier_id' => $supplierId,
             'selling_price' => $sellingPrice,
+            'updated_at' => date('Y-m-d H:i:s'),
         ];
 
         // Update the product
         $this->productModel->update($productId, $data);
 
+        // Set flash data to highlight the updated product
+        session()->setFlashdata('success', 'Product updated successfully.');
+        session()->setFlashdata('updated_product_id', $productId);
+
         // Redirect back to the product list
-        return redirect()->to('/products')->with('success', 'Product updated successfully.');
+        return redirect()->to('/products');
     }
 
     // Delete function to set the product status as inactive instead of deleting it

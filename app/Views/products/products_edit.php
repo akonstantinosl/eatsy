@@ -54,7 +54,7 @@
             <div class="form-group">
                 <label for="selling_price">Selling Price</label>
                 <div class="input-group">
-                    <input type="number" class="form-control" id="selling_price" name="selling_price" value="<?= old('selling_price', $product['selling_price']) ?>" required min="1">
+                    <input type="number" class="form-control" id="selling_price" name="selling_price" value="<?= old('selling_price', $product['selling_price']) ?>" required min="0">
                     <div class="input-group-append">
                         <span class="input-group-text">IDR</span>
                     </div>
@@ -70,83 +70,151 @@
 
 <?= $this->section('scripts') ?>
 <script>
-    $(document).ready(function() {
-        // Initialize Select2 for category and supplier dropdowns with search functionality
-        $('#product_category_id').select2({
-            theme: 'bootstrap',
-            placeholder: 'Search for a category...',
-            allowClear: true,
-            width: '100%',
-            language: {
-                noResults: function() {
-                    return "No category found";
-                },
-                searching: function() {
-                    return "Searching...";
-                }
+$(document).ready(function() {
+    // Initialize Select2 for category and supplier dropdowns with search functionality
+    $('#product_category_id').select2({
+        theme: 'bootstrap',
+        placeholder: 'Search for a category...',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "No category found";
             },
-            escapeMarkup: function(markup) {
-                return markup;
+            searching: function() {
+                return "Searching...";
             }
-        });
+        },
+        escapeMarkup: function(markup) {
+            return markup;
+        }
+    });
 
-        $('#supplier_id').select2({
-            theme: 'bootstrap',
-            placeholder: 'Search for a supplier...',
-            allowClear: true,
-            width: '100%',
-            language: {
-                noResults: function() {
-                    return "No supplier found";
-                },
-                searching: function() {
-                    return "Searching...";
-                }
+    $('#supplier_id').select2({
+        theme: 'bootstrap',
+        placeholder: 'Search for a supplier...',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "No supplier found";
             },
-            escapeMarkup: function(markup) {
-                return markup;
+            searching: function() {
+                return "Searching...";
             }
-        });
+        },
+        escapeMarkup: function(markup) {
+            return markup;
+        }
+    });
 
-        // Update Button Confirmation
-        $('#updateBtn').on('click', function() {
+    // Validate selling price on input change
+    $('#selling_price').on('input', function() {
+        const price = $(this).val();
+        // Check if input is negative
+        if (price < 0) {
             Swal.fire({
-                title: 'Are you sure you want to update this product?',
-                text: 'Please double-check the details before updating.',
-                icon: 'warning',
-                showCancelButton: true,
+                title: 'Invalid Price',
+                text: 'Selling price cannot be negative',
+                icon: 'error',
                 confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, update it!',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#editProductForm').submit();
-                }
+                confirmButtonText: 'OK'
+            }).then(() => {
+                $(this).val('0');
+                $(this).focus();
             });
-        });
+        }
+    });
 
-        // Cancel Button Confirmation
-        $('#cancelBtn').on('click', function(e) {
-            e.preventDefault();
+    // Update Button Confirmation with additional price validation
+    $('#updateBtn').on('click', function(e) {
+        e.preventDefault();
+        
+        // Get form values
+        const productName = $('#product_name').val().trim();
+        const price = $('#selling_price').val();
+        
+        // Validate product name is not empty
+        if (!productName) {
             Swal.fire({
-                title: 'Are you sure you want to cancel?',
-                text: 'Any changes you made will not be saved!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!',
-                cancelButtonText: 'Continue editing',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/products';  // Redirect to the products page
-                }
+                title: 'Required Field',
+                text: 'Product name is required',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                $('#product_name').focus();
             });
+            return;
+        }
+        
+        // Validate selling price (allow zero but not negative)
+        if (price === '' || price === null) {
+            Swal.fire({
+                title: 'Required Field',
+                text: 'Selling price is required',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                $('#selling_price').focus();
+            });
+            return;
+        }
+        
+        // Convert to number for comparison
+        const numericPrice = parseFloat(price);
+        if (numericPrice < 0) {
+            Swal.fire({
+                title: 'Invalid Price',
+                text: 'Selling price cannot be negative',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                $('#selling_price').focus();
+            });
+            return;
+        }
+        
+        // If all validations pass, show confirmation dialog
+        Swal.fire({
+            title: 'Are you sure you want to update this product?',
+            text: 'Please double-check the details before updating.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#editProductForm').submit();
+            }
         });
     });
+
+    // Cancel Button Confirmation
+    $('#cancelBtn').on('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure you want to cancel?',
+            text: 'Any changes you made will not be saved!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'Continue editing',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/products';  // Redirect to the products page
+            }
+        });
+    });
+});
 </script>
 <?= $this->endSection() ?>
 

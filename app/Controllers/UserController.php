@@ -136,7 +136,8 @@ class UserController extends BaseController
             'password' => 'required|min_length[6]',
             'fullname' => 'required',
             'phone' => 'permit_empty|numeric|min_length[10]',
-            'role' => 'required|in_list[admin,staff]'
+            'role' => 'required|in_list[admin,staff]',
+            'status' => 'required|in_list[active,inactive]'
         ];
 
         if (!$this->validate($rules)) {
