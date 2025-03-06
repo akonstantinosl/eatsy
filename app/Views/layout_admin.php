@@ -123,7 +123,7 @@
                                         <p>Product Purchases</p>
                                     </a>
                                 </li>
-                                <!-- Sales -->
+                                <!-- Product Sales -->
                                 <li class="nav-item">
                                     <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
                                         <i class="fas fa-cash-register nav-icon"></i>
@@ -131,6 +131,20 @@
                                     </a>
                                 </li>
                             </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
+                                <i class="fas fa-cart-plus nav-icon"></i>
+                                <p>Purchases</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
+                                <i class="fas fa-cash-register nav-icon"></i>
+                                <p>Sales</p>
+                            </a>
                         </li>
 
                         <li class="nav-item">

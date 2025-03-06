@@ -140,33 +140,28 @@
                     <tr>
                         <th>#</th>
                         <th>Product Name</th>
-                        <th class="text-center">Box Bought</th>
-                        <th class="text-center">Unit per Box</th>
-                        <th class="text-center">Total Units</th>
-                        <th class="text-center">Price per Box</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Price per Unit</th>
                         <th class="text-right">Total Price</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($purchase_details)): ?>
                         <tr>
-                            <td colspan="7" class="text-center">Purchase Detail not Found</td>
+                            <td colspan="5" class="text-center">Purchase Detail not Found</td>
                         </tr>
                     <?php else: ?>
                         <?php $grandTotal = 0; ?>
                         <?php foreach ($purchase_details as $index => $detail): ?>
                             <?php 
-                                $totalUnits = $detail['box_bought'] * $detail['unit_per_box'];
-                                $totalPrice = $detail['box_bought'] * $detail['price_per_box'];
+                                $totalPrice = $detail['quantity_bought'] * $detail['price_per_unit'];
                                 $grandTotal += $totalPrice;
                             ?>
                             <tr>
                                 <td><?= $index + 1 ?></td>
                                 <td><?= esc($detail['product_name']) ?></td>
-                                <td class="text-center"><?= $detail['box_bought'] ?></td>
-                                <td class="text-center"><?= $detail['unit_per_box'] ?></td>
-                                <td class="text-center"><?= $totalUnits ?></td>
-                                <td class="text-center"><?= number_format($detail['price_per_box'], 0, ',', '.') ?> IDR</td>
+                                <td class="text-center"><?= $detail['quantity_bought'] ?></td>
+                                <td class="text-center"><?= number_format($detail['price_per_unit'], 0, ',', '.') ?> IDR</td>
                                 <td class="text-right"><?= number_format($totalPrice, 0, ',', '.') ?> IDR</td>
                             </tr>
                         <?php endforeach; ?>
@@ -174,7 +169,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="6" class="text-right font-weight-bold">Grand Total:</td>
+                        <td colspan="4" class="text-right font-weight-bold">Grand Total:</td>
                         <td class="text-right font-weight-bold"><?= number_format($grandTotal, 0, ',', '.') ?> IDR</td>
                     </tr>
                 </tfoot>
