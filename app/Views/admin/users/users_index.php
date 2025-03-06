@@ -5,6 +5,8 @@
     <div class="card-header p-2">
         <form id="filterForm" action="<?= site_url('admin/users') ?>" method="get" class="mb-0">
             <input type="hidden" name="page" value="<?= $currentPage ?? 1 ?>">
+            <input type="hidden" name="sort" value="<?= $sortField ?? 'updated_at' ?>">
+            <input type="hidden" name="dir" value="<?= $sortDir ?? 'desc' ?>">
             <div class="row align-items-center">
 
                 <div class="col-md-8 col-sm-12">
@@ -51,7 +53,7 @@
                                     <button type="submit" class="btn btn-sm btn-default">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <?php if (!empty($search) || !empty($roleFilter) || $perPage != 10): ?>
+                                    <?php if (!empty($search) || !empty($roleFilter) || $perPage != 10 || $sortField != 'updated_at' || $sortDir != 'desc'): ?>
                                         <a href="/admin/users" class="btn btn-sm btn-danger">
                                             <i class="fas fa-times"></i>
                                         </a>
@@ -82,9 +84,36 @@
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="15%">Username</th>
-                        <th width="25%">Full Name</th>
-                        <th width="15%">Phone</th>
+                        <th width="15%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="user_name">
+                                Username 
+                                <?php if($sortField == 'user_name'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="25%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="user_fullname">
+                                Full Name
+                                <?php if($sortField == 'user_fullname'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="15%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="user_phone">
+                                Phone
+                                <?php if($sortField == 'user_phone'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
                         <th width="10%">Role</th>
                         <th width="30%">Actions</th>
                     </tr>
@@ -102,9 +131,16 @@
                                 continue;
                             }
                             $displayIndex++;
+                            
+                            // Check if this is a newly created or updated user
+                            $isNewUser = isset($newUserId) && $user['user_id'] == $newUserId;
+                            $isUpdatedUser = isset($updatedUserId) && $user['user_id'] == $updatedUserId;
+                            $rowClass = $isNewUser ? 'table-success' : ($isUpdatedUser ? 'table-info' : '');
                     ?>
-                        <tr>
-                            <td><?= $startIndex + $displayIndex - 1 ?></td>
+                        <tr class="<?= $rowClass ?>">
+                            <td>
+                                <?= $startIndex + $displayIndex - 1 ?>
+                            </td>
                             <td><?= $user['user_name'] ?></td>
                             <td><?= $user['user_fullname'] ?></td>
                             <td><?= $user['user_phone'] ?></td>
@@ -124,6 +160,11 @@
                                         <i class="fas fa-trash"></i> Inactive
                                     </button>
                                 </div>
+                                <?php if($isNewUser): ?>
+                                    <span class="badge badge-success ml-2">NEW</span>
+                                <?php elseif($isUpdatedUser): ?>
+                                    <span class="badge badge-info ml-2">UPDATED</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php 
@@ -173,6 +214,8 @@
                             if (!empty($perPage)) $queryParams['entries'] = $perPage;
                             if (!empty($roleFilter)) $queryParams['role'] = $roleFilter;
                             if (!empty($search)) $queryParams['search'] = $search;
+                            if (!empty($sortField)) $queryParams['sort'] = $sortField;
+                            if (!empty($sortDir)) $queryParams['dir'] = $sortDir;
                             
                             // Create the query string
                             $queryString = http_build_query($queryParams);
@@ -256,6 +299,25 @@
         float: right !important;
     }
     
+    /* Sorting styles */
+    th a.sort-link {
+        color: #212529;
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    th a.sort-link:hover {
+        color: #007bff;
+    }
+    
+    /* Animation for new/updated rows */
+    .table-success, .table-info {
+        transition: background-color 3s;
+    }
+    
     /* Optimize for smaller screens */
     @media (max-width: 768px) {
         .btn-sm {
@@ -286,7 +348,6 @@
 </style>
 
 <script>
-    // Reset page parameter when search or filter changes
     document.addEventListener('DOMContentLoaded', function() {
         // Get all the form controls that should reset the page parameter
         const formControls = document.querySelectorAll('#filterForm select, #filterForm input[type="text"]');
@@ -305,6 +366,40 @@
                 document.getElementById('filterForm').submit();
             }
         });
+        
+        // Handle column sorting
+        const sortLinks = document.querySelectorAll('.sort-link');
+        sortLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const sortField = this.getAttribute('data-sort');
+                const currentSort = document.querySelector('input[name="sort"]').value;
+                const currentDir = document.querySelector('input[name="dir"]').value;
+                
+                // Determine new sort direction
+                let newDir = 'asc';
+                if (sortField === currentSort) {
+                    // If clicking the same column, toggle direction
+                    newDir = (currentDir === 'asc') ? 'desc' : 'asc';
+                }
+                
+                // Update form values
+                document.querySelector('input[name="sort"]').value = sortField;
+                document.querySelector('input[name="dir"]').value = newDir;
+                
+                // Reset to page 1 when sort changes
+                document.querySelector('input[name="page"]').value = '1';
+                
+                // Submit the form
+                document.getElementById('filterForm').submit();
+            });
+        });
+        
+        // Fade out highlight effects after a delay
+        setTimeout(function() {
+            document.querySelectorAll('.table-success, .table-info').forEach(function(el) {
+                el.style.backgroundColor = 'transparent';
+            });
+        }, 3000);
         
         // SweetAlert for inactive confirmation
         const inactiveButtons = document.querySelectorAll('.btn-inactive');

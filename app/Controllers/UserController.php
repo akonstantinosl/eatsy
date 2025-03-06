@@ -36,6 +36,28 @@ class UserController extends BaseController
         // Get search term (if any)
         $search = $this->request->getGet('search');
         
+        // Get sort field and direction
+        $sortField = $this->request->getGet('sort') ?? 'updated_at';
+        $sortDir = $this->request->getGet('dir') ?? 'desc';
+        
+        // Validate sort field to prevent SQL injection
+        $validSortFields = [
+            'user_name', 
+            'user_fullname', 
+            'user_phone', 
+            'updated_at',
+            'created_at'
+        ];
+        
+        if (!in_array($sortField, $validSortFields)) {
+            $sortField = 'updated_at';
+        }
+        
+        // Validate sort direction
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+        
         // Get current user ID
         $currentUserId = session()->get('user_id');
         
@@ -61,6 +83,9 @@ class UserController extends BaseController
         // Get total count based on filters
         $totalUsers = $query->countAllResults(false);
         
+        // Add sorting
+        $query = $query->orderBy($sortField, $sortDir);
+        
         // Get paginated users based on filters
         $users = $query
                 ->limit($perPage, ($page - 1) * $perPage)
@@ -68,6 +93,10 @@ class UserController extends BaseController
         
         // Create pager links
         $pager->setPath('admin/users');
+        
+        // Get newly created or updated user IDs from flash data
+        $newUserId = session()->getFlashdata('new_user_id');
+        $updatedUserId = session()->getFlashdata('updated_user_id');
         
         // Pass users data and pager to the view
         return view('admin/users/users_index', [
@@ -77,10 +106,15 @@ class UserController extends BaseController
             'perPage' => $perPage,
             'total' => $totalUsers,
             'roleFilter' => $roleFilter,
-            'search' => $search
+            'search' => $search,
+            'sortField' => $sortField,
+            'sortDir' => $sortDir,
+            'newUserId' => $newUserId,
+            'updatedUserId' => $updatedUserId
         ]);
     }
     
+    // The rest of the controller methods remain unchanged
     public function create()
     {
         if (!session()->get('logged_in') || session()->get('user_role') != 'admin') {
@@ -168,11 +202,13 @@ class UserController extends BaseController
             'user_photo' => $photoName,
             'user_role' => $role,
             'user_status' => 'active', // Automatically set status to active
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
 
         $this->userModel->insert($data);
         session()->setFlashdata('success', 'User successfully added');
+        session()->setFlashdata('new_user_id', $userId);
         return redirect()->to('admin/users');
     }
 
@@ -281,6 +317,7 @@ class UserController extends BaseController
 
         $this->userModel->update($id, $data);
         session()->setFlashdata('success', 'User successfully updated');
+        session()->setFlashdata('updated_user_id', $id);
         return redirect()->to('admin/users');
     }
     
