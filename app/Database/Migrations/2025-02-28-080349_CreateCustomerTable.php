@@ -10,7 +10,7 @@ class CreateCustomerTable extends Migration
     {
         $this->forge->addField([
             'customer_id'     => ['type' => 'VARCHAR', 'constraint' => 20],
-            'customer_name'   => ['type' => 'VARCHAR', 'constraint' => 100],
+            'customer_name'   => ['type' => 'VARCHAR', 'constraint' => 255],
             'customer_phone'  => ['type' => 'VARCHAR', 'constraint' => 20],
             'customer_address'=> ['type' => 'TEXT'],
             'customer_status' => ['type' => 'ENUM', 'constraint' => ['active', 'inactive'], 'default' => 'active'],

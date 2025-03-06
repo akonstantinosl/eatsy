@@ -10,7 +10,7 @@ class CreateSuppliersTable extends Migration
     {
         $this->forge->addField([
             'supplier_id'     => ['type' => 'VARCHAR', 'constraint' => 20],
-            'supplier_name'   => ['type' => 'VARCHAR', 'constraint' => 100],
+            'supplier_name'   => ['type' => 'VARCHAR', 'constraint' => 255],
             'supplier_phone'  => ['type' => 'VARCHAR', 'constraint' => 20],
             'supplier_address'=> ['type' => 'TEXT'],
             'supplier_status' => ['type' => 'ENUM', 'constraint' => ['active', 'inactive'], 'default' => 'active'],

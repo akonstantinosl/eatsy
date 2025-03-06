@@ -10,12 +10,12 @@ class CreateSaleDetailsTable extends Migration
     {
         $this->forge->addField([
             'sale_detail_id' => ['type' => 'VARCHAR', 'constraint' => 20],
-            'sale_id' => ['type' => 'VARCHAR', 'constraint' => 20],
-            'product_id' => ['type' => 'VARCHAR', 'constraint' => 20],
-            'quantity_sold' => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+            'sale_id'        => ['type' => 'VARCHAR', 'constraint' => 20],
+            'product_id'     => ['type' => 'VARCHAR', 'constraint' => 20],
+            'quantity_sold'  => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
             'price_per_unit' => ['type' => 'FLOAT', 'constraint' => 20, 'null' => true],
-            'created_at' => ['type' => 'DATETIME', 'null' => true],
-            'updated_at' => ['type' => 'DATETIME', 'null' => true],
+            'created_at'     => ['type' => 'DATETIME', 'null' => true],
+            'updated_at'     => ['type' => 'DATETIME', 'null' => true],
         ]);
         
         $this->forge->addPrimaryKey('sale_detail_id');

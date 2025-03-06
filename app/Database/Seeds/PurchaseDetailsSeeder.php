@@ -17,8 +17,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 20,
                 'price_per_box'      => 8000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-05 10:15:30',
+                'updated_at'         => '2025-01-05 14:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('2', 6, '0', STR_PAD_LEFT),
@@ -27,8 +27,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 5000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-05 10:15:30',
+                'updated_at'         => '2025-01-05 14:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('3', 6, '0', STR_PAD_LEFT),
@@ -37,8 +37,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 5,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 35000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-05 10:15:30',
+                'updated_at'         => '2025-01-05 14:30:00',
             ],
             
             // Purchase 2 (2 produk)
@@ -49,8 +49,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 5000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-07 09:20:15',
+                'updated_at'         => '2025-01-07 13:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('5', 6, '0', STR_PAD_LEFT),
@@ -59,8 +59,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 4,
                 'unit_per_box'       => 8,
                 'price_per_box'      => 60000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-07 09:20:15',
+                'updated_at'         => '2025-01-07 13:45:00',
             ],
             
             // Purchase 3 (3 produk)
@@ -71,8 +71,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-10 11:30:00',
+                'updated_at'         => '2025-01-10 16:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('7', 6, '0', STR_PAD_LEFT),
@@ -81,8 +81,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-10 11:30:00',
+                'updated_at'         => '2025-01-10 16:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('8', 6, '0', STR_PAD_LEFT),
@@ -91,8 +91,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-10 11:30:00',
+                'updated_at'         => '2025-01-10 16:00:00',
             ],
             
             // Purchase 4 (2 produk)
@@ -103,8 +103,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 20,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-12 08:45:00',
+                'updated_at'         => '2025-01-12 11:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('10', 6, '0', STR_PAD_LEFT),
@@ -113,8 +113,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 25,
                 'unit_per_box'       => 30,
                 'price_per_box'      => 3000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-12 08:45:00',
+                'updated_at'         => '2025-01-12 11:30:00',
             ],
             
             // Purchase 5 (2 produk)
@@ -125,8 +125,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 25000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-15 13:20:00',
+                'updated_at'         => '2025-01-15 17:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('12', 6, '0', STR_PAD_LEFT),
@@ -135,8 +135,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 6,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 20000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-15 13:20:00',
+                'updated_at'         => '2025-01-15 17:00:00',
             ],
             
             // Purchase 6 (3 produk)
@@ -147,8 +147,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 40,
                 'price_per_box'      => 7500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-18 09:30:00',
+                'updated_at'         => '2025-01-18 12:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('14', 6, '0', STR_PAD_LEFT),
@@ -157,8 +157,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 3000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-18 09:30:00',
+                'updated_at'         => '2025-01-18 12:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('15', 6, '0', STR_PAD_LEFT),
@@ -167,8 +167,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-18 09:30:00',
+                'updated_at'         => '2025-01-18 12:15:00',
             ],
             
             // Purchase 7 (2 produk)
@@ -179,8 +179,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-20 14:00:00',
+                'updated_at'         => '2025-01-20 16:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('17', 6, '0', STR_PAD_LEFT),
@@ -189,8 +189,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 5000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-20 14:00:00',
+                'updated_at'         => '2025-01-20 16:30:00',
             ],
             
             // Purchase 8 (3 produk)
@@ -201,8 +201,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 20,
                 'price_per_box'      => 8000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-22 10:45:00',
+                'updated_at'         => '2025-01-22 14:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('19', 6, '0', STR_PAD_LEFT),
@@ -211,8 +211,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-22 10:45:00',
+                'updated_at'         => '2025-01-22 14:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('20', 6, '0', STR_PAD_LEFT),
@@ -221,8 +221,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-22 10:45:00',
+                'updated_at'         => '2025-01-22 14:00:00',
             ],
             
             // Purchase 9 (2 produk)
@@ -233,8 +233,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-25 09:15:00',
+                'updated_at'         => '2025-01-25 13:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('22', 6, '0', STR_PAD_LEFT),
@@ -243,8 +243,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-25 09:15:00',
+                'updated_at'         => '2025-01-25 13:30:00',
             ],
             
             // Purchase 10 (2 produk)
@@ -255,8 +255,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 5,
                 'unit_per_box'       => 8,
                 'price_per_box'      => 60000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-28 11:00:00',
+                'updated_at'         => '2025-01-28 15:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('24', 6, '0', STR_PAD_LEFT),
@@ -265,8 +265,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-28 11:00:00',
+                'updated_at'         => '2025-01-28 15:45:00',
             ],
             
             // Purchase 11 (2 produk) - Ordered
@@ -277,8 +277,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 20,
                 'price_per_box'      => 8000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-02 08:30:00',
+                'updated_at'         => '2025-02-02 10:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('26', 6, '0', STR_PAD_LEFT),
@@ -287,8 +287,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 6,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 35000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-02 08:30:00',
+                'updated_at'         => '2025-02-02 10:15:00',
             ],
             
             // Purchase 12 (2 produk) - Ordered
@@ -299,8 +299,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 18,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-05 09:45:00',
+                'updated_at'         => '2025-02-05 11:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('28', 6, '0', STR_PAD_LEFT),
@@ -309,8 +309,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-05 09:45:00',
+                'updated_at'         => '2025-02-05 11:30:00',
             ],
             
             // Purchase 13 (2 produk) - Ordered
@@ -321,8 +321,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 7,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 35000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-08 13:00:00',
+                'updated_at'         => '2025-02-08 14:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('30', 6, '0', STR_PAD_LEFT),
@@ -331,8 +331,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 18000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-08 13:00:00',
+                'updated_at'         => '2025-02-08 14:45:00',
             ],
             
             // Purchase 14 (2 produk) - Ordered
@@ -343,8 +343,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-10 10:30:00',
+                'updated_at'         => '2025-02-10 12:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('32', 6, '0', STR_PAD_LEFT),
@@ -353,8 +353,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-10 10:30:00',
+                'updated_at'         => '2025-02-10 12:15:00',
             ],
             
             // Purchase 15 (2 produk) - Ordered
@@ -365,8 +365,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 20,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-12 14:15:00',
+                'updated_at'         => '2025-02-12 16:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('34', 6, '0', STR_PAD_LEFT),
@@ -375,8 +375,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-12 14:15:00',
+                'updated_at'         => '2025-02-12 16:00:00',
             ],
             
             // Purchase 16 (2 produk) - Ordered
@@ -387,8 +387,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 5000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-15 09:00:00',
+                'updated_at'         => '2025-02-15 10:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('36', 6, '0', STR_PAD_LEFT),
@@ -397,8 +397,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-15 09:00:00',
+                'updated_at'         => '2025-02-15 10:45:00',
             ],
             
             // Purchase 17 (2 produk) - Ordered
@@ -409,8 +409,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 18,
                 'unit_per_box'       => 40,
                 'price_per_box'      => 7500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-18 11:30:00',
+                'updated_at'         => '2025-02-18 13:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('38', 6, '0', STR_PAD_LEFT),
@@ -419,8 +419,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 3000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-18 11:30:00',
+                'updated_at'         => '2025-02-18 13:15:00',
             ],
             
             // Purchase 18 (2 produk) - Ordered
@@ -431,8 +431,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 20,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-20 13:45:00',
+                'updated_at'         => '2025-02-20 15:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('40', 6, '0', STR_PAD_LEFT),
@@ -441,8 +441,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 18,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-20 13:45:00',
+                'updated_at'         => '2025-02-20 15:30:00',
             ],
             
             // Purchase 19 (2 produk) - Ordered
@@ -453,8 +453,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 25000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-22 10:15:00',
+                'updated_at'         => '2025-02-22 12:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('42', 6, '0', STR_PAD_LEFT),
@@ -463,8 +463,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 20000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-22 10:15:00',
+                'updated_at'         => '2025-02-22 12:00:00',
             ],
             
             // Purchase 20 (2 produk) - Ordered
@@ -475,8 +475,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-25 14:30:00',
+                'updated_at'         => '2025-02-25 16:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('44', 6, '0', STR_PAD_LEFT),
@@ -485,8 +485,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-25 14:30:00',
+                'updated_at'         => '2025-02-25 16:15:00',
             ],
             
             // Purchase 21 (2 produk) - Pending
@@ -497,8 +497,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 20,
                 'price_per_box'      => 8000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-01 09:30:00',
+                'updated_at'         => '2025-03-01 09:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('46', 6, '0', STR_PAD_LEFT),
@@ -507,8 +507,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-01 09:30:00',
+                'updated_at'         => '2025-03-01 09:30:00',
             ],
             
             // Purchase 22 (2 produk) - Pending
@@ -519,8 +519,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 20,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-02 10:45:00',
+                'updated_at'         => '2025-03-02 10:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('48', 6, '0', STR_PAD_LEFT),
@@ -529,8 +529,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-02 10:45:00',
+                'updated_at'         => '2025-03-02 10:45:00',
             ],
             
             // Purchase 23 (2 produk) - Pending
@@ -541,8 +541,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 35000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-03 13:15:00',
+                'updated_at'         => '2025-03-03 13:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('50', 6, '0', STR_PAD_LEFT),
@@ -551,8 +551,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 25000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-03 13:15:00',
+                'updated_at'         => '2025-03-03 13:15:00',
             ],
             
             // Purchase 24 (2 produk) - Pending
@@ -563,8 +563,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-03 15:30:00',
+                'updated_at'         => '2025-03-03 15:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('52', 6, '0', STR_PAD_LEFT),
@@ -573,8 +573,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-03 15:30:00',
+                'updated_at'         => '2025-03-03 15:30:00',
             ],
             
             // Purchase 25 (2 produk) - Pending
@@ -585,8 +585,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 18,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-04 08:45:00',
+                'updated_at'         => '2025-03-04 08:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('54', 6, '0', STR_PAD_LEFT),
@@ -595,8 +595,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-03-04 08:45:00',
+                'updated_at'         => '2025-03-04 08:45:00',
             ],
             
             // Purchase 26 (2 produk) - Cancelled
@@ -607,8 +607,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 5000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-08 10:00:00',
+                'updated_at'         => '2025-01-08 14:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('56', 6, '0', STR_PAD_LEFT),
@@ -617,8 +617,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-08 10:00:00',
+                'updated_at'         => '2025-01-08 14:30:00',
             ],
             
             // Purchase 27 (2 produk) - Cancelled
@@ -629,8 +629,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-16 09:15:00',
+                'updated_at'         => '2025-01-16 11:45:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('58', 6, '0', STR_PAD_LEFT),
@@ -639,8 +639,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 12,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 4000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-16 09:15:00',
+                'updated_at'         => '2025-01-16 11:45:00',
             ],
             
             // Purchase 28 (2 produk) - Cancelled
@@ -651,8 +651,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 3000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-24 13:30:00',
+                'updated_at'         => '2025-01-24 16:00:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('60', 6, '0', STR_PAD_LEFT),
@@ -661,8 +661,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 15,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 6000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-01-24 13:30:00',
+                'updated_at'         => '2025-01-24 16:00:00',
             ],
             
             // Purchase 29 (2 produk) - Cancelled
@@ -673,8 +673,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 6,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 20000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-06 11:00:00',
+                'updated_at'         => '2025-02-06 13:15:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('62', 6, '0', STR_PAD_LEFT),
@@ -683,8 +683,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 5,
                 'unit_per_box'       => 10,
                 'price_per_box'      => 18000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-06 11:00:00',
+                'updated_at'         => '2025-02-06 13:15:00',
             ],
             
             // Purchase 30 (2 produk) - Cancelled
@@ -695,8 +695,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 10,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7500,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-14 14:45:00',
+                'updated_at'         => '2025-02-14 16:30:00',
             ],
             [
                 'purchase_detail_id' => 'PUD' . str_pad('64', 6, '0', STR_PAD_LEFT),
@@ -705,8 +705,8 @@ class PurchaseDetailsSeeder extends Seeder
                 'box_bought'         => 8,
                 'unit_per_box'       => 24,
                 'price_per_box'      => 7000,
-                'created_at'         => date('Y-m-d H:i:s'),
-                'updated_at'         => date('Y-m-d H:i:s'),
+                'created_at'         => '2025-02-14 14:45:00',
+                'updated_at'         => '2025-02-14 16:30:00',
             ],
         ];
 

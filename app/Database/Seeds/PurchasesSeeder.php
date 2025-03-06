@@ -9,13 +9,12 @@ class PurchasesSeeder extends Seeder
     public function run()
     {
         $data = [
-            // Transaksi 1-10 (Completed)
             [
                 'purchase_id'      => 'PUR' . str_pad('1', 6, '0', STR_PAD_LEFT),
                 'supplier_id'      => 'SUP000001',
                 'user_id'          => 'USR000001',
-                'purchase_amount'  => 0, // Akan diupdate dari purchase_details
-                'order_status'     => 'completed',
+                'purchase_amount'  => 0,
+                'order_status'     => 'ordered',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Pembelian rutin bulanan',
                 'created_at'       => '2025-01-05 10:15:30',
@@ -26,7 +25,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000002',
                 'user_id'          => 'USR000002',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'pending',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Restock produk makanan ringan',
                 'created_at'       => '2025-01-07 09:20:15',
@@ -37,7 +36,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000003',
                 'user_id'          => 'USR000001',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'cancelled',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Pembelian minuman soda',
                 'created_at'       => '2025-01-10 11:30:00',
@@ -48,7 +47,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000004',
                 'user_id'          => 'USR000001',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'ordered',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Restock minuman teh',
                 'created_at'       => '2025-01-12 08:45:00',
@@ -59,7 +58,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000005',
                 'user_id'          => 'USR000002',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'pending',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Pembelian makanan beku',
                 'created_at'       => '2025-01-15 13:20:00',
@@ -70,7 +69,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000006',
                 'user_id'          => 'USR000001',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'cancelled',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Pembelian makanan instan',
                 'created_at'       => '2025-01-18 09:30:00',
@@ -81,7 +80,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000007',
                 'user_id'          => 'USR000001',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'ordered',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Restock minuman jus',
                 'created_at'       => '2025-01-20 14:00:00',
@@ -92,7 +91,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000008',
                 'user_id'          => 'USR000002',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'pending',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Pembelian makanan ringan',
                 'created_at'       => '2025-01-22 10:45:00',
@@ -103,7 +102,7 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000009',
                 'user_id'          => 'USR000001',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'cancelled',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Restock produk minuman',
                 'created_at'       => '2025-01-25 09:15:00',
@@ -114,14 +113,12 @@ class PurchasesSeeder extends Seeder
                 'supplier_id'      => 'SUP000010',
                 'user_id'          => 'USR000001',
                 'purchase_amount'  => 0,
-                'order_status'     => 'completed',
+                'order_status'     => 'ordered',
                 'purchase_status'  => 'continue',
                 'purchase_notes'   => 'Pembelian makanan instan',
                 'created_at'       => '2025-01-28 11:00:00',
                 'updated_at'       => '2025-01-28 15:45:00',
             ],
-            
-            // Transaksi 11-20 (Ordered)
             [
                 'purchase_id'      => 'PUR' . str_pad('11', 6, '0', STR_PAD_LEFT),
                 'supplier_id'      => 'SUP000001',
@@ -232,8 +229,6 @@ class PurchasesSeeder extends Seeder
                 'created_at'       => '2025-02-25 14:30:00',
                 'updated_at'       => '2025-02-25 16:15:00',
             ],
-            
-            // Transaksi 21-25 (Pending)
             [
                 'purchase_id'      => 'PUR' . str_pad('21', 6, '0', STR_PAD_LEFT),
                 'supplier_id'      => 'SUP000001',
@@ -290,7 +285,6 @@ class PurchasesSeeder extends Seeder
                 'updated_at'       => '2025-03-04 08:45:00',
             ],
             
-            // Transaksi 26-30 (Cancelled)
             [
                 'purchase_id'      => 'PUR' . str_pad('26', 6, '0', STR_PAD_LEFT),
                 'supplier_id'      => 'SUP000002',

@@ -11,7 +11,7 @@ class CreateProductsTable extends Migration
         $this->forge->addField([
             'product_id'         => ['type' => 'VARCHAR', 'constraint' => 20],
             'product_name'       => ['type' => 'VARCHAR', 'constraint' => 100],
-            'purchase_price'     => ['type' => 'FLOAT', 'constraint' => 20],  
+            'buying_price'       => ['type' => 'FLOAT', 'constraint' => 20],  
             'selling_price'      => ['type' => 'FLOAT', 'constraint' => 20],  
             'product_stock'      => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
             'product_category_id'=> ['type' => 'VARCHAR', 'constraint' => 20],
