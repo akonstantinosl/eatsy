@@ -4,33 +4,22 @@
     <?= $this->extend('layout_staff') ?>
 <?php endif; ?>
 
-
 <?= $this->section('content') ?>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Edit customer</h3>
+        <h3 class="card-title">Edit Customer</h3>
         <div class="card-tools">
             <a href="/customers" class="btn btn-sm" style="background-color: #5a6268; color: white;">
-                <i class="fas fa-arrow-left"></i> Back to customers
+                <i class="fas fa-arrow-left"></i> Back to Customers
             </a>
         </div>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <?php if (session()->has('errors')): ?>
-            <div class="alert alert-danger">
-                <ul>
-                    <?php foreach (session('errors') as $error): ?>
-                        <li><?= $error ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-    
         <form id="customerForm" action="/customers/update/<?= $customer['customer_id'] ?>" method="post">
             <div class="form-group">
                 <label for="customer_name">Customer Name</label>
-                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['customer_name']) ? 'is-invalid' : '' ?>" id="customer_name" name="customer_name" value="<?= old('customer_name', $customer['customer_name']) ?>" required>
+                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['customer_name']) ? 'is-invalid' : '' ?>" id="customer_name" name="customer_name" value="<?= old('customer_name', $customer['customer_name']) ?>" required data-original-value="<?= $customer['customer_name'] ?>">
                 <?php if (session()->has('errors') && isset(session('errors')['customer_name'])): ?>
                     <div class="invalid-feedback">
                         <?= session('errors')['customer_name'] ?>
@@ -40,17 +29,18 @@
 
             <div class="form-group">
                 <label for="customer_phone">Phone Number</label>
-                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['customer_phone']) ? 'is-invalid' : '' ?>" id="customer_phone" name="customer_phone" value="<?= old('customer_phone', $customer['customer_phone']) ?>" required>
+                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['customer_phone']) ? 'is-invalid' : '' ?>" id="customer_phone" name="customer_phone" value="<?= old('customer_phone', $customer['customer_phone']) ?>" required data-original-value="<?= $customer['customer_phone'] ?>">
                 <?php if (session()->has('errors') && isset(session('errors')['customer_phone'])): ?>
                     <div class="invalid-feedback">
                         <?= session('errors')['customer_phone'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Phone number must be unique and at least 10 digits.</small>
             </div>
 
             <div class="form-group">
                 <label for="customer_address">Address</label>
-                <textarea class="form-control <?= session()->has('errors') && isset(session('errors')['customer_address']) ? 'is-invalid' : '' ?>" id="customer_address" name="customer_address" rows="4" required><?= old('customer_address', $customer['customer_address']) ?></textarea>
+                <textarea class="form-control <?= session()->has('errors') && isset(session('errors')['customer_address']) ? 'is-invalid' : '' ?>" id="customer_address" name="customer_address" rows="4" required data-original-value="<?= $customer['customer_address'] ?>"><?= old('customer_address', $customer['customer_address']) ?></textarea>
                 <?php if (session()->has('errors') && isset(session('errors')['customer_address'])): ?>
                     <div class="invalid-feedback">
                         <?= session('errors')['customer_address'] ?>
@@ -76,25 +66,66 @@
             bsCustomFileInput.init();
         }
         
+        // Store original values for comparison
+        let originalName = '<?= addslashes($customer['customer_name']) ?>';
+        let originalPhone = '<?= $customer['customer_phone'] ?>';
+        let originalAddress = '<?= addslashes($customer['customer_address']) ?>';
+        
         // Add input validation for phone number to ensure it's numeric
         document.getElementById('customer_phone').addEventListener('input', function(e) {
             // Replace any non-numeric characters with empty string
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
+        // Function to check if form has been modified
+        function isFormModified() {
+            const nameChanged = document.getElementById('customer_name').value.trim() !== originalName;
+            const phoneChanged = document.getElementById('customer_phone').value.trim() !== originalPhone;
+            const addressChanged = document.getElementById('customer_address').value.trim() !== originalAddress;
+            
+            return nameChanged || phoneChanged || addressChanged;
+        }
+
         // Save Button Confirmation
         document.getElementById('saveBtn').addEventListener('click', function() {
             // First validate the phone input before submission
             const phoneInput = document.getElementById('customer_phone');
-            if (!/^\d+$/.test(phoneInput.value)) {
+            const nameInput = document.getElementById('customer_name');
+            const addressInput = document.getElementById('customer_address');
+            let hasErrors = false;
+            let errorMessages = [];
+            
+            // Validate required fields
+            if (nameInput.value.trim() === '') {
+                errorMessages.push('Customer name is required.');
+                nameInput.classList.add('is-invalid');
+                hasErrors = true;
+            }
+            
+            if (phoneInput.value.trim() === '') {
+                errorMessages.push('Phone number is required.');
+                phoneInput.classList.add('is-invalid');
+                hasErrors = true;
+            } else if (phoneInput.value.trim().length < 10) {
+                errorMessages.push('Phone number must be at least 10 digits.');
+                phoneInput.classList.add('is-invalid');
+                hasErrors = true;
+            }
+            
+            if (addressInput.value.trim() === '') {
+                errorMessages.push('Address is required.');
+                addressInput.classList.add('is-invalid');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
                 Swal.fire({
                     title: 'Validation Error',
-                    text: 'The phone number field must contain only numbers.',
+                    html: errorMessages.join('<br>'),
                     icon: 'error',
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 });
-                phoneInput.focus();
                 return;
             }
             
@@ -115,24 +146,31 @@
             });
         });
 
-        // Cancel Button Confirmation
+        // Cancel Button Confirmation - only show if changes were made
         document.getElementById('cancelBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            Swal.fire({
-                title: 'Are you sure you want to cancel?',
-                text: 'Any changes you made will not be saved!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!',
-                cancelButtonText: 'Continue editing',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/customers';  // Redirect back to the customers page
-                }
-            });
+            
+            // Check if any values have changed
+            if (isFormModified()) {
+                Swal.fire({
+                    title: 'Are you sure you want to cancel?',
+                    text: 'Any changes you made will not be saved!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'Continue editing',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/customers';  // Redirect back to the customers page
+                    }
+                });
+            } else {
+                // No changes, just redirect
+                window.location.href = '/customers';
+            }
         });
 
         // Display SweetAlert for error message if it exists (single error message)
