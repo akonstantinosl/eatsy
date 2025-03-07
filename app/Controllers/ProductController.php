@@ -309,11 +309,13 @@ class ProductController extends BaseController
         // Validate sort field to prevent SQL injection
         $validSortFields = [
             'product_name',
+            'product_category_name',
             'product_stock',
             'sales_quantity',
             'sales_amount',
             'purchase_quantity',
-            'purchase_amount'
+            'purchase_amount',
+            'profit_loss'  // Add profit_loss to valid sort fields
         ];
         
         if (!in_array($sortField, $validSortFields)) {
@@ -381,6 +383,9 @@ class ProductController extends BaseController
             $purchaseQuantity = (int)($purchasesData['total_quantity'] ?? 0);
             $purchaseAmount = (float)($purchasesData['total_amount'] ?? 0);
             
+            // Calculate profit/loss for each product
+            $profitLoss = $salesAmount - $purchaseAmount;
+            
             // Only include products that have either sales or purchase transactions
             if ($salesQuantity > 0 || $purchaseQuantity > 0) {
                 // Create transaction data entry
@@ -392,17 +397,28 @@ class ProductController extends BaseController
                     'sales_quantity' => $salesQuantity,
                     'sales_amount' => $salesAmount,
                     'purchase_quantity' => $purchaseQuantity,
-                    'purchase_amount' => $purchaseAmount
+                    'purchase_amount' => $purchaseAmount,
+                    'profit_loss' => $profitLoss // Add profit_loss to the data array
                 ];
             }
         }
         
         // Sort data based on request
         usort($transactionData, function($a, $b) use ($sortField, $sortDir) {
-            if ($sortDir == 'asc') {
-                return $a[$sortField] <=> $b[$sortField];
+            if ($sortField == 'product_category_name') {
+                // Special case for category sorting (string comparison)
+                if ($sortDir == 'asc') {
+                    return strcasecmp($a[$sortField], $b[$sortField]);
+                } else {
+                    return strcasecmp($b[$sortField], $a[$sortField]);
+                }
             } else {
-                return $b[$sortField] <=> $a[$sortField];
+                // For numeric and other columns
+                if ($sortDir == 'asc') {
+                    return $a[$sortField] <=> $b[$sortField];
+                } else {
+                    return $b[$sortField] <=> $a[$sortField];
+                }
             }
         });
         
@@ -429,7 +445,7 @@ class ProductController extends BaseController
             'pager' => $pager,
             'currentPage' => $page,
             'perPage' => $perPage,
-            'total' => $totalProducts,
+            'total' => count($transactionData),  // Use actual count of transaction data
             'categoryFilter' => $categoryFilter,
             'search' => $search,
             'sortField' => $sortField,
