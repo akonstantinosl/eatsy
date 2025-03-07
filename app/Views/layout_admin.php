@@ -127,6 +127,20 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>Customers</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>Suppliers</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
                                 <i class="fas fa-cart-plus nav-icon"></i>
                                 <p>Purchases</p>
@@ -140,19 +154,6 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-user"></i>
-                                <p>Customers</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-truck"></i>
-                                <p>Suppliers</p>
-                            </a>
-                        </li>
                         <!-- Reports Menu -->
                         <li class="nav-item">
                             <a href="#" class="nav-link">

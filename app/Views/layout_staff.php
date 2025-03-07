@@ -98,15 +98,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
-                                <i class="fas fa-cash-register nav-icon"></i>
-                                <p>Product Sales</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-user"></i>
                                 <p>Customers</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
+                                <i class="fas fa-cash-register nav-icon"></i>
+                                <p>Product Sales</p>
                             </a>
                         </li>
                     </ul>
