@@ -33,6 +33,29 @@ class SupplierController extends BaseController
         // Get search term (if any)
         $search = $this->request->getGet('search');
         
+        // Get sort field and direction
+        $sortField = $this->request->getGet('sort') ?? 'updated_at';
+        $sortDir = $this->request->getGet('dir') ?? 'desc';
+        
+        // Validate sort field to prevent SQL injection
+        $validSortFields = [
+            'supplier_name', 
+            'supplier_phone', 
+            'supplier_address', 
+            'supplier_status',
+            'updated_at',
+            'created_at'
+        ];
+        
+        if (!in_array($sortField, $validSortFields)) {
+            $sortField = 'updated_at';
+        }
+        
+        // Validate sort direction
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+        
         // Base query
         $query = $this->supplierModel->where('supplier_status', 'active');
         
@@ -47,6 +70,9 @@ class SupplierController extends BaseController
         // Get total count based on filters
         $totalSuppliers = $query->countAllResults(false);
         
+        // Add sorting
+        $query = $query->orderBy($sortField, $sortDir);
+        
         // Get paginated suppliers
         $suppliers = $query
                    ->limit($perPage, ($page - 1) * $perPage)
@@ -55,6 +81,10 @@ class SupplierController extends BaseController
         // Create pager links
         $pager->setPath('admin/suppliers');
         
+        // Get newly created or updated supplier IDs from flash data
+        $newSupplierId = session()->getFlashdata('new_supplier_id');
+        $updatedSupplierId = session()->getFlashdata('updated_supplier_id');
+        
         // Pass suppliers data and pager to the view
         return view('admin/suppliers/suppliers_index', [
             'suppliers' => $suppliers,
@@ -62,7 +92,11 @@ class SupplierController extends BaseController
             'currentPage' => $page,
             'perPage' => $perPage,
             'total' => $totalSuppliers,
-            'search' => $search
+            'search' => $search,
+            'sortField' => $sortField,
+            'sortDir' => $sortDir,
+            'newSupplierId' => $newSupplierId,
+            'updatedSupplierId' => $updatedSupplierId
         ]);
     }
 
@@ -89,11 +123,26 @@ class SupplierController extends BaseController
             'supplier_status' => 'required|in_list[active,inactive]',
         ];
 
+        // Check if the supplier name already exists (case-insensitive and ignoring spaces)
+        $supplierName = $this->request->getPost('supplier_name');
+        $normalizedName = strtolower(preg_replace('/\s+/', '', $supplierName)); // Remove spaces and convert to lowercase
+        
+        $existingSuppliers = $this->supplierModel
+            ->where('supplier_status', 'active')
+            ->findAll();
+            
+        foreach ($existingSuppliers as $existingSupplier) {
+            $existingNormalizedName = strtolower(preg_replace('/\s+/', '', $existingSupplier['supplier_name']));
+            if ($normalizedName === $existingNormalizedName) {
+                return redirect()->back()->withInput()->with('errors', ['supplier_name' => 'Supplier name is already in use by an active supplier. Names must be unique regardless of spacing or capitalization.']);
+            }
+        }
+
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Check if the phone number  already exists for active suppliers
+        // Check if the phone number already exists for active suppliers
         $existingSupplier = $this->supplierModel
             ->where('supplier_phone', $this->request->getPost('supplier_phone'))
             ->where('supplier_status', 'active')
@@ -125,10 +174,12 @@ class SupplierController extends BaseController
             'supplier_address' => $this->request->getPost('supplier_address'),
             'supplier_status' => $this->request->getPost('supplier_status'),
             'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
 
         $this->supplierModel->insert($data);
         session()->setFlashdata('success', 'Supplier successfully added');
+        session()->setFlashdata('new_supplier_id', $supplierId);
         return redirect()->to('admin/suppliers');
     }
 
@@ -173,6 +224,22 @@ class SupplierController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        // Check if the supplier name already exists (case-insensitive and ignoring spaces)
+        $supplierName = $this->request->getPost('supplier_name');
+        $normalizedName = strtolower(preg_replace('/\s+/', '', $supplierName)); // Remove spaces and convert to lowercase
+        
+        $existingSuppliers = $this->supplierModel
+            ->where('supplier_status', 'active')
+            ->where('supplier_id !=', $id) // Exclude current supplier
+            ->findAll();
+            
+        foreach ($existingSuppliers as $existingSupplier) {
+            $existingNormalizedName = strtolower(preg_replace('/\s+/', '', $existingSupplier['supplier_name']));
+            if ($normalizedName === $existingNormalizedName) {
+                return redirect()->back()->withInput()->with('errors', ['supplier_name' => 'Supplier name is already in use by an active supplier. Names must be unique regardless of spacing or capitalization.']);
+            }
+        }
+        
         // Check if phone number exists for other active suppliers
         if ($this->request->getPost('supplier_phone') != $supplier['supplier_phone']) {
             $existingSupplier = $this->supplierModel
@@ -196,6 +263,7 @@ class SupplierController extends BaseController
 
         $this->supplierModel->update($id, $data);
         session()->setFlashdata('success', 'Supplier successfully updated');
+        session()->setFlashdata('updated_supplier_id', $id);
         return redirect()->to('admin/suppliers');
     }
 

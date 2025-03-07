@@ -59,6 +59,7 @@
                         <span class="input-group-text">IDR</span>
                     </div>
                 </div>
+                <small class="text-muted">Enter the selling price in Indonesian Rupiah (IDR). Price must be zero or positive.</small>
             </div>
 
             <button type="button" id="updateBtn" class="btn btn-primary mr-2">Update</button>

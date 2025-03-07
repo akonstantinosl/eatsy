@@ -21,6 +21,7 @@
                         <?= session('errors')['supplier_name'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Supplier name must be unique regardless of spacing or capitalization.</small>
             </div>
 
             <div class="form-group">
@@ -31,6 +32,7 @@
                         <?= session('errors')['supplier_phone'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Phone number must be unique and at least 10 digits.</small>
             </div>
 
             <div class="form-group">
@@ -55,30 +57,58 @@
 <!-- /.card -->
 
 <script>
-    // Preview Image
-    function previewImage() {
-        const preview = document.getElementById('preview-image');
-        const file = document.getElementById('photo').files[0];
-        const reader = new FileReader();
-        
-        reader.onloadend = function() {
-            preview.src = reader.result;
-        }
-        
-        if (file) {
-            reader.readAsDataURL(file);
-        } else {
-            // Show default image based on selected role
-            const role = document.getElementById('role').value;
-            preview.src = '<?= base_url('assets/image/') ?>' + (role === 'admin' ? 'default_admin.png' : 'default_staff.png');
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
-        bsCustomFileInput.init();
+        if (typeof bsCustomFileInput !== 'undefined') {
+            bsCustomFileInput.init();
+        }
 
-        // Save Button Confirmation
+        // Basic phone number format validation
+        let supplierPhoneInput = document.getElementById('supplier_phone');
+        
+        // Validate phone number format (only allow digits)
+        supplierPhoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, ''); // Remove non-numeric characters
+        });
+
+        // Save Button Confirmation with basic validation
         document.getElementById('saveBtn').addEventListener('click', function() {
+            // Perform basic validation before confirmation
+            const name = document.getElementById('supplier_name').value.trim();
+            const phone = supplierPhoneInput.value.trim();
+            const address = document.getElementById('supplier_address').value.trim();
+            let validationErrors = [];
+            
+            // Validate required fields
+            if (name === '') {
+                validationErrors.push('Supplier name is required.');
+                document.getElementById('supplier_name').classList.add('is-invalid');
+            }
+            
+            if (phone === '') {
+                validationErrors.push('Phone number is required.');
+                supplierPhoneInput.classList.add('is-invalid');
+            } else if (phone.length < 10) {
+                validationErrors.push('Phone number must be at least 10 digits.');
+                supplierPhoneInput.classList.add('is-invalid');
+            }
+            
+            if (address === '') {
+                validationErrors.push('Address is required.');
+                document.getElementById('supplier_address').classList.add('is-invalid');
+            }
+            
+            // If there are validation errors, show them and stop
+            if (validationErrors.length > 0) {
+                Swal.fire({
+                    title: 'Validation Error',
+                    html: validationErrors.join('<br>'),
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+            
+            // If validations pass, show confirmation dialog
             Swal.fire({
                 title: 'Are you sure you want to save?',
                 text: 'You can review and edit the information before saving.',
