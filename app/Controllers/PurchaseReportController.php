@@ -270,7 +270,8 @@ class PurchaseReportController extends Controller
         // Filter berdasarkan rentang tanggal and completed status
         $purchaseQuery = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
                                        ->where('updated_at <=', $endDate . ' 23:59:59')
-                                       ->where('order_status', 'completed'); // Filter for completed orders only
+                                       ->where('order_status', 'completed') // Filter for completed orders only
+                                       ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
@@ -330,16 +331,18 @@ class PurchaseReportController extends Controller
             foreach ($purchase_details as $detail) {
                 $product = $productModel->find($detail['product_id']);
                 if ($product) {
-                    $totalUnits = $detail['box_bought'] * $detail['unit_per_box'];
-                    $productAmount = $detail['price_per_box'] * $detail['box_bought'];
+                    // Use the new column structure
+                    $quantity = $detail['quantity_bought'];
+                    $productAmount = $detail['purchase_price'];
+                    
                     $purchase_info['products'][] = [
                         'product_name' => $product['product_name'],
-                        'quantity' => $totalUnits,
+                        'quantity' => $quantity,
                         'amount' => $productAmount
                     ];
                     
                     // Add to total items
-                    $totalItems += $totalUnits;
+                    $totalItems += $quantity;
                 }
             }
             
@@ -372,7 +375,8 @@ class PurchaseReportController extends Controller
         // Filter berdasarkan rentang tanggal and completed status
         $purchaseQuery = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
                                       ->where('updated_at <=', $endDate . ' 23:59:59')
-                                      ->where('order_status', 'completed'); // Filter for completed orders only
+                                      ->where('order_status', 'completed') // Filter for completed orders only
+                                      ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
@@ -424,11 +428,12 @@ class PurchaseReportController extends Controller
                 foreach ($purchase_details as $detailIndex => $detail) {
                     $product = $productModel->find($detail['product_id']);
                     if ($product) {
-                        $totalUnits = $detail['box_bought'] * $detail['unit_per_box'];
-                        $productAmount = $detail['price_per_box'] * $detail['box_bought'];
+                        // Use the new column structure
+                        $quantity = $detail['quantity_bought'];
+                        $productAmount = $detail['purchase_price'];
                         
                         // Add to total items
-                        $totalItems += $totalUnits;
+                        $totalItems += $quantity;
                         
                         // Tampilkan semua informasi untuk setiap produk
                         $rowData = [
@@ -436,7 +441,7 @@ class PurchaseReportController extends Controller
                             $userFullname,
                             $supplierName,
                             $product['product_name'],
-                            $totalUnits,
+                            $quantity,
                             number_format($productAmount, 0, ',', '.') . " IDR"
                         ];
                         

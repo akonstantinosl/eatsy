@@ -270,7 +270,8 @@ class SalesReportController extends Controller
         // Filter by date range and completed status
         $saleQuery = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
                               ->where('updated_at <=', $endDate . ' 23:59:59')
-                              ->where('transaction_status', 'completed'); // Filter for completed sales only
+                              ->where('transaction_status', 'completed') // Filter for completed sales only
+                              ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
@@ -373,7 +374,8 @@ class SalesReportController extends Controller
         // Filter by date range and completed status
         $saleQuery = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
                               ->where('updated_at <=', $endDate . ' 23:59:59')
-                              ->where('transaction_status', 'completed'); // Filter for completed sales only
+                              ->where('transaction_status', 'completed') // Filter for completed sales only
+                              ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
