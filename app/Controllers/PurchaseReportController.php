@@ -2,25 +2,29 @@
 
 namespace App\Controllers;
 
+use App\Models\SaleModel;
+use App\Models\SaleDetailModel;
 use App\Models\PurchaseModel;
 use App\Models\PurchaseDetailModel;
 use App\Models\ProductModel;
+use App\Models\CustomerModel;
+use App\Models\UserModel;
 use App\Models\SupplierModel;
-use App\Models\UserModel; 
 use CodeIgniter\Controller;
 
 require_once APPPATH . 'ThirdParty/fpdf/fpdf.php';
 
-// Define the PDF class outside of the controller class
-class PDF extends \FPDF {
+class PDF extends \FPDF
+{
     public $periodTitle;
     
     // Page header
-    function Header() {
+    function Header()
+    {
         // Logo
         $this->Image(FCPATH . 'assets/image/logo.png', 10, 10, 30);
         
-        // Title
+        // Company Title
         $this->SetFont('Arial', 'B', 16);
         $this->Cell(0, 10, 'EATSY', 0, 1, 'C');
         $this->SetFont('Arial', '', 12);
@@ -32,29 +36,33 @@ class PDF extends \FPDF {
         // Report Title and period - ONLY on the first page
         if ($this->PageNo() == 1) {
             $this->SetFont('Arial', 'B', 16);
-            $this->Cell(0, 10, 'PURCHASE TRANSACTION REPORT', 0, 1, 'C');
+            $this->Cell(0, 10, 'PROFIT REPORT', 0, 1, 'C');
             $this->SetFont('Arial', '', 12);
             $this->Cell(0, 10, $this->periodTitle, 0, 1, 'C');
             $this->Ln(5);
         }
         
-        // Header tabel (on all pages)
+        // Add table headers on each page
         $this->SetFont('Arial', 'B', 10);
         $this->SetFillColor(200, 220, 255);
-        $this->Cell(35, 10, 'Date', 1, 0, 'C', true);
-        $this->Cell(35, 10, 'Buyer', 1, 0, 'C', true);
-        $this->Cell(35, 10, 'Supplier', 1, 0, 'C', true);
-        $this->Cell(85, 10, 'Product', 1, 0, 'C', true);
-        $this->Cell(35, 10, 'Quantity', 1, 0, 'C', true);
-        $this->Cell(35, 10, 'Amount', 1, 1, 'C', true);
+        $this->Cell(70, 10, 'Product', 1, 0, 'C', true);
+        $this->Cell(30, 10, 'Stock', 1, 0, 'C', true);
+        $this->Cell(30, 10, 'Quantity', 1, 0, 'C', true);
+        $this->Cell(45, 10, 'Sales Amount', 1, 0, 'C', true);
+        $this->Cell(45, 10, 'Purchase Amount', 1, 0, 'C', true);
+        $this->Cell(45, 10, 'Profit', 1, 1, 'C', true);
+        
+        // Reset font for table content
+        $this->SetFont('Arial', '', 9);
     }
-    
-    // Footer halaman
-    function Footer() {
+
+    // Page footer
+    function Footer()
+    {
         $this->SetY(-15);
         $this->SetFont('Arial', 'I', 8);
         $this->Cell(0, 10, 'Page ' . $this->PageNo() . ' of {nb}', 0, 0, 'C');
-        $this->Cell(0, 10, 'Generated on: ' . date('d/m/Y H:i:s'), 0, 0, 'R');
+        $this->Cell(0, 10, 'Generated on: ' . date('Y-m-d H:i:s'), 0, 0, 'R');
     }
     
     // Calculate height needed for a MultiCell
@@ -75,15 +83,15 @@ class PDF extends \FPDF {
         return $height;
     }
     
-   // Fungsi untuk menampilkan baris data dengan multiline
+    // Function to display row data with multi-line support
     function RowMultiLine($data, $heights = []) {
-        // Lebar kolom
-        $widths = [35, 35, 35, 85, 35, 35];
+        // Column widths
+        $widths = [70, 30, 30, 45, 45, 45]; // Updated widths to match new columns
         
-        // Simpan posisi Y awal
+        // Save initial Y position
         $startY = $this->GetY();
         
-        // Hitung tinggi maksimum yang dibutuhkan untuk semua cell
+        // Calculate maximum height needed for all cells
         $maxHeight = 0;
         
         // First, calculate the maximum height needed
@@ -247,11 +255,11 @@ class PDF extends \FPDF {
     }
 }
 
-class PurchaseReportController extends Controller
+class ProfitReportController extends Controller
 {
     public function index()
     {
-        return view('admin/reports/purchases_report');
+        return view('admin/reports/profit_report');
     }
     
     public function generateReport()
@@ -259,104 +267,107 @@ class PurchaseReportController extends Controller
         // Get date parameters
         $startDate = $this->request->getPost('start_date');
         $endDate = $this->request->getPost('end_date');
-        
-        // Inisialisasi model
-        $purchaseModel = new PurchaseModel();
-        $userModel = new UserModel();
-        $supplierModel = new SupplierModel();
-        $purchaseDetailModel = new PurchaseDetailModel();
+
+        // Initialize models
+        $saleModel = new SaleModel();
+        $saleDetailModel = new SaleDetailModel();
         $productModel = new ProductModel();
-        
-        // Filter berdasarkan rentang tanggal and completed status
-        $purchaseQuery = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
-                                       ->where('updated_at <=', $endDate . ' 23:59:59')
-                                       ->where('order_status', 'completed') // Filter for completed orders only
-                                       ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
-        
+
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
-        
-        // Dapatkan data pembelian sesuai filter
-        $purchases = $purchaseQuery->findAll();
-        
-        // Persiapkan data untuk view
-        $data['purchases'] = [];
-        $data['periodTitle'] = $periodTitle;
-        
-        // Jika tidak ada data, kembalikan dengan pesan error
-        if (empty($purchases)) {
-            return redirect()->to('/admin/reports/purchases')->with('error', 'No completed purchase data found for the selected period.');
+
+        // Get sales data based on filter - ONLY COMPLETED TRANSACTIONS
+        $sales = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
+                           ->where('updated_at <=', $endDate . ' 23:59:59')
+                           ->where('transaction_status', 'completed') // Filter for completed sales only
+                           ->findAll();
+
+        // If no data, return with error message
+        if (empty($sales)) {
+            return redirect()->to('/admin/reports/profit')->with('error', 'No completed sales data found for the selected period.');
         }
-        
-        // Lengkapi data untuk setiap pembelian
-        $totalAmount = 0;
-        $totalItems = 0;
-        $supplierStats = [];
-        
-        foreach ($purchases as $purchase) {
-            $purchase_info = [
-                'purchase_id' => $purchase['purchase_id'],
-                'updated_at' => $purchase['updated_at'],
-                'purchase_amount' => $purchase['purchase_amount'],
-                'user_id' => $purchase['user_id'],
-                'supplier_id' => $purchase['supplier_id']
-            ];
+
+        // Prepare data structure for profit calculation
+        $profitData = [];
+        $totalSales = 0;
+        $totalPurchases = 0;
+        $totalProfit = 0;
+        $totalQuantity = 0;
+
+        // Process sales data - group by product
+        foreach ($sales as $sale) {
+            $saleDetails = $saleDetailModel->where('sale_id', $sale['sale_id'])->findAll();
             
-            // Add to total amount
-            $totalAmount += $purchase['purchase_amount'];
-            
-            // Ambil nama user berdasarkan user_id
-            $user = $userModel->find($purchase['user_id']);
-            $purchase_info['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
-            
-            // Ambil nama supplier berdasarkan supplier_id
-            $supplier = $supplierModel->find($purchase['supplier_id']);
-            $purchase_info['supplier_name'] = $supplier ? $supplier['supplier_name'] : 'Unknown';
-            
-            // Track supplier statistics
-            if (!isset($supplierStats[$purchase['supplier_id']])) {
-                $supplierStats[$purchase['supplier_id']] = [
-                    'name' => $purchase_info['supplier_name'],
-                    'amount' => 0,
-                    'count' => 0
-                ];
-            }
-            $supplierStats[$purchase['supplier_id']]['amount'] += $purchase['purchase_amount'];
-            $supplierStats[$purchase['supplier_id']]['count']++;
-            
-            // Ambil detail produk yang dibeli
-            $purchase_details = $purchaseDetailModel->where('purchase_id', $purchase['purchase_id'])->findAll();
-            $purchase_info['products'] = [];
-            
-            foreach ($purchase_details as $detail) {
-                $product = $productModel->find($detail['product_id']);
-                if ($product) {
-                    // Use the new column structure
-                    $quantity = $detail['quantity_bought'];
-                    $productAmount = $detail['purchase_price'];
-                    
-                    $purchase_info['products'][] = [
-                        'product_name' => $product['product_name'],
-                        'quantity' => $quantity,
-                        'amount' => $productAmount
-                    ];
-                    
-                    // Add to total items
-                    $totalItems += $quantity;
+            foreach ($saleDetails as $detail) {
+                $productId = $detail['product_id'];
+                $product = $productModel->find($productId);
+                
+                if (!$product) {
+                    continue; // Skip if product not found
                 }
+                
+                if (!isset($profitData[$productId])) {
+                    $profitData[$productId] = [
+                        'product_id' => $productId,
+                        'product_name' => $product['product_name'],
+                        'product_stock' => $product['product_stock'],
+                        'buying_price' => $product['buying_price'],
+                        'sales_quantity' => 0,
+                        'sales_amount' => 0,
+                        'purchase_amount' => 0,
+                        'profit' => 0
+                    ];
+                }
+                
+                // Calculate sales amount
+                $saleAmount = $detail['price_per_unit'] * $detail['quantity_sold'];
+                
+                // Add to sales quantity
+                $profitData[$productId]['sales_quantity'] += $detail['quantity_sold'];
+                
+                // Add to sales amount
+                $profitData[$productId]['sales_amount'] += $saleAmount;
+                
+                // Keep track of total sold quantity
+                $totalQuantity += $detail['quantity_sold'];
+                
+                // Add to total sales
+                $totalSales += $saleAmount;
             }
+        }
+
+        // Calculate purchase amount and profit for each product
+        foreach ($profitData as &$item) {
+            // Calculate purchase amount based on buying_price and sales_quantity
+            $item['purchase_amount'] = $item['buying_price'] * $item['sales_quantity'];
             
-            $data['purchases'][] = $purchase_info;
+            // Calculate profit
+            $item['profit'] = $item['sales_amount'] - $item['purchase_amount'];
+            
+            // Add to totals
+            $totalPurchases += $item['purchase_amount'];
+            $totalProfit += $item['profit'];
         }
         
-        $data['start_date'] = $startDate;
-        $data['end_date'] = $endDate;
-        $data['totalAmount'] = $totalAmount;
-        $data['totalItems'] = $totalItems;
-        $data['supplierStats'] = $supplierStats;
+        // Sort profitData by profit (highest to lowest)
+        uasort($profitData, function($a, $b) {
+            return $b['profit'] - $a['profit']; // Sort in descending order
+        });
+
+        // Prepare data for view
+        $data = [
+            'profitData' => $profitData,
+            'periodTitle' => $periodTitle,
+            'totalSales' => $totalSales,
+            'totalPurchases' => $totalPurchases,
+            'totalProfit' => $totalProfit,
+            'totalQuantity' => $totalQuantity,
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ];
         
-        // Tampilkan hasil report
-        return view('admin/reports/purchases_report_result', $data);
+        // Display report result
+        return view('admin/reports/profit_report_result', $data);
     }
     
     public function exportPdf()
@@ -365,100 +376,123 @@ class PurchaseReportController extends Controller
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
         
-        // Inisialisasi model
-        $purchaseModel = new PurchaseModel();
-        $userModel = new UserModel();
-        $supplierModel = new SupplierModel();
-        $purchaseDetailModel = new PurchaseDetailModel();
+        // Initialize models
+        $saleModel = new SaleModel();
+        $saleDetailModel = new SaleDetailModel();
         $productModel = new ProductModel();
-        
-        // Filter berdasarkan rentang tanggal and completed status
-        $purchaseQuery = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
-                                      ->where('updated_at <=', $endDate . ' 23:59:59')
-                                      ->where('order_status', 'completed') // Filter for completed orders only
-                                      ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
         
-        // Dapatkan data pembelian sesuai filter
-        $purchases = $purchaseQuery->findAll();
+        // Get sales data based on filter - ONLY COMPLETED TRANSACTIONS
+        $sales = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
+                           ->where('updated_at <=', $endDate . ' 23:59:59')
+                           ->where('transaction_status', 'completed') // Filter for completed sales only
+                           ->findAll();
+
+        // Prepare data structure for profit calculation
+        $profitData = [];
+        $totalSales = 0;
+        $totalPurchases = 0;
+        $totalProfit = 0;
+        $totalQuantity = 0;
+
+        // Process sales data - group by product
+        foreach ($sales as $sale) {
+            $saleDetails = $saleDetailModel->where('sale_id', $sale['sale_id'])->findAll();
+            
+            foreach ($saleDetails as $detail) {
+                $productId = $detail['product_id'];
+                $product = $productModel->find($productId);
+                
+                if (!$product) {
+                    continue; // Skip if product not found
+                }
+                
+                if (!isset($profitData[$productId])) {
+                    $profitData[$productId] = [
+                        'product_id' => $productId,
+                        'product_name' => $product['product_name'],
+                        'product_stock' => $product['product_stock'],
+                        'buying_price' => $product['buying_price'],
+                        'sales_quantity' => 0,
+                        'sales_amount' => 0,
+                        'purchase_amount' => 0,
+                        'profit' => 0
+                    ];
+                }
+                
+                // Calculate sales amount
+                $saleAmount = $detail['price_per_unit'] * $detail['quantity_sold'];
+                
+                // Add to sales quantity
+                $profitData[$productId]['sales_quantity'] += $detail['quantity_sold'];
+                
+                // Add to sales amount
+                $profitData[$productId]['sales_amount'] += $saleAmount;
+                
+                // Keep track of total sold quantity
+                $totalQuantity += $detail['quantity_sold'];
+                
+                // Add to total sales
+                $totalSales += $saleAmount;
+            }
+        }
+
+        // Calculate purchase amount and profit for each product
+        foreach ($profitData as &$item) {
+            // Calculate purchase amount based on buying_price and sales_quantity
+            $item['purchase_amount'] = $item['buying_price'] * $item['sales_quantity'];
+            
+            // Calculate profit
+            $item['profit'] = $item['sales_amount'] - $item['purchase_amount'];
+            
+            // Add to totals
+            $totalPurchases += $item['purchase_amount'];
+            $totalProfit += $item['profit'];
+        }
+        
+        // Sort profitData by profit (highest to lowest)
+        uasort($profitData, function($a, $b) {
+            return $b['profit'] - $a['profit']; // Sort in descending order
+        });
         
         // Generate PDF
         $pdf = new PDF('L', 'mm', 'A4');
+        
+        // Set the period title before adding any page
         $pdf->periodTitle = $periodTitle;
-        $pdf->AliasNbPages(); // Untuk nomor halaman total
+        
+        $pdf->AliasNbPages(); // For total page numbers
         $pdf->SetAutoPageBreak(true, 15);
         $pdf->AddPage();
         
-        // Data tabel
         $pdf->SetFont('Arial', '', 9);
-        $totalAmount = 0;
-        $totalItems = 0;
         
-        foreach ($purchases as $index => $purchase) {
-            // Tambahkan ke total
-            $totalAmount += $purchase['purchase_amount'];
+        foreach ($profitData as $item) {
+            $rowData = [
+                $item['product_name'],
+                $item['product_stock'],
+                $item['sales_quantity'],
+                number_format($item['sales_amount'], 0, ',', '.') . " IDR",
+                number_format($item['purchase_amount'], 0, ',', '.') . " IDR",
+                number_format($item['profit'], 0, ',', '.') . " IDR"
+            ];
             
-            // Ambil nama user berdasarkan user_id
-            $user = $userModel->find($purchase['user_id']);
-            $userFullname = $user ? $user['user_fullname'] : 'Unknown';
-            
-            // Ambil nama supplier berdasarkan supplier_id
-            $supplier = $supplierModel->find($purchase['supplier_id']);
-            $supplierName = $supplier ? $supplier['supplier_name'] : 'Unknown';
-            
-            // Ambil detail produk yang dibeli
-            $purchase_details = $purchaseDetailModel->where('purchase_id', $purchase['purchase_id'])->findAll();
-            
-            // Jika tidak ada produk, tampilkan baris kosong
-            if (empty($purchase_details)) {
-                $rowData = [
-                    date('d/m/Y H:i', strtotime($purchase['updated_at'])),
-                    $userFullname,
-                    $supplierName,
-                    'No products',
-                    '0',
-                    number_format($purchase['purchase_amount'], 0, ',', '.') . " IDR"
-                ];
-                $pdf->RowMultiLine($rowData);
-            } 
-            else {
-                // Loop untuk setiap produk
-                foreach ($purchase_details as $detailIndex => $detail) {
-                    $product = $productModel->find($detail['product_id']);
-                    if ($product) {
-                        // Use the new column structure
-                        $quantity = $detail['quantity_bought'];
-                        $productAmount = $detail['purchase_price'];
-                        
-                        // Add to total items
-                        $totalItems += $quantity;
-                        
-                        // Tampilkan semua informasi untuk setiap produk
-                        $rowData = [
-                            date('d/m/Y H:i', strtotime($purchase['updated_at'])),
-                            $userFullname,
-                            $supplierName,
-                            $product['product_name'],
-                            $quantity,
-                            number_format($productAmount, 0, ',', '.') . " IDR"
-                        ];
-                        
-                        $pdf->RowMultiLine($rowData);
-                    }
-                }
-            }
+            // Use the RowMultiLine method for better formatting
+            $pdf->RowMultiLine($rowData);
         }
         
-        // Tampilkan total
+        // Display totals
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->Cell(190, 10, 'TOTAL', 1, 0, 'R');
-        $pdf->Cell(35, 10, $totalItems, 1, 0, 'R');
-        $pdf->Cell(35, 10, number_format($totalAmount, 0, ',', '.') . " IDR", 1, 1, 'R');
+        $pdf->Cell(100, 10, 'TOTAL', 1, 0, 'L');
+        $pdf->Cell(30, 10, $totalQuantity, 1, 0, 'C');
+        $pdf->Cell(45, 10, number_format($totalSales, 0, ',', '.') . " IDR", 1, 0, 'R');
+        $pdf->Cell(45, 10, number_format($totalPurchases, 0, ',', '.') . " IDR", 1, 0, 'R');
+        $pdf->Cell(45, 10, number_format($totalProfit, 0, ',', '.') . " IDR", 1, 1, 'R');
         
         // Output PDF
-        $pdf->Output('Purchase_Report_' . date('YmdHis') . '.pdf', 'D');
+        $pdf->Output('Profit_Report_' . date('YmdHis') . '.pdf', 'D');
         exit;
     }
 }
