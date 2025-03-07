@@ -80,8 +80,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Buyer:</th>
-                        <td><?= esc($purchase['buyer_name']) ?></td>
+                        <th>User:</th>
+                        <td><?= esc($purchase['user_name']) ?></td>
                     </tr>
                 </table>
             </div>

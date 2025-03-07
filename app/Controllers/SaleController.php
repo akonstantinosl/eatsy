@@ -37,6 +37,27 @@ class SaleController extends Controller
         // Get search term (if any)
         $search = $this->request->getGet('search');
         
+        // Get sort field and direction
+        $sortField = $this->request->getGet('sort') ?? 'updated_at';
+        $sortDir = $this->request->getGet('dir') ?? 'desc';
+        
+        // Define allowed sort fields
+        $allowedSortFields = [
+            'updated_at', 'user_fullname', 'customer_name', 
+            'customer_phone', 'sale_amount', 'payment_method', 
+            'transaction_status'
+        ];
+        
+        // Validate sort field
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'updated_at';
+        }
+        
+        // Validate sort direction
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+        
         // Base query
         $query = $saleModel;
         
@@ -45,24 +66,55 @@ class SaleController extends Controller
             $query = $query->where('transaction_status', $statusFilter);
         }
         
-        // Prepare to join tables for search
+        // Prepare to join tables for search and sorting
+        $query = $query->join('users', 'sales.user_id = users.user_id')
+                      ->join('customers', 'sales.customer_id = customers.customer_id');
+        
+        // Apply search if set
         if ($search) {
-            $query = $query->join('users', 'sales.user_id = users.user_id')
-                          ->join('customers', 'sales.customer_id = customers.customer_id')
-                          ->groupStart()
-                            ->like('users.user_fullname', $search) // Seller search
-                            ->orLike('customers.customer_name', $search) // Customer search
-                            ->orLike('customers.customer_phone', $search) // Contact search
-                          ->groupEnd();
+            $query = $query->groupStart()
+                        ->like('users.user_fullname', $search) // User search
+                        ->orLike('customers.customer_name', $search) // Customer search
+                        ->orLike('customers.customer_phone', $search) // Contact search
+                      ->groupEnd();
         }
         
         // Get total count based on filters
         $totalSales = $query->countAllResults(false);
         
-        // Get paginated sales based on filters
-        $sales = $query->orderBy('sales.updated_at', 'DESC')
-                    ->limit($perPage, ($page - 1) * $perPage)
+        // Apply sorting
+        if ($sortField === 'updated_at') {
+            $query = $query->orderBy('sales.updated_at', $sortDir);
+        } elseif ($sortField === 'user_fullname') {
+            $query = $query->orderBy('users.user_fullname', $sortDir);
+        } elseif ($sortField === 'customer_name') {
+            $query = $query->orderBy('customers.customer_name', $sortDir);
+        } elseif ($sortField === 'customer_phone') {
+            $query = $query->orderBy('customers.customer_phone', $sortDir);
+        } elseif ($sortField === 'sale_amount') {
+            $query = $query->orderBy('sales.sale_amount', $sortDir);
+        } elseif ($sortField === 'payment_method') {
+            $query = $query->orderBy('sales.payment_method', $sortDir);
+        } elseif ($sortField === 'transaction_status') {
+            $query = $query->orderBy('sales.transaction_status', $sortDir);
+        }
+        
+        // Get paginated sales based on filters and sorting
+        $sales = $query->limit($perPage, ($page - 1) * $perPage)
                     ->findAll();
+
+        // Check for new or recently updated sales
+        $session = session();
+        
+        // New sales (created in the last 5 minutes)
+        $newSaleIds = $saleModel->where('transaction_status', 'pending')
+                             ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
+                             ->findColumn('sale_id') ?? [];
+                             
+        // Updated sales (updated in the last 5 minutes with status changed)
+        $updatedSaleIds = $saleModel->where('transaction_status !=', 'pending')
+                                 ->where('updated_at >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
+                                 ->findColumn('sale_id') ?? [];
 
         // Get user and customer information for each sale
         foreach ($sales as &$sale) {
@@ -87,7 +139,11 @@ class SaleController extends Controller
             'perPage' => $perPage,
             'total' => $totalSales,
             'statusFilter' => $statusFilter,
-            'search' => $search
+            'search' => $search,
+            'sortField' => $sortField,
+            'sortDir' => $sortDir,
+            'newSaleIds' => $newSaleIds,
+            'updatedSaleIds' => $updatedSaleIds
         ]);
     }
 
@@ -107,9 +163,9 @@ class SaleController extends Controller
             return redirect()->to('/sales')->with('error', 'Sale not found.');
         }
 
-        // Get seller name based on user_id
+        // Get user name based on user_id
         $user = $userModel->find($data['sale']['user_id']);
-        $data['sale']['seller_name'] = $user ? $user['user_fullname'] : 'Unknown Seller';
+        $data['sale']['user_name'] = $user ? $user['user_fullname'] : 'Unknown User';
 
         // Get customer information based on customer_id
         $customer = $customerModel->find($data['sale']['customer_id']);
@@ -200,6 +256,9 @@ class SaleController extends Controller
         // Get logged-in user_id from session
         $userId = session()->get('user_id'); // Assuming user_id is stored in the session
 
+        // Get current timestamp for both created_at and updated_at
+        $currentTimestamp = date('Y-m-d H:i:s');
+
         // Prepare the sale data
         $saleData = [
             'sale_id' => $saleId,
@@ -210,8 +269,8 @@ class SaleController extends Controller
             'transaction_status' => 'pending', // Default status
             'sale_status' => 'continue',
             'sale_notes' => $postData['sale_notes'] ?? '',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'created_at' => $currentTimestamp,
+            'updated_at' => $currentTimestamp // Explicitly set updated_at for new transactions
         ];
 
         // Start transaction
@@ -258,8 +317,8 @@ class SaleController extends Controller
                 'product_id' => $product['product_id'],
                 'quantity_sold' => $quantitySold,
                 'price_per_unit' => $pricePerUnit,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'created_at' => $currentTimestamp,
+                'updated_at' => $currentTimestamp // Use the same timestamp
             ]);
 
             // Add to total amount
@@ -275,7 +334,10 @@ class SaleController extends Controller
         }
 
         // Update sale amount after adding details
-        $saleModel->update($saleId, ['sale_amount' => $totalAmount]);
+        $saleModel->update($saleId, [
+            'sale_amount' => $totalAmount,
+            'updated_at' => $currentTimestamp // Ensure updated_at is consistent
+        ]);
 
         // Commit the transaction
         $db->transComplete();
@@ -325,15 +387,31 @@ class SaleController extends Controller
         $db = \Config\Database::connect();
         $db->transStart();
         
-        // Update the sale status
-        $saleModel->update($saleId, [
+        // Generate the current timestamp
+        $currentTimestamp = date('Y-m-d H:i:s');
+        
+        // Update the sale status and updated_at timestamp
+        $updateData = [
             'transaction_status' => $newStatus,
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
+            'updated_at' => $currentTimestamp // Always update timestamp when status changes
+        ];
+        
+        // If cancellation has notes, add them to the sale_notes
+        if ($newStatus === 'cancelled' && $this->request->getGet('cancel_notes')) {
+            $cancelNotes = "CANCELLATION: " . $this->request->getGet('cancel_notes');
+            if (!empty($sale['sale_notes'])) {
+                $updateData['sale_notes'] = $sale['sale_notes'] . "\n\n" . $cancelNotes;
+            } else {
+                $updateData['sale_notes'] = $cancelNotes;
+            }
+        }
+        
+        // Update the sale record
+        $saleModel->update($saleId, $updateData);
         
         // If status is completed, update product stock
         if ($newStatus === 'completed') {
-            $this->updateProductStock($saleId);
+            $this->updateProductStock($saleId, $currentTimestamp);
         }
         
         // Complete the transaction
@@ -349,10 +427,15 @@ class SaleController extends Controller
             ->with('success', 'Sale status updated to ' . ucfirst($newStatus));
     }
     
-    private function updateProductStock($saleId)
+    private function updateProductStock($saleId, $timestamp = null)
     {
         $saleDetailModel = new SaleDetailModel();
         $productModel = new ProductModel();
+        
+        // If no timestamp is provided, use current time
+        if ($timestamp === null) {
+            $timestamp = date('Y-m-d H:i:s');
+        }
         
         // Get all sale details for this sale
         $saleDetails = $saleDetailModel->where('sale_id', $saleId)->findAll();
@@ -368,10 +451,15 @@ class SaleController extends Controller
             // Calculate new stock after sale
             $newStock = $product['product_stock'] - $detail['quantity_sold'];
             
-            // Update the product stock
+            // Update the product stock with the timestamp
             $productModel->update($detail['product_id'], [
                 'product_stock' => $newStock,
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => $timestamp
+            ]);
+            
+            // Also update the sale detail record with the same timestamp
+            $saleDetailModel->update($detail['sale_detail_id'], [
+                'updated_at' => $timestamp
             ]);
         }
         

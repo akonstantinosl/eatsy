@@ -77,7 +77,7 @@ class PurchaseController extends Controller
         // Apply search filter if set
         if ($search) {
             $query = $query->groupStart()
-                        ->like('users.user_fullname', $search) // Buyer search
+                        ->like('users.user_fullname', $search) // User search
                         ->orLike('suppliers.supplier_name', $search) // Supplier search
                         ->orLike('suppliers.supplier_phone', $search) // Contact search
                         ->groupEnd();
@@ -117,7 +117,7 @@ class PurchaseController extends Controller
 
         // Get user and supplier information for each purchase
         foreach ($purchases as &$purchase) {
-            // Get buyer name based on user_id (already joined but keep just in case)
+            // Get user name based on user_id (already joined but keep just in case)
             $user = $userModel->find($purchase['user_id']);
             $purchase['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
 
@@ -189,9 +189,9 @@ class PurchaseController extends Controller
             return redirect()->to('/admin/purchases')->with('error', 'Purchase not found.');
         }
 
-        // Mendapatkan nama pembeli (buyer) berdasarkan user_id
+        // Mendapatkan nama pembeli (user) berdasarkan user_id
         $user = $userModel->find($data['purchase']['user_id']);
-        $data['purchase']['buyer_name'] = $user ? $user['user_fullname'] : 'Unknown Buyer';
+        $data['purchase']['user_name'] = $user ? $user['user_fullname'] : 'Unknown user';
 
         // Mendapatkan nama supplier berdasarkan supplier_id
         $supplier = $supplierModel->find($data['purchase']['supplier_id']);

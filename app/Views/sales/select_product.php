@@ -15,6 +15,8 @@
                 <?= csrf_field() ?>
 
                 <input type="hidden" name="customer_id" value="<?= esc($customer_id) ?>">
+                <!-- Add hidden input for updated_at timestamp -->
+                <input type="hidden" name="updated_at" id="updated_at" value="<?= date('Y-m-d H:i:s') ?>">
 
                 <div id="product-section" class="table-responsive">
                     <table class="table table-bordered table-striped" id="product-table">
@@ -365,6 +367,9 @@
         $('#sale-form').submit(function(event) {
             event.preventDefault();
             
+            // Update timestamp before submission
+            $('#updated_at').val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+            
             // Check if at least one product is selected
             let hasSelectedProducts = false;
             $('.product-select').each(function() {
@@ -384,8 +389,8 @@
                 return;
             }
             
-// Check if quantities exceed available stock
-let hasStockIssue = false;
+            // Check if quantities exceed available stock
+            let hasStockIssue = false;
             let errorMessage = '';
             
             $('.product-select').each(function() {

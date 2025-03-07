@@ -42,7 +42,7 @@ class PDF extends \FPDF {
         $this->SetFont('Arial', 'B', 10);
         $this->SetFillColor(200, 220, 255);
         $this->Cell(35, 10, 'Date', 1, 0, 'C', true);
-        $this->Cell(35, 10, 'Seller', 1, 0, 'C', true);
+        $this->Cell(35, 10, 'User', 1, 0, 'C', true);
         $this->Cell(35, 10, 'Customer', 1, 0, 'C', true);
         $this->Cell(85, 10, 'Product', 1, 0, 'C', true);
         $this->Cell(35, 10, 'Quantity', 1, 0, 'C', true);
