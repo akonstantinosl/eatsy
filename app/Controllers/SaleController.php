@@ -26,7 +26,7 @@ class SaleController extends Controller
         // Get entries per page (default to 10 if not set)
         $perPage = (int)($this->request->getGet('entries') ?? 10);
         
-        // Validasi perPage hanya boleh 10, 25, atau 50
+        // Validate perPage to only be 10, 25, or 50
         if (!in_array($perPage, [10, 25, 50])) {
             $perPage = 10;
         }
@@ -43,7 +43,7 @@ class SaleController extends Controller
         
         // Define allowed sort fields
         $allowedSortFields = [
-            'updated_at', 'user_fullname', 'customer_name', 
+            'updated_at', 'created_at', 'user_fullname', 'customer_name', 
             'customer_phone', 'sale_amount', 'payment_method', 
             'transaction_status'
         ];
@@ -66,9 +66,10 @@ class SaleController extends Controller
             $query = $query->where('transaction_status', $statusFilter);
         }
         
-        // Prepare to join tables for search and sorting
+        // Always join tables for searching and sorting
         $query = $query->join('users', 'sales.user_id = users.user_id')
-                      ->join('customers', 'sales.customer_id = customers.customer_id');
+                    ->join('customers', 'sales.customer_id = customers.customer_id')
+                    ->select('sales.*, users.user_fullname, customers.customer_name, customers.customer_phone');
         
         // Apply search if set
         if ($search) {
@@ -76,58 +77,71 @@ class SaleController extends Controller
                         ->like('users.user_fullname', $search) // User search
                         ->orLike('customers.customer_name', $search) // Customer search
                         ->orLike('customers.customer_phone', $search) // Contact search
-                      ->groupEnd();
+                    ->groupEnd();
         }
         
         // Get total count based on filters
         $totalSales = $query->countAllResults(false);
         
-        // Apply sorting
-        if ($sortField === 'updated_at') {
-            $query = $query->orderBy('sales.updated_at', $sortDir);
-        } elseif ($sortField === 'user_fullname') {
-            $query = $query->orderBy('users.user_fullname', $sortDir);
-        } elseif ($sortField === 'customer_name') {
-            $query = $query->orderBy('customers.customer_name', $sortDir);
-        } elseif ($sortField === 'customer_phone') {
-            $query = $query->orderBy('customers.customer_phone', $sortDir);
-        } elseif ($sortField === 'sale_amount') {
-            $query = $query->orderBy('sales.sale_amount', $sortDir);
-        } elseif ($sortField === 'payment_method') {
-            $query = $query->orderBy('sales.payment_method', $sortDir);
-        } elseif ($sortField === 'transaction_status') {
-            $query = $query->orderBy('sales.transaction_status', $sortDir);
+        // Add sorting based on selected field
+        switch ($sortField) {
+            case 'user_fullname':
+                $query = $query->orderBy('users.user_fullname', $sortDir);
+                break;
+            case 'customer_name':
+                $query = $query->orderBy('customers.customer_name', $sortDir);
+                break;
+            case 'customer_phone':
+                $query = $query->orderBy('customers.customer_phone', $sortDir);
+                break;
+            case 'sale_amount':
+                $query = $query->orderBy('sales.sale_amount', $sortDir);
+                break;
+            case 'payment_method':
+                $query = $query->orderBy('sales.payment_method', $sortDir);
+                break;
+            case 'transaction_status':
+                $query = $query->orderBy('sales.transaction_status', $sortDir);
+                break;
+            case 'created_at':
+                $query = $query->orderBy('sales.created_at', $sortDir);
+                break;
+            default:
+                $query = $query->orderBy('sales.updated_at', $sortDir);
+                break;
         }
         
-        // Get paginated sales based on filters and sorting
+        // Get paginated sales based on filters
         $sales = $query->limit($perPage, ($page - 1) * $perPage)
                     ->findAll();
-
-        // Check for new or recently updated sales
-        $session = session();
         
-        // New sales (created in the last 5 minutes)
-        $newSaleIds = $saleModel->where('transaction_status', 'pending')
-                             ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
-                             ->findColumn('sale_id') ?? [];
-                             
-        // Updated sales (updated in the last 5 minutes with status changed)
-        $updatedSaleIds = $saleModel->where('transaction_status !=', 'pending')
-                                 ->where('updated_at >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
-                                 ->findColumn('sale_id') ?? [];
-
-        // Get user and customer information for each sale
-        foreach ($sales as &$sale) {
-            // Get user fullname based on user_id
-            $user = $userModel->find($sale['user_id']);
-            $sale['user_fullname'] = $user ? $user['user_fullname'] : 'Unknown';
-
-            // Get customer name and phone based on customer_id
-            $customer = $customerModel->find($sale['customer_id']);
-            $sale['customer_name'] = $customer ? $customer['customer_name'] : 'Unknown';
-            $sale['customer_phone'] = $customer ? $customer['customer_phone'] : 'No Phone';
+        // Initialize current time for comparison
+        $currentTime = new \DateTime();
+        
+        // Prepare arrays to hold IDs of new and updated sales
+        $newSaleIds = [];
+        $updatedSaleIds = [];
+        
+        // Loop through all sales to check timestamps
+        foreach ($sales as $sale) {
+            $updatedAt = new \DateTime($sale['updated_at']);
+            $interval = $currentTime->diff($updatedAt);
+            
+            // Convert interval to minutes
+            $minutesDiff = $interval->days * 24 * 60 + $interval->h * 60 + $interval->i;
+            
+            // If the sale was updated in the last 5 minutes
+            if ($minutesDiff <= 5) {
+                if ($sale['transaction_status'] === 'pending') {
+                    // Mark as new sale
+                    $newSaleIds[] = $sale['sale_id'];
+                } else if (in_array($sale['transaction_status'], ['cancelled', 'processing', 'completed'])) {
+                    // Mark as updated sale
+                    $updatedSaleIds[] = $sale['sale_id'];
+                }
+            }
         }
-
+        
         // Create pager links
         $pager->setPath('sales');
         
@@ -406,8 +420,9 @@ class SaleController extends Controller
             }
         }
         
-        // Update the sale record
-        $saleModel->update($saleId, $updateData);
+        $db->table('sales')
+        ->where('sale_id', $saleId)
+        ->update($updateData);
         
         // If status is completed, update product stock
         if ($newStatus === 'completed') {
