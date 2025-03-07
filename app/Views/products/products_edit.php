@@ -72,6 +72,15 @@
 <?= $this->section('scripts') ?>
 <script>
 $(document).ready(function() {
+    // Initialize form state tracking
+    let formChanged = false;
+    const originalValues = {
+        product_name: $('#product_name').val(),
+        product_category_id: $('#product_category_id').val(),
+        supplier_id: $('#supplier_id').val(),
+        selling_price: $('#selling_price').val()
+    };
+
     // Initialize Select2 for category and supplier dropdowns with search functionality
     $('#product_category_id').select2({
         theme: 'bootstrap',
@@ -107,6 +116,25 @@ $(document).ready(function() {
         escapeMarkup: function(markup) {
             return markup;
         }
+    });
+
+    // Function to check if form has changed
+    function checkFormChanged() {
+        return (
+            $('#product_name').val() !== originalValues.product_name ||
+            $('#product_category_id').val() !== originalValues.product_category_id ||
+            $('#supplier_id').val() !== originalValues.supplier_id ||
+            $('#selling_price').val() !== originalValues.selling_price
+        );
+    }
+
+    // Track changes on all form elements
+    $('#product_name, #selling_price').on('input', function() {
+        formChanged = checkFormChanged();
+    });
+
+    $('#product_category_id, #supplier_id').on('change', function() {
+        formChanged = checkFormChanged();
     });
 
     // Validate selling price on input change
@@ -196,24 +224,31 @@ $(document).ready(function() {
         });
     });
 
-    // Cancel Button Confirmation
+    // Cancel Button with Smart Confirmation
     $('#cancelBtn').on('click', function(e) {
         e.preventDefault();
-        Swal.fire({
-            title: 'Are you sure you want to cancel?',
-            text: 'Any changes you made will not be saved!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'Continue editing',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/products';  // Redirect to the products page
-            }
-        });
+        
+        // Only show confirmation if form has changed
+        if (formChanged) {
+            Swal.fire({
+                title: 'Are you sure you want to cancel?',
+                text: 'Any changes you made will not be saved!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, discard changes',
+                cancelButtonText: 'Continue editing',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/products';  // Redirect to the products page
+                }
+            });
+        } else {
+            // No changes made, redirect immediately
+            window.location.href = '/products';
+        }
     });
 });
 </script>
