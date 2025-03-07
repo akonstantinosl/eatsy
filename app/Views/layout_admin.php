@@ -116,18 +116,11 @@
                                         <p>All Products</p>
                                     </a>
                                 </li>
-                                <!-- Product Purchase -->
+                                <!-- Product Transactions (Combined Purchases and Sales) -->
                                 <li class="nav-item">
-                                    <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
-                                        <i class="fas fa-cart-plus nav-icon"></i>
-                                        <p>Product Purchases</p>
-                                    </a>
-                                </li>
-                                <!-- Product Sales -->
-                                <li class="nav-item">
-                                    <a href="/sales" class="nav-link <?= (current_url() == base_url('admin/products/sales')) ? 'active' : '' ?>">
-                                        <i class="fas fa-cash-register nav-icon"></i>
-                                        <p>Product Sales</p>
+                                    <a href="/products/transaction" class="nav-link <?= (current_url() == base_url('products/transaction')) ? 'active' : '' ?>">
+                                        <i class="fas fa-exchange-alt nav-icon"></i>
+                                        <p>Product Transactions</p>
                                     </a>
                                 </li>
                             </ul>
@@ -170,7 +163,7 @@
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
-                                <li class="nav-item">
+                            <li class="nav-item">
                                     <a href="<?= base_url('admin/reports/purchases') ?>" class="nav-link">
                                         <i class="fas fa-cart-plus nav-icon"></i>
                                         <p>Purchase Reports</p>

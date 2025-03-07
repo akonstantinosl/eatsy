@@ -51,6 +51,7 @@ $routes->group('products', function($routes) {
     $routes->get('', 'ProductController::index');
     $routes->get('create', 'ProductController::create');
     $routes->post('store', 'ProductController::store');
+    $routes->get('transaction', 'ProductController::transaction');
     $routes->get('edit/(:segment)', 'ProductController::edit/$1'); 
     $routes->post('update/(:segment)', 'ProductController::update/$1'); 
     $routes->get('delete/(:segment)', 'ProductController::delete/$1');

@@ -280,4 +280,164 @@ class ProductController extends BaseController
         session()->setFlashdata('success', 'Product successfully Inactivated');
         return redirect()->to('/products');
     }
+
+    public function transaction()
+    {
+        // Get pagination configuration
+        $pager = \Config\Services::pager();
+        
+        // Get current page from the request, default to 1 if not set
+        $page = $this->request->getGet('page') ?? 1;
+        
+        // Get entries per page (default to 10 if not set)
+        $perPage = (int)($this->request->getGet('entries') ?? 10);
+        
+        // Get category filter (if any)
+        $categoryFilter = $this->request->getGet('category');
+        
+        // Get search term (if any)
+        $search = $this->request->getGet('search');
+        
+        // Get sort field and direction
+        $sortField = $this->request->getGet('sort') ?? 'product_name';
+        $sortDir = $this->request->getGet('dir') ?? 'asc';
+        
+        // Initialize models
+        $saleDetailModel = new \App\Models\SaleDetailModel();
+        $purchaseDetailModel = new \App\Models\PurchaseDetailModel();
+        
+        // Validate sort field to prevent SQL injection
+        $validSortFields = [
+            'product_name',
+            'product_stock',
+            'sales_quantity',
+            'sales_amount',
+            'purchase_quantity',
+            'purchase_amount'
+        ];
+        
+        if (!in_array($sortField, $validSortFields)) {
+            $sortField = 'product_name';
+        }
+        
+        // Validate sort direction
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'asc';
+        }
+        
+        // Get all products
+        $productsQuery = $this->productModel
+            ->select('products.product_id, products.product_name, products.product_stock, products.product_category_id, product_categories.product_category_name')
+            ->join('product_categories', 'product_categories.product_category_id = products.product_category_id')
+            ->where('products.product_status', 'active');
+        
+        // Apply category filter if set
+        if ($categoryFilter) {
+            $productsQuery->where('products.product_category_id', $categoryFilter);
+        }
+        
+        // Apply search filter if set
+        if ($search) {
+            $productsQuery->groupStart()
+                ->like('products.product_name', $search)
+                ->orLike('product_categories.product_category_name', $search)
+                ->groupEnd();
+        }
+        
+        // Get total products count with filters
+        $totalProducts = $productsQuery->countAllResults(false);
+        
+        // Get products for this page
+        $products = $productsQuery
+            ->orderBy('products.product_name', 'ASC')
+            ->findAll();
+        
+        // Prepare transaction data
+        $transactionData = [];
+        
+        foreach ($products as $product) {
+            $productId = $product['product_id'];
+            
+            // Get all completed sales for this product
+            $salesQuery = $saleDetailModel
+                ->select('SUM(sale_details.quantity_sold) as total_quantity, SUM(sale_details.quantity_sold * sale_details.price_per_unit) as total_amount')
+                ->join('sales', 'sales.sale_id = sale_details.sale_id')
+                ->where('sale_details.product_id', $productId)
+                ->where('sales.transaction_status', 'completed');
+            
+            $salesData = $salesQuery->first();
+            
+            // Get all completed purchases for this product
+            $purchasesQuery = $purchaseDetailModel
+                ->select('SUM(purchase_details.quantity_bought) as total_quantity, SUM(purchase_details.purchase_price) as total_amount')
+                ->join('purchases', 'purchases.purchase_id = purchase_details.purchase_id')
+                ->where('purchase_details.product_id', $productId)
+                ->where('purchases.order_status', 'completed');
+            
+            $purchasesData = $purchasesQuery->first();
+            
+            $salesQuantity = (int)($salesData['total_quantity'] ?? 0);
+            $salesAmount = (float)($salesData['total_amount'] ?? 0);
+            $purchaseQuantity = (int)($purchasesData['total_quantity'] ?? 0);
+            $purchaseAmount = (float)($purchasesData['total_amount'] ?? 0);
+            
+            // Only include products that have either sales or purchase transactions
+            if ($salesQuantity > 0 || $purchaseQuantity > 0) {
+                // Create transaction data entry
+                $transactionData[] = [
+                    'product_id' => $productId,
+                    'product_name' => $product['product_name'],
+                    'product_stock' => $product['product_stock'],
+                    'product_category_name' => $product['product_category_name'],
+                    'sales_quantity' => $salesQuantity,
+                    'sales_amount' => $salesAmount,
+                    'purchase_quantity' => $purchaseQuantity,
+                    'purchase_amount' => $purchaseAmount
+                ];
+            }
+        }
+        
+        // Sort data based on request
+        usort($transactionData, function($a, $b) use ($sortField, $sortDir) {
+            if ($sortDir == 'asc') {
+                return $a[$sortField] <=> $b[$sortField];
+            } else {
+                return $b[$sortField] <=> $a[$sortField];
+            }
+        });
+        
+        // Apply pagination manually
+        $offset = ($page - 1) * $perPage;
+        $pagedData = array_slice($transactionData, $offset, $perPage);
+        
+        // Get all product categories for the filter dropdown
+        $categories = $this->categoryModel->findAll();
+        
+        // Create pager links
+        $pager->setPath('/products/transaction');
+        
+        // Calculate totals for summary
+        $totalSalesQuantity = array_sum(array_column($transactionData, 'sales_quantity'));
+        $totalSalesAmount = array_sum(array_column($transactionData, 'sales_amount'));
+        $totalPurchaseQuantity = array_sum(array_column($transactionData, 'purchase_quantity'));
+        $totalPurchaseAmount = array_sum(array_column($transactionData, 'purchase_amount'));
+        
+        // Return the view with data
+        return view('products/products_transaction', [
+            'transactions' => $pagedData,
+            'categories' => $categories,
+            'pager' => $pager,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'total' => $totalProducts,
+            'categoryFilter' => $categoryFilter,
+            'search' => $search,
+            'sortField' => $sortField,
+            'sortDir' => $sortDir,
+            'totalSalesQuantity' => $totalSalesQuantity,
+            'totalSalesAmount' => $totalSalesAmount,
+            'totalPurchaseQuantity' => $totalPurchaseQuantity,
+            'totalPurchaseAmount' => $totalPurchaseAmount
+        ]);
+    }
 }
