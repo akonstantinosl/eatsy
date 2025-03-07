@@ -16,6 +16,10 @@ class CustomerController extends BaseController
 
     public function index()
     {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('login');
+        }
+
         // Set pagination configuration
         $pager = \Config\Services::pager();
         
@@ -28,6 +32,29 @@ class CustomerController extends BaseController
         
         // Get search term (if any)
         $search = $this->request->getGet('search');
+        
+        // Get sort field and direction
+        $sortField = $this->request->getGet('sort') ?? 'updated_at';
+        $sortDir = $this->request->getGet('dir') ?? 'desc';
+        
+        // Validate sort field to prevent SQL injection
+        $validSortFields = [
+            'customer_name', 
+            'customer_phone', 
+            'customer_address', 
+            'customer_status',
+            'updated_at',
+            'created_at'
+        ];
+        
+        if (!in_array($sortField, $validSortFields)) {
+            $sortField = 'updated_at';
+        }
+        
+        // Validate sort direction
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
         
         // Base query
         $query = $this->customerModel->where('customer_status', 'active');
@@ -44,13 +71,20 @@ class CustomerController extends BaseController
         // Get total count based on filters
         $totalCustomers = $query->countAllResults(false);
         
-        // Get paginated customers based on filters
+        // Add sorting
+        $query = $query->orderBy($sortField, $sortDir);
+        
+        // Get paginated customers
         $customers = $query
                    ->limit($perPage, ($page - 1) * $perPage)
                    ->find();
         
         // Create pager links
         $pager->setPath('customers');
+        
+        // Get newly created or updated customer IDs from flash data
+        $newCustomerId = session()->getFlashdata('new_customer_id');
+        $updatedCustomerId = session()->getFlashdata('updated_customer_id');
         
         // Pass customers data and pager to the view
         return view('customers/customers_index', [
@@ -59,17 +93,29 @@ class CustomerController extends BaseController
             'currentPage' => $page,
             'perPage' => $perPage,
             'total' => $totalCustomers,
-            'search' => $search
+            'search' => $search,
+            'sortField' => $sortField,
+            'sortDir' => $sortDir,
+            'newCustomerId' => $newCustomerId,
+            'updatedCustomerId' => $updatedCustomerId
         ]);
     }
 
     public function create()
     {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('login');
+        }
+
         return view('customers/customers_create');
     }
 
     public function store()
     {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('login');
+        }
+
         // Define validation rules
         $rules = [
             'customer_name' => 'required',
@@ -114,10 +160,12 @@ class CustomerController extends BaseController
             'customer_address' => $this->request->getPost('customer_address'),
             'customer_status' => $this->request->getPost('customer_status'),
             'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ];
 
         $this->customerModel->insert($data);
         session()->setFlashdata('success', 'Customer successfully added');
+        session()->setFlashdata('new_customer_id', $customerId);
         return redirect()->to('/customers');
     }
 
@@ -184,7 +232,8 @@ class CustomerController extends BaseController
         ];
 
         $this->customerModel->update($id, $data);
-        session()->setFlashdata('success', 'Customer sucessfully updated');
+        session()->setFlashdata('success', 'Customer successfully updated');
+        session()->setFlashdata('updated_customer_id', $id);
         return redirect()->to('/customers');
     }
 

@@ -12,58 +12,64 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <form action="/admin/users/update/<?= $user['user_id'] ?>" method="post" enctype="multipart/form-data">
+        <form action="/admin/users/update/<?= $user['user_id'] ?>" method="post" enctype="multipart/form-data" id="userForm">
             <div class="row">
                 <div class="col-md-9">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" 
-                            id="username" name="username" value="<?= old('username', $user['user_name']) ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['username'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" 
-                            id="password" name="password">
-                        <small class="text-muted">Leave blank to keep current password</small>
-                        <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['password'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="fullname">Full Name</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" 
-                            id="fullname" name="fullname" value="<?= old('fullname', $user['user_fullname']) ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['fullname'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" 
-                            id="phone" name="phone" value="<?= old('phone', $user['user_phone']) ?>">
-                        <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['phone'] ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+                <!-- Username field with error message positioned correctly -->
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" 
+                        id="username" name="username" value="<?= old('username', $user['user_name']) ?>" required data-original-value="<?= $user['user_name'] ?>">
+                    <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
+                        <div class="invalid-feedback">
+                            <?= session('errors')['username'] ?>
+                        </div>
+                    <?php endif; ?>
+                    <small class="text-muted">Username must be unique and at least 3 characters long</small>
+                </div>
+
+                <!-- Password field with error message positioned correctly -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" 
+                        id="password" name="password">
+                    <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
+                        <div class="invalid-feedback">
+                            <?= session('errors')['password'] ?>
+                        </div>
+                    <?php endif; ?>
+                    <small class="text-muted">Leave blank to keep current password</small>
+                </div>
+
+                <!-- Full Name field with error message positioned correctly -->
+                <div class="form-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" 
+                        id="fullname" name="fullname" value="<?= old('fullname', $user['user_fullname']) ?>" required data-original-value="<?= $user['user_fullname'] ?>">
+                    <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
+                        <div class="invalid-feedback">
+                            <?= session('errors')['fullname'] ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Phone field with error message positioned correctly -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" 
+                        id="phone" name="phone" value="<?= old('phone', $user['user_phone']) ?>" data-original-value="<?= $user['user_phone'] ?>">
+                    <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
+                        <div class="invalid-feedback">
+                            <?= session('errors')['phone'] ?>
+                        </div>
+                    <?php endif; ?>
+                    <small class="text-muted">Phone number must be unique and at least 10 digits</small>
+                </div>
                     
                     <div class="form-group">
                         <label for="role">Role</label>
                         <select class="form-control <?= session()->has('errors') && isset(session('errors')['role']) ? 'is-invalid' : '' ?>" 
-                            id="role" name="role" required>
+                            id="role" name="role" required data-original-value="<?= $user['user_role'] ?>">
                             <option value="admin" <?= (old('role', $user['user_role']) == 'admin') ? 'selected' : '' ?>>Admin</option>
                             <option value="staff" <?= (old('role', $user['user_role']) == 'staff') ? 'selected' : '' ?>>Staff</option>
                         </select>
@@ -108,7 +114,7 @@
             </div>
 
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary mr-2" id="saveBtn">Update</button>
+                <button type="button" class="btn btn-primary mr-2" id="saveBtn">Update</button>
                 <a href="/admin/users" class="btn btn-default" id="cancelBtn">Cancel</a>
             </div>
         </form>
@@ -148,9 +154,68 @@
         }
     });
 
+    // Function to check if form has been modified
+    function isFormModified() {
+        // Check text inputs and selects with data-original-value
+        const modifiableElements = document.querySelectorAll('[data-original-value]');
+        for (const element of modifiableElements) {
+            if (element.value !== element.getAttribute('data-original-value')) {
+                return true;
+            }
+        }
+        
+        // Check password field (any input means modification)
+        if (document.getElementById('password').value !== '') {
+            return true;
+        }
+        
+        // Check if a file has been selected for upload
+        if (document.getElementById('photo').files.length > 0) {
+            return true;
+        }
+        
+        return false;
+    }
+
     // SweetAlert for Save Button Confirmation
     document.getElementById('saveBtn').addEventListener('click', function(event) {
         event.preventDefault();
+        
+        // Basic client-side validation
+        const username = document.getElementById('username').value.trim();
+        const fullname = document.getElementById('fullname').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        let hasErrors = false;
+        let errorMessages = [];
+        
+        if (username === '') {
+            errorMessages.push('Username is required');
+            hasErrors = true;
+        } else if (username.length < 3) {
+            errorMessages.push('Username must be at least 3 characters long');
+            hasErrors = true;
+        }
+        
+        if (fullname === '') {
+            errorMessages.push('Full Name is required');
+            hasErrors = true;
+        }
+        
+        if (phone !== '' && phone.length < 10) {
+            errorMessages.push('Phone number must be at least 10 digits');
+            hasErrors = true;
+        }
+        
+        if (hasErrors) {
+            Swal.fire({
+                title: 'Validation Error',
+                html: errorMessages.join('<br>'),
+                icon: 'error',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+        
         Swal.fire({
             title: 'Are you sure you want to update this user?',
             text: 'You can review and edit the information before saving.',
@@ -163,34 +228,46 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                document.querySelector('form').submit();
+                document.getElementById('userForm').submit();
             }
         });
     });
 
-    // SweetAlert for Cancel Button Confirmation
+    // SweetAlert for Cancel Button Confirmation - only show if changes were made
     document.getElementById('cancelBtn').addEventListener('click', function(e) {
         e.preventDefault();
-        Swal.fire({
-            title: 'Are you sure you want to cancel?',
-            text: 'Any changes you made will not be saved!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'Continue editing',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/admin/users';  // Redirect back to users page
-            }
-        });
+        
+        // If the form has been modified, show confirmation dialog
+        if (isFormModified()) {
+            Swal.fire({
+                title: 'Are you sure you want to cancel?',
+                text: 'Any changes you made will not be saved!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'Continue editing',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/admin/users';  // Redirect back to users page
+                }
+            });
+        } else {
+            // If no changes were made, just redirect without confirmation
+            window.location.href = '/admin/users';
+        }
     });
 
     // Initialize BS Custom File Input
     document.addEventListener('DOMContentLoaded', function() {
         bsCustomFileInput.init();
+        
+        // Add phone number format validation
+        document.getElementById('phone').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, ''); // Remove non-numeric characters
+        });
         
         // Display SweetAlert for validation errors if they exist
         <?php if (session()->has('errors')): ?>

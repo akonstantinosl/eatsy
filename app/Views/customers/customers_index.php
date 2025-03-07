@@ -9,6 +9,8 @@
     <div class="card-header p-2">
         <form id="filterForm" action="<?= site_url('customers') ?>" method="get" class="mb-0">
             <input type="hidden" name="page" value="<?= $currentPage ?? 1 ?>">
+            <input type="hidden" name="sort" value="<?= $sortField ?? 'updated_at' ?>">
+            <input type="hidden" name="dir" value="<?= $sortDir ?? 'desc' ?>">
             <div class="row align-items-center">
 
                 <div class="col-md-8 col-sm-12">
@@ -41,7 +43,7 @@
                                     <button type="submit" class="btn btn-sm btn-default">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <?php if (!empty($search) || $perPage != 10): ?>
+                                    <?php if (!empty($search) || $perPage != 10 || $sortField != 'updated_at' || $sortDir != 'desc'): ?>
                                         <a href="/customers" class="btn btn-sm btn-danger">
                                             <i class="fas fa-times"></i>
                                         </a>
@@ -72,9 +74,36 @@
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="25%">Name</th>
-                        <th width="15%">Phone</th>
-                        <th width="<?= session()->get('user_role') == 'admin' ? '35%' : '55%' ?>">Address</th>
+                        <th width="25%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="customer_name">
+                                Name
+                                <?php if($sortField == 'customer_name'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="15%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="customer_phone">
+                                Phone
+                                <?php if($sortField == 'customer_phone'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="<?= session()->get('user_role') == 'admin' ? '35%' : '55%' ?>">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="customer_address">
+                                Address
+                                <?php if($sortField == 'customer_address'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
                         <?php if (session()->get('user_role') == 'admin'): ?>
                             <th width="20%">Actions</th>
                         <?php endif; ?>
@@ -85,8 +114,12 @@
                     $startIndex = ($currentPage - 1) * $perPage + 1;
                     if (!empty($customers)): 
                         foreach ($customers as $index => $customer): 
+                            // Check if this is a newly created or updated customer
+                            $isNewCustomer = isset($newCustomerId) && $customer['customer_id'] == $newCustomerId;
+                            $isUpdatedCustomer = isset($updatedCustomerId) && $customer['customer_id'] == $updatedCustomerId;
+                            $rowClass = $isNewCustomer ? 'table-success' : ($isUpdatedCustomer ? 'table-info' : '');
                     ?>
-                        <tr>
+                        <tr class="<?= $rowClass ?>">
                             <td><?= $startIndex + $index ?></td>
                             <td><?= esc($customer['customer_name']) ?></td>
                             <td><?= esc($customer['customer_phone']) ?></td>
@@ -103,6 +136,11 @@
                                             <i class="fas fa-trash"></i> Inactive
                                         </button>
                                     </div>
+                                    <?php if($isNewCustomer): ?>
+                                        <span class="badge badge-success ml-2">NEW</span>
+                                    <?php elseif($isUpdatedCustomer): ?>
+                                        <span class="badge badge-info ml-2">UPDATED</span>
+                                    <?php endif; ?>
                                 </td>
                             <?php endif; ?>
                         </tr>
@@ -134,6 +172,8 @@
                             $queryParams = [];
                             if (!empty($perPage)) $queryParams['entries'] = $perPage;
                             if (!empty($search)) $queryParams['search'] = $search;
+                            if (!empty($sortField)) $queryParams['sort'] = $sortField;
+                            if (!empty($sortDir)) $queryParams['dir'] = $sortDir;
                             
                             // Create the query string
                             $queryString = http_build_query($queryParams);
@@ -215,6 +255,25 @@
         float: right !important;
     }
     
+    /* Sorting styles */
+    th a.sort-link {
+        color: #212529;
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    th a.sort-link:hover {
+        color: #007bff;
+    }
+    
+    /* Animation for new/updated rows */
+    .table-success, .table-info {
+        transition: background-color 3s;
+    }
+    
     /* Optimize for smaller screens */
     @media (max-width: 768px) {
         .btn-sm {
@@ -245,7 +304,6 @@
 </style>
 
 <script>
-    // Reset page parameter when search or filter changes
     document.addEventListener('DOMContentLoaded', function() {
         // Get all the form controls that should reset the page parameter
         const formControls = document.querySelectorAll('#filterForm select, #filterForm input[type="text"]');
@@ -264,6 +322,40 @@
                 document.getElementById('filterForm').submit();
             }
         });
+        
+        // Handle column sorting
+        const sortLinks = document.querySelectorAll('.sort-link');
+        sortLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const sortField = this.getAttribute('data-sort');
+                const currentSort = document.querySelector('input[name="sort"]').value;
+                const currentDir = document.querySelector('input[name="dir"]').value;
+                
+                // Determine new sort direction
+                let newDir = 'asc';
+                if (sortField === currentSort) {
+                    // If clicking the same column, toggle direction
+                    newDir = (currentDir === 'asc') ? 'desc' : 'asc';
+                }
+                
+                // Update form values
+                document.querySelector('input[name="sort"]').value = sortField;
+                document.querySelector('input[name="dir"]').value = newDir;
+                
+                // Reset to page 1 when sort changes
+                document.querySelector('input[name="page"]').value = '1';
+                
+                // Submit the form
+                document.getElementById('filterForm').submit();
+            });
+        });
+        
+        // Fade out highlight effects after a delay
+        setTimeout(function() {
+            document.querySelectorAll('.table-success, .table-info').forEach(function(el) {
+                el.style.backgroundColor = 'transparent';
+            });
+        }, 3000);
         
         // SweetAlert for inactive confirmation
         const inactiveButtons = document.querySelectorAll('.btn-inactive');

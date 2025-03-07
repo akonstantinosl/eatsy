@@ -62,8 +62,8 @@
                                 <td><?= ucfirst(str_replace('_', ' ', $sale['payment_method'])) ?></td>
                             </tr>
                             <tr>
-                                <th>Seller:</th>
-                                <td><?= esc($sale['seller_name']) ?></td>
+                                <th>User:</th>
+                                <td><?= esc($sale['user_name']) ?></td>
                             </tr>
                         </table>
                     </div>

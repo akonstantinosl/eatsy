@@ -24,9 +24,9 @@
                 <thead>
                     <tr>
                         <th>Product</th>
-                        <th>Sales Qty</th>
+                        <th>Stock</th>
+                        <th>Sales Quantity</th>
                         <th>Sales Amount</th>
-                        <th>Purchase Qty</th>
                         <th>Purchase Amount</th>
                         <th>Profit</th>
                     </tr>
@@ -35,9 +35,9 @@
                     <?php foreach ($profitData as $item): ?>
                         <tr>
                             <td><?= $item['product_name'] ?></td>
+                            <td class="text-center"><?= $item['product_stock'] ?></td>
                             <td class="text-center"><?= $item['sales_quantity'] ?></td>
                             <td class="text-right"><?= number_format($item['sales_amount'], 0, ',', '.') ?> IDR</td>
-                            <td class="text-center"><?= $item['purchase_quantity'] ?></td>
                             <td class="text-right"><?= number_format($item['purchase_amount'], 0, ',', '.') ?> IDR</td>
                             <td class="text-right <?= ($item['profit'] >= 0) ? 'text-success' : 'text-danger' ?>">
                                 <?= number_format($item['profit'], 0, ',', '.') ?> IDR
@@ -49,8 +49,8 @@
                     <tr class="font-weight-bold">
                         <td>TOTAL</td>
                         <td></td>
+                        <td class="text-center"><?= number_format($totalQuantity) ?></td>
                         <td class="text-right"><?= number_format($totalSales, 0, ',', '.') ?> IDR</td>
-                        <td></td>
                         <td class="text-right"><?= number_format($totalPurchases, 0, ',', '.') ?> IDR</td>
                         <td class="text-right <?= ($totalProfit >= 0) ? 'text-success' : 'text-danger' ?>">
                             <?= number_format($totalProfit, 0, ',', '.') ?> IDR
@@ -80,7 +80,7 @@
         <div class="small-box bg-warning">
             <div class="inner">
                 <h3><?= number_format($totalPurchases, 0, ',', '.') ?> IDR</h3>
-                <p>Total Purchases</p>
+                <p>Total Purchase Cost</p>
             </div>
             <div class="icon">
                 <i class="fas fa-truck-loading"></i>
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     borderWidth: 1
                 },
                 {
-                    label: 'Purchases',
+                    label: 'Purchase Cost',
                     data: purchasesData,
                     backgroundColor: 'rgba(255, 193, 7, 0.7)',
                     borderColor: 'rgba(255, 193, 7, 1)',
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Sales, Purchases, and Profit by Product'
+                    text: 'Sales, Purchase Costs, and Profit by Product'
                 },
                 tooltip: {
                     callbacks: {

@@ -15,44 +15,54 @@
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-9">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" id="username" name="username" value="<?= old('username') ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['username'] ?>
-                            </div>
-                        <?php endif; ?>
+                <!-- Username field with error message positioned correctly -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['username']) ? 'is-invalid' : '' ?>" 
+                    id="username" name="username" value="<?= old('username') ?>" required>
+                <?php if (session()->has('errors') && isset(session('errors')['username'])): ?>
+                    <div class="invalid-feedback">
+                        <?= session('errors')['username'] ?>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" id="password" name="password" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['password'] ?>
-                            </div>
-                        <?php endif; ?>
+                <?php endif; ?>
+                <small class="text-muted">Username must be unique and at least 3 characters long</small>
+            </div>
+
+            <!-- Password field with error message positioned correctly -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control <?= session()->has('errors') && isset(session('errors')['password']) ? 'is-invalid' : '' ?>" 
+                    id="password" name="password" required>
+                <?php if (session()->has('errors') && isset(session('errors')['password'])): ?>
+                    <div class="invalid-feedback">
+                        <?= session('errors')['password'] ?>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="fullname">Full Name</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" id="fullname" name="fullname" value="<?= old('fullname') ?>" required>
-                        <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['fullname'] ?>
-                            </div>
-                        <?php endif; ?>
+                <?php endif; ?>
+                <small class="text-muted">Password must be at least 6 characters long</small>
+            </div>
+
+            <!-- Full Name field with error message positioned correctly -->
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['fullname']) ? 'is-invalid' : '' ?>" 
+                    id="fullname" name="fullname" value="<?= old('fullname') ?>" required>
+                <?php if (session()->has('errors') && isset(session('errors')['fullname'])): ?>
+                    <div class="invalid-feedback">
+                        <?= session('errors')['fullname'] ?>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" id="phone" name="phone" value="<?= old('phone') ?>">
-                        <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
-                            <div class="invalid-feedback">
-                                <?= session('errors')['phone'] ?>
-                            </div>
-                        <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- Phone field with error message positioned correctly -->
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" class="form-control <?= session()->has('errors') && isset(session('errors')['phone']) ? 'is-invalid' : '' ?>" 
+                    id="phone" name="phone" value="<?= old('phone') ?>">
+                <?php if (session()->has('errors') && isset(session('errors')['phone'])): ?>
+                    <div class="invalid-feedback">
+                        <?= session('errors')['phone'] ?>
+                    </div>
+                <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
@@ -67,7 +77,7 @@
                             </div>
                         <?php endif; ?>
                     </div>
-                </div>
+            </div>
                 
                 <div class="col-md-3">
                     <div class="form-group text-center">

@@ -35,6 +35,7 @@
                         <?= session('errors')['customer_phone'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Phone number must be unique and at least 10 digits.</small>
             </div>
 
             <div class="form-group">
@@ -65,6 +66,11 @@
             bsCustomFileInput.init();
         }
         
+        // Store original values for comparison
+        let originalName = '';
+        let originalPhone = '';
+        let originalAddress = '';
+        
         // Add input validation for phone number to ensure it's numeric
         document.getElementById('customer_phone').addEventListener('input', function(e) {
             // Replace any non-numeric characters with empty string
@@ -75,15 +81,42 @@
         document.getElementById('saveBtn').addEventListener('click', function() {
             // First validate the phone input before submission
             const phoneInput = document.getElementById('customer_phone');
-            if (!/^\d+$/.test(phoneInput.value)) {
+            const nameInput = document.getElementById('customer_name');
+            const addressInput = document.getElementById('customer_address');
+            let hasErrors = false;
+            let errorMessages = [];
+            
+            // Validate required fields
+            if (nameInput.value.trim() === '') {
+                errorMessages.push('Customer name is required.');
+                nameInput.classList.add('is-invalid');
+                hasErrors = true;
+            }
+            
+            if (phoneInput.value.trim() === '') {
+                errorMessages.push('Phone number is required.');
+                phoneInput.classList.add('is-invalid');
+                hasErrors = true;
+            } else if (phoneInput.value.trim().length < 10) {
+                errorMessages.push('Phone number must be at least 10 digits.');
+                phoneInput.classList.add('is-invalid');
+                hasErrors = true;
+            }
+            
+            if (addressInput.value.trim() === '') {
+                errorMessages.push('Address is required.');
+                addressInput.classList.add('is-invalid');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
                 Swal.fire({
                     title: 'Validation Error',
-                    text: 'The phone number field must contain only numbers.',
+                    html: errorMessages.join('<br>'),
                     icon: 'error',
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 });
-                phoneInput.focus();
                 return;
             }
             
@@ -104,24 +137,44 @@
             });
         });
 
-        // Cancel Button Confirmation
+        // Function to check if form has been modified
+        function isFormModified() {
+            const nameChanged = document.getElementById('customer_name').value.trim() !== originalName;
+            const phoneChanged = document.getElementById('customer_phone').value.trim() !== originalPhone;
+            const addressChanged = document.getElementById('customer_address').value.trim() !== originalAddress;
+            
+            return nameChanged || phoneChanged || addressChanged;
+        }
+
+        // Cancel Button Confirmation - only show if changes were made
         document.getElementById('cancelBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            Swal.fire({
-                title: 'Are you sure you want to cancel?',
-                text: 'Any changes you made will not be saved!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!',
-                cancelButtonText: 'Continue editing',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/customers';  // Redirect back to the customers page
-                }
-            });
+            
+            // Check if any fields have values (for create form)
+            const name = document.getElementById('customer_name').value.trim();
+            const phone = document.getElementById('customer_phone').value.trim();
+            const address = document.getElementById('customer_address').value.trim();
+            
+            if (name !== '' || phone !== '' || address !== '') {
+                Swal.fire({
+                    title: 'Are you sure you want to cancel?',
+                    text: 'Any changes you made will not be saved!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'Continue editing',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/customers';  // Redirect back to the customers page
+                    }
+                });
+            } else {
+                // No changes, just redirect
+                window.location.href = '/customers';
+            }
         });
 
         // Display SweetAlert for error message if it exists (single error message)

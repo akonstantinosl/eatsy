@@ -33,46 +33,48 @@ class SaleModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules = [
-        'sale_id' => 'required|alpha_numeric|min_length[3]|max_length[20]',
-        'customer_id' => 'required|alpha_numeric|min_length[3]|max_length[20]',
-        'user_id' => 'required|alpha_numeric|min_length[3]|max_length[20]',
-        'sale_amount' => 'permit_empty|numeric',
-        'payment_method' => 'required|in_list[cash,credit_card,debit_card,e-wallet]',
-        'transaction_status' => 'required|in_list[pending,processing,completed,cancelled]',
-        'sale_status' => 'required|in_list[continue,cancel]',
-    ];
+    // protected $validationRules = [
+    //     'sale_id' => 'required|alpha_numeric|min_length[3]|max_length[20]',
+    //     'customer_id' => 'required|alpha_numeric|min_length[3]|max_length[20]',
+    //     'user_id' => 'required|alpha_numeric|min_length[3]|max_length[20]',
+    //     'sale_amount' => 'permit_empty|numeric',
+    //     'payment_method' => 'required|in_list[cash,credit_card,debit_card,e-wallet]',
+    //     'transaction_status' => 'required|in_list[pending,processing,completed,cancelled]',
+    //     'sale_status' => 'required|in_list[continue,cancel]',
+    // ];
 
-    protected $validationMessages = [
-        'sale_id' => [
-            'required' => 'Sale ID is required',
-            'alpha_numeric' => 'Sale ID can only contain alphanumeric characters',
-            'min_length' => 'Sale ID must be at least {param} characters long',
-            'max_length' => 'Sale ID cannot exceed {param} characters in length',
-        ],
-        'customer_id' => [
-            'required' => 'Customer ID is required',
-        ],
-        'user_id' => [
-            'required' => 'User ID is required',
-        ],
-        'payment_method' => [
-            'required' => 'Payment method is required',
-            'in_list' => 'Payment method must be one of: cash, credit card, debit card, e-wallet',
-        ],
-        'transaction_status' => [
-            'required' => 'Transaction status is required',
-            'in_list' => 'Transaction status must be one of: pending, processing, completed, cancelled',
-        ],
-        'sale_status' => [
-            'required' => 'Sale status is required',
-            'in_list' => 'Sale status must be one of: continue, cancel',
-        ],
-    ];
+    // protected $validationMessages = [
+    //     'sale_id' => [
+    //         'required' => 'Sale ID is required',
+    //         'alpha_numeric' => 'Sale ID can only contain alphanumeric characters',
+    //         'min_length' => 'Sale ID must be at least {param} characters long',
+    //         'max_length' => 'Sale ID cannot exceed {param} characters in length',
+    //     ],
+    //     'customer_id' => [
+    //         'required' => 'Customer ID is required',
+    //     ],
+    //     'user_id' => [
+    //         'required' => 'User ID is required',
+    //     ],
+    //     'payment_method' => [
+    //         'required' => 'Payment method is required',
+    //         'in_list' => 'Payment method must be one of: cash, credit card, debit card, e-wallet',
+    //     ],
+    //     'transaction_status' => [
+    //         'required' => 'Transaction status is required',
+    //         'in_list' => 'Transaction status must be one of: pending, processing, completed, cancelled',
+    //     ],
+    //     'sale_status' => [
+    //         'required' => 'Sale status is required',
+    //         'in_list' => 'Sale status must be one of: continue, cancel',
+    //     ],
+    // ];
 
-    protected $skipValidation = false;
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
     protected $cleanValidationRules = true;
-
     // Callbacks
     protected $allowCallbacks = true;
     protected $beforeInsert   = [];

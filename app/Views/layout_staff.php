@@ -151,19 +151,6 @@
             <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
-                    <?php if (session()->getFlashdata('success')): ?>
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                        <?= session()->getFlashdata('success') ?>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php if (session()->getFlashdata('error')): ?>
-                    <div class="alert alert-danger alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                        <?= session()->getFlashdata('error') ?>
-                    </div>
-                    <?php endif; ?>
                     
                     <?= $this->renderSection('content') ?>
                 </div>

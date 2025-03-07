@@ -21,6 +21,7 @@
                         <?= session('errors')['supplier_name'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Supplier name must be unique regardless of spacing or capitalization.</small>
             </div>
 
             <div class="form-group">
@@ -31,6 +32,7 @@
                         <?= session('errors')['supplier_phone'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Phone number must be unique and at least 10 digits.</small>
             </div>
 
             <div class="form-group">
@@ -43,7 +45,7 @@
                 <?php endif; ?>
             </div>
 
-            <!-- Hidden input for status (can't be edited) -->
+            <!-- Hidden input for status -->
             <input type="hidden" name="supplier_status" value="<?= $supplier['supplier_status'] ?>">
 
             <button type="button" id="saveBtn" class="btn btn-primary mr-2">Update</button>
@@ -55,47 +57,110 @@
 <!-- /.card -->
 
 <script>
-    // Save Button Confirmation
-    document.getElementById('saveBtn').addEventListener('click', function() {
-        Swal.fire({
-            title: 'Are you sure you want to update this supplier?',
-            text: 'You can review and edit the information before saving.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, update it!',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('supplierForm').submit();
-            }
-        });
-    });
-
-    // Cancel Button Confirmation
-    document.getElementById('cancelBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Are you sure you want to cancel?',
-            text: 'Any changes you made will not be saved!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'Continue editing',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/admin/suppliers';  // Redirect back to suppliers page
-            }
-        });
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
-        bsCustomFileInput.init();
+        if (typeof bsCustomFileInput !== 'undefined') {
+            bsCustomFileInput.init();
+        }
+
+        // Store original values for comparison
+        let originalName = '<?= addslashes($supplier['supplier_name']) ?>';
+        let originalPhone = '<?= $supplier['supplier_phone'] ?>';
+        let originalAddress = '<?= addslashes($supplier['supplier_address']) ?>';
+        
+        // Basic phone number format validation
+        let supplierPhoneInput = document.getElementById('supplier_phone');
+        
+        // Validate phone number format (only allow digits)
+        supplierPhoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, ''); // Remove non-numeric characters
+        });
+
+        // Save Button Confirmation with basic validation
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            // Perform basic validation before confirmation
+            const name = document.getElementById('supplier_name').value.trim();
+            const phone = supplierPhoneInput.value.trim();
+            const address = document.getElementById('supplier_address').value.trim();
+            let validationErrors = [];
+            
+            // Validate required fields
+            if (name === '') {
+                validationErrors.push('Supplier name is required.');
+                document.getElementById('supplier_name').classList.add('is-invalid');
+            }
+            
+            if (phone === '') {
+                validationErrors.push('Phone number is required.');
+                supplierPhoneInput.classList.add('is-invalid');
+            } else if (phone.length < 10) {
+                validationErrors.push('Phone number must be at least 10 digits.');
+                supplierPhoneInput.classList.add('is-invalid');
+            }
+            
+            if (address === '') {
+                validationErrors.push('Address is required.');
+                document.getElementById('supplier_address').classList.add('is-invalid');
+            }
+            
+            // If there are validation errors, show them and stop
+            if (validationErrors.length > 0) {
+                Swal.fire({
+                    title: 'Validation Error',
+                    html: validationErrors.join('<br>'),
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+            
+            // If validations pass, show confirmation dialog
+            Swal.fire({
+                title: 'Are you sure you want to update this supplier?',
+                text: 'You can review and edit the information before saving.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('supplierForm').submit();
+                }
+            });
+        });
+
+        // Cancel Button Confirmation - only show if changes were made
+        document.getElementById('cancelBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Check if any values have changed
+            const nameChanged = document.getElementById('supplier_name').value.trim() !== originalName;
+            const phoneChanged = supplierPhoneInput.value.trim() !== originalPhone;
+            const addressChanged = document.getElementById('supplier_address').value.trim() !== originalAddress;
+            
+            if (nameChanged || phoneChanged || addressChanged) {
+                Swal.fire({
+                    title: 'Are you sure you want to cancel?',
+                    text: 'Any changes you made will not be saved!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'Continue editing',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/admin/suppliers';  // Redirect back to suppliers page
+                    }
+                });
+            } else {
+                // No changes, just redirect
+                window.location.href = '/admin/suppliers';
+            }
+        });
 
         // Display SweetAlert for validation errors if they exist
         <?php if (session()->has('errors')): ?>

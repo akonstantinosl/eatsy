@@ -42,7 +42,7 @@ class PDF extends \FPDF {
         $this->SetFont('Arial', 'B', 10);
         $this->SetFillColor(200, 220, 255);
         $this->Cell(35, 10, 'Date', 1, 0, 'C', true);
-        $this->Cell(35, 10, 'Seller', 1, 0, 'C', true);
+        $this->Cell(35, 10, 'User', 1, 0, 'C', true);
         $this->Cell(35, 10, 'Customer', 1, 0, 'C', true);
         $this->Cell(85, 10, 'Product', 1, 0, 'C', true);
         $this->Cell(35, 10, 'Quantity', 1, 0, 'C', true);
@@ -270,7 +270,8 @@ class SalesReportController extends Controller
         // Filter by date range and completed status
         $saleQuery = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
                               ->where('updated_at <=', $endDate . ' 23:59:59')
-                              ->where('transaction_status', 'completed'); // Filter for completed sales only
+                              ->where('transaction_status', 'completed') // Filter for completed sales only
+                              ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));
@@ -373,7 +374,8 @@ class SalesReportController extends Controller
         // Filter by date range and completed status
         $saleQuery = $saleModel->where('updated_at >=', $startDate . ' 00:00:00')
                               ->where('updated_at <=', $endDate . ' 23:59:59')
-                              ->where('transaction_status', 'completed'); // Filter for completed sales only
+                              ->where('transaction_status', 'completed') // Filter for completed sales only
+                              ->orderBy('updated_at', 'ASC'); // Order by date from oldest to newest
         
         // Set period title
         $periodTitle = 'Period: ' . date('d M Y', strtotime($startDate)) . ' - ' . date('d M Y', strtotime($endDate));

@@ -9,6 +9,8 @@
     <div class="card-header p-2">
         <form id="filterForm" action="<?= site_url('sales') ?>" method="get" class="mb-0">
             <input type="hidden" name="page" value="<?= $currentPage ?? 1 ?>">
+            <input type="hidden" name="sort" value="<?= $sortField ?? 'updated_at' ?>">
+            <input type="hidden" name="dir" value="<?= $sortDir ?? 'desc' ?>">
             <div class="row align-items-center">
 
                 <div class="col-md-8 col-sm-12">
@@ -23,7 +25,7 @@
                                     <span class="input-group-text">Show</span>
                                 </div>
                                 <select name="entries" id="entries" class="form-control form-control-sm" onchange="document.getElementById('filterForm').submit()">
-                                    <?php foreach ([10, 25, 50, 100] as $option): ?>
+                                    <?php foreach ([10, 25, 50] as $option): ?>
                                         <option value="<?= $option ?>" <?= $perPage == $option ? 'selected' : '' ?>><?= $option ?></option>
                                     <?php endforeach; ?>
                                 </select>
@@ -57,7 +59,7 @@
                                     <button type="submit" class="btn btn-sm btn-default">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <?php if (!empty($search) || !empty($statusFilter) || $perPage != 10): ?>
+                                    <?php if (!empty($search) || !empty($statusFilter) || $perPage != 10 || $sortField != 'updated_at' || $sortDir != 'desc'): ?>
                                         <a href="/sales" class="btn btn-sm btn-danger">
                                             <i class="fas fa-times"></i>
                                         </a>
@@ -85,13 +87,76 @@
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="12%">Date</th>
-                        <th width="12%">Seller</th>
-                        <th width="12%">Customer</th>
-                        <th width="12%">Contact</th>
-                        <th width="12%">Amount</th>
-                        <th width="12%">Payment Method</th>
-                        <th width="10%">Status</th>
+                        <th width="12%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="updated_at">
+                                Date
+                                <?php if($sortField == 'updated_at'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="12%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="user_fullname">
+                                User
+                                <?php if($sortField == 'user_fullname'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="12%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="customer_name">
+                                Customer
+                                <?php if($sortField == 'customer_name'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="12%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="customer_phone">
+                                Contact
+                                <?php if($sortField == 'customer_phone'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="12%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="sale_amount">
+                                Amount
+                                <?php if($sortField == 'sale_amount'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="12%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="payment_method">
+                                Payment Method
+                                <?php if($sortField == 'payment_method'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
+                        <th width="10%">
+                            <a href="javascript:void(0)" class="sort-link" data-sort="transaction_status">
+                                Status
+                                <?php if($sortField == 'transaction_status'): ?>
+                                    <i class="fas fa-sort-<?= ($sortDir == 'asc') ? 'up' : 'down' ?>"></i>
+                                <?php else: ?>
+                                    <i class="fas fa-sort text-muted"></i>
+                                <?php endif; ?>
+                            </a>
+                        </th>
                         <th width="10%">Actions</th>
                     </tr>
                 </thead>
@@ -100,8 +165,12 @@
                     $startIndex = ($currentPage - 1) * $perPage + 1;
                     if (!empty($sales)): 
                         foreach ($sales as $index => $sale): 
+                            // Check if this is a newly created or updated sale
+                            $isNewSale = isset($newSaleIds) && in_array($sale['sale_id'], $newSaleIds);
+                            $isUpdatedSale = isset($updatedSaleIds) && in_array($sale['sale_id'], $updatedSaleIds);
+                            $rowClass = $isNewSale ? 'table-success' : ($isUpdatedSale ? 'table-info' : '');
                     ?>
-                        <tr>
+                        <tr class="<?= $rowClass ?>">
                             <td><?= $startIndex + $index ?></td>
                             <td><?= date('d F Y, H:i', strtotime($sale['updated_at'])) ?></td>
                             <td><?= esc($sale['user_fullname']) ?></td>
@@ -160,9 +229,16 @@
                                 <span class="badge <?= $statusClass ?>"><?= $statusText ?></span> 
                             </td>
                             <td>
-                                <a href="/sales/details/<?= esc($sale['sale_id']) ?>" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
+                                <div class="d-flex align-items-center">
+                                    <a href="/sales/details/<?= esc($sale['sale_id']) ?>" class="btn btn-info btn-sm mr-2">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <?php if($isNewSale): ?>
+                                        <span class="badge badge-success">NEW</span>
+                                    <?php elseif($isUpdatedSale): ?>
+                                        <span class="badge badge-info">UPDATED</span>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php 
@@ -194,6 +270,8 @@
                             if (!empty($perPage) && $perPage != 10) $queryParams['entries'] = $perPage;
                             if (!empty($statusFilter)) $queryParams['status'] = $statusFilter;
                             if (!empty($search)) $queryParams['search'] = $search;
+                            if (!empty($sortField) && $sortField != 'updated_at') $queryParams['sort'] = $sortField;
+                            if (!empty($sortDir) && $sortDir != 'desc') $queryParams['dir'] = $sortDir;
                             
                             // Create the query string
                             $queryString = http_build_query($queryParams);
@@ -273,6 +351,25 @@
         float: right !important;
     }
     
+    /* Sorting styles */
+    th a.sort-link {
+        color: #212529;
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    th a.sort-link:hover {
+        color: #007bff;
+    }
+    
+    /* Animation for new/updated rows */
+    .table-success, .table-info {
+        transition: background-color 3s;
+    }
+    
     /* Optimize for smaller screens */
     @media (max-width: 768px) {
         .btn-sm {
@@ -303,7 +400,6 @@
 </style>
 
 <script>
-    // Reset page parameter when search or filter changes
     document.addEventListener('DOMContentLoaded', function() {
         // Get all the form controls that should reset the page parameter
         const formControls = document.querySelectorAll('#filterForm select, #filterForm input[type="text"]');
@@ -322,6 +418,40 @@
                 document.getElementById('filterForm').submit();
             }
         });
+        
+        // Handle column sorting
+        const sortLinks = document.querySelectorAll('.sort-link');
+        sortLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const sortField = this.getAttribute('data-sort');
+                const currentSort = document.querySelector('input[name="sort"]').value;
+                const currentDir = document.querySelector('input[name="dir"]').value;
+                
+                // Determine new sort direction
+                let newDir = 'asc';
+                if (sortField === currentSort) {
+                    // If clicking the same column, toggle direction
+                    newDir = (currentDir === 'asc') ? 'desc' : 'asc';
+                }
+                
+                // Update form values
+                document.querySelector('input[name="sort"]').value = sortField;
+                document.querySelector('input[name="dir"]').value = newDir;
+                
+                // Reset to page 1 when sort changes
+                document.querySelector('input[name="page"]').value = '1';
+                
+                // Submit the form
+                document.getElementById('filterForm').submit();
+            });
+        });
+        
+        // Fade out highlight effects after a delay
+        setTimeout(function() {
+            document.querySelectorAll('.table-success, .table-info').forEach(function(el) {
+                el.style.backgroundColor = 'transparent';
+            });
+        }, 3000);
         
         // Display SweetAlert for flash messages if they exist
         <?php if (session()->getFlashdata('success')): ?>

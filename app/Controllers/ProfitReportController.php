@@ -46,9 +46,9 @@ class PDF extends \FPDF
         $this->SetFont('Arial', 'B', 10);
         $this->SetFillColor(200, 220, 255);
         $this->Cell(70, 10, 'Product', 1, 0, 'C', true);
-        $this->Cell(30, 10, 'Sales Qty', 1, 0, 'C', true);
+        $this->Cell(30, 10, 'Stock', 1, 0, 'C', true);
+        $this->Cell(30, 10, 'Sales Quantity', 1, 0, 'C', true);
         $this->Cell(45, 10, 'Sales Amount', 1, 0, 'C', true);
-        $this->Cell(30, 10, 'Purchase Qty', 1, 0, 'C', true);
         $this->Cell(45, 10, 'Purchase Amount', 1, 0, 'C', true);
         $this->Cell(45, 10, 'Profit', 1, 1, 'C', true);
         
@@ -86,7 +86,7 @@ class PDF extends \FPDF
     // Function to display row data with multi-line support
     function RowMultiLine($data, $heights = []) {
         // Column widths
-        $widths = [70, 30, 45, 30, 45, 45]; // Same as the col_widths in the original PDF class
+        $widths = [70, 30, 30, 45, 45, 45]; // Updated widths to match new columns
         
         // Save initial Y position
         $startY = $this->GetY();
@@ -271,8 +271,6 @@ class ProfitReportController extends Controller
         // Initialize models
         $saleModel = new SaleModel();
         $saleDetailModel = new SaleDetailModel();
-        $purchaseModel = new PurchaseModel();
-        $purchaseDetailModel = new PurchaseDetailModel();
         $productModel = new ProductModel();
 
         // Set period title
@@ -284,15 +282,9 @@ class ProfitReportController extends Controller
                            ->where('transaction_status', 'completed') // Filter for completed sales only
                            ->findAll();
 
-        // Get purchases data based on filter - ONLY COMPLETED ORDERS
-        $purchases = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
-                                  ->where('updated_at <=', $endDate . ' 23:59:59')
-                                  ->where('order_status', 'completed') // Filter for completed purchases only
-                                  ->findAll();
-
         // If no data, return with error message
-        if (empty($sales) && empty($purchases)) {
-            return redirect()->to('/admin/reports/profit')->with('error', 'No completed transaction data found for the selected period.');
+        if (empty($sales)) {
+            return redirect()->to('/admin/reports/profit')->with('error', 'No completed sales data found for the selected period.');
         }
 
         // Prepare data structure for profit calculation
@@ -300,6 +292,7 @@ class ProfitReportController extends Controller
         $totalSales = 0;
         $totalPurchases = 0;
         $totalProfit = 0;
+        $totalQuantity = 0;
 
         // Process sales data - group by product
         foreach ($sales as $sale) {
@@ -309,66 +302,63 @@ class ProfitReportController extends Controller
                 $productId = $detail['product_id'];
                 $product = $productModel->find($productId);
                 
+                if (!$product) {
+                    continue; // Skip if product not found
+                }
+                
                 if (!isset($profitData[$productId])) {
+                    // Get current stock or default to 0 if not available
+                    $currentStock = isset($product['product_stock']) ? $product['product_stock'] : 0;
+                    
+                    // Get buying price or default to 0 if not available
+                    $buyingPrice = isset($product['buying_price']) ? $product['buying_price'] : 0;
+                    
                     $profitData[$productId] = [
                         'product_id' => $productId,
-                        'product_name' => $product ? $product['product_name'] : 'Unknown Product',
+                        'product_name' => $product['product_name'],
+                        'product_stock' => $currentStock,
+                        'buying_price' => $buyingPrice,
                         'sales_quantity' => 0,
                         'sales_amount' => 0,
-                        'purchase_quantity' => 0,
                         'purchase_amount' => 0,
                         'profit' => 0
                     ];
                 }
                 
-                // Using the correct field name: price_per_unit
+                // Calculate sales amount
                 $saleAmount = $detail['price_per_unit'] * $detail['quantity_sold'];
+                
+                // Add to sales quantity
                 $profitData[$productId]['sales_quantity'] += $detail['quantity_sold'];
+                
+                // Add to sales amount
                 $profitData[$productId]['sales_amount'] += $saleAmount;
                 
+                // Keep track of total sold quantity
+                $totalQuantity += $detail['quantity_sold'];
+                
+                // Add to total sales
                 $totalSales += $saleAmount;
             }
         }
 
-        // Process purchase data - group by product
-        foreach ($purchases as $purchase) {
-            $purchaseDetails = $purchaseDetailModel->where('purchase_id', $purchase['purchase_id'])->findAll();
-            
-            foreach ($purchaseDetails as $detail) {
-                $productId = $detail['product_id'];
-                $product = $productModel->find($productId);
-                
-                if (!isset($profitData[$productId])) {
-                    $profitData[$productId] = [
-                        'product_id' => $productId,
-                        'product_name' => $product ? $product['product_name'] : 'Unknown Product',
-                        'sales_quantity' => 0,
-                        'sales_amount' => 0,
-                        'purchase_quantity' => 0,
-                        'purchase_amount' => 0,
-                        'profit' => 0
-                    ];
-                }
-                
-                // Using the correct field names from purchase_details table
-                // Calculate total units purchased (box_bought * unit_per_box)
-                $totalUnitsPurchased = $detail['box_bought'] * $detail['unit_per_box'];
-                
-                // Calculate purchase amount (price_per_box * box_bought)
-                $purchaseAmount = $detail['price_per_box'] * $detail['box_bought'];
-                
-                $profitData[$productId]['purchase_quantity'] += $totalUnitsPurchased;
-                $profitData[$productId]['purchase_amount'] += $purchaseAmount;
-                
-                $totalPurchases += $purchaseAmount;
-            }
-        }
-
-        // Calculate profit for each product
+        // Calculate purchase amount and profit for each product
         foreach ($profitData as &$item) {
+            // Calculate purchase amount based on buying_price and sales_quantity
+            $item['purchase_amount'] = $item['buying_price'] * $item['sales_quantity'];
+            
+            // Calculate profit
             $item['profit'] = $item['sales_amount'] - $item['purchase_amount'];
+            
+            // Add to totals
+            $totalPurchases += $item['purchase_amount'];
             $totalProfit += $item['profit'];
         }
+        
+        // Sort profitData by profit (highest to lowest)
+        uasort($profitData, function($a, $b) {
+            return $b['profit'] - $a['profit']; // Sort in descending order
+        });
 
         // Prepare data for view
         $data = [
@@ -377,6 +367,7 @@ class ProfitReportController extends Controller
             'totalSales' => $totalSales,
             'totalPurchases' => $totalPurchases,
             'totalProfit' => $totalProfit,
+            'totalQuantity' => $totalQuantity,
             'start_date' => $startDate,
             'end_date' => $endDate
         ];
@@ -394,8 +385,6 @@ class ProfitReportController extends Controller
         // Initialize models
         $saleModel = new SaleModel();
         $saleDetailModel = new SaleDetailModel();
-        $purchaseModel = new PurchaseModel();
-        $purchaseDetailModel = new PurchaseDetailModel();
         $productModel = new ProductModel();
         
         // Set period title
@@ -407,17 +396,12 @@ class ProfitReportController extends Controller
                            ->where('transaction_status', 'completed') // Filter for completed sales only
                            ->findAll();
 
-        // Get purchases data based on filter - ONLY COMPLETED ORDERS
-        $purchases = $purchaseModel->where('updated_at >=', $startDate . ' 00:00:00')
-                                  ->where('updated_at <=', $endDate . ' 23:59:59')
-                                  ->where('order_status', 'completed') // Filter for completed purchases only
-                                  ->findAll();
-
         // Prepare data structure for profit calculation
         $profitData = [];
         $totalSales = 0;
         $totalPurchases = 0;
         $totalProfit = 0;
+        $totalQuantity = 0;
 
         // Process sales data - group by product
         foreach ($sales as $sale) {
@@ -427,66 +411,63 @@ class ProfitReportController extends Controller
                 $productId = $detail['product_id'];
                 $product = $productModel->find($productId);
                 
+                if (!$product) {
+                    continue; // Skip if product not found
+                }
+                
                 if (!isset($profitData[$productId])) {
+                    // Get current stock or default to 0 if not available
+                    $currentStock = isset($product['product_stock']) ? $product['product_stock'] : 0;
+                    
+                    // Get buying price or default to 0 if not available
+                    $buyingPrice = isset($product['buying_price']) ? $product['buying_price'] : 0;
+                    
                     $profitData[$productId] = [
                         'product_id' => $productId,
-                        'product_name' => $product ? $product['product_name'] : 'Unknown Product',
+                        'product_name' => $product['product_name'],
+                        'product_stock' => $currentStock,
+                        'buying_price' => $buyingPrice,
                         'sales_quantity' => 0,
                         'sales_amount' => 0,
-                        'purchase_quantity' => 0,
                         'purchase_amount' => 0,
                         'profit' => 0
                     ];
                 }
                 
-                // Using the correct field name: price_per_unit
+                // Calculate sales amount
                 $saleAmount = $detail['price_per_unit'] * $detail['quantity_sold'];
+                
+                // Add to sales quantity
                 $profitData[$productId]['sales_quantity'] += $detail['quantity_sold'];
+                
+                // Add to sales amount
                 $profitData[$productId]['sales_amount'] += $saleAmount;
                 
+                // Keep track of total sold quantity
+                $totalQuantity += $detail['quantity_sold'];
+                
+                // Add to total sales
                 $totalSales += $saleAmount;
             }
         }
 
-        // Process purchase data - group by product
-        foreach ($purchases as $purchase) {
-            $purchaseDetails = $purchaseDetailModel->where('purchase_id', $purchase['purchase_id'])->findAll();
-            
-            foreach ($purchaseDetails as $detail) {
-                $productId = $detail['product_id'];
-                $product = $productModel->find($productId);
-                
-                if (!isset($profitData[$productId])) {
-                    $profitData[$productId] = [
-                        'product_id' => $productId,
-                        'product_name' => $product ? $product['product_name'] : 'Unknown Product',
-                        'sales_quantity' => 0,
-                        'sales_amount' => 0,
-                        'purchase_quantity' => 0,
-                        'purchase_amount' => 0,
-                        'profit' => 0
-                    ];
-                }
-                
-                // Using the correct field names from purchase_details table
-                // Calculate total units purchased (box_bought * unit_per_box)
-                $totalUnitsPurchased = $detail['box_bought'] * $detail['unit_per_box'];
-                
-                // Calculate purchase amount (price_per_box * box_bought)
-                $purchaseAmount = $detail['price_per_box'] * $detail['box_bought'];
-                
-                $profitData[$productId]['purchase_quantity'] += $totalUnitsPurchased;
-                $profitData[$productId]['purchase_amount'] += $purchaseAmount;
-                
-                $totalPurchases += $purchaseAmount;
-            }
-        }
-        
-        // Calculate profit for each product
+        // Calculate purchase amount and profit for each product
         foreach ($profitData as &$item) {
+            // Calculate purchase amount based on buying_price and sales_quantity
+            $item['purchase_amount'] = $item['buying_price'] * $item['sales_quantity'];
+            
+            // Calculate profit
             $item['profit'] = $item['sales_amount'] - $item['purchase_amount'];
+            
+            // Add to totals
+            $totalPurchases += $item['purchase_amount'];
             $totalProfit += $item['profit'];
         }
+        
+        // Sort profitData by profit (highest to lowest)
+        uasort($profitData, function($a, $b) {
+            return $b['profit'] - $a['profit']; // Sort in descending order
+        });
         
         // Generate PDF
         $pdf = new PDF('L', 'mm', 'A4');
@@ -503,9 +484,9 @@ class ProfitReportController extends Controller
         foreach ($profitData as $item) {
             $rowData = [
                 $item['product_name'],
+                $item['product_stock'],
                 $item['sales_quantity'],
                 number_format($item['sales_amount'], 0, ',', '.') . " IDR",
-                $item['purchase_quantity'],
                 number_format($item['purchase_amount'], 0, ',', '.') . " IDR",
                 number_format($item['profit'], 0, ',', '.') . " IDR"
             ];
@@ -517,8 +498,8 @@ class ProfitReportController extends Controller
         // Display totals
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(100, 10, 'TOTAL', 1, 0, 'L');
+        $pdf->Cell(30, 10, $totalQuantity, 1, 0, 'C');
         $pdf->Cell(45, 10, number_format($totalSales, 0, ',', '.') . " IDR", 1, 0, 'R');
-        $pdf->Cell(30, 10, '', 1, 0, 'C');
         $pdf->Cell(45, 10, number_format($totalPurchases, 0, ',', '.') . " IDR", 1, 0, 'R');
         $pdf->Cell(45, 10, number_format($totalProfit, 0, ',', '.') . " IDR", 1, 1, 'R');
         

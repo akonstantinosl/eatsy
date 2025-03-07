@@ -28,11 +28,10 @@
                     <table class="table table-bordered table-striped" id="product-table">
                         <thead class="thead-light">
                             <tr>
-                                <th style="width: 35%">Product</th>
-                                <th style="width: 12%">Box Bought</th>
-                                <th style="width: 12%">Unit per Box</th>
-                                <th style="width: 18%">Price per Box</th>
-                                <th style="width: 15%">Total</th>
+                                <th style="width: 40%">Product</th>
+                                <th style="width: 15%">Quantity</th>
+                                <th style="width: 22%">Purchase Price</th>
+                                <th style="width: 15%">Unit Price</th>
                                 <th style="width: 8%">Action</th>
                             </tr>
                         </thead>
@@ -42,8 +41,7 @@
                                     <select name="products[0][product_id]" class="form-control product-select" required>
                                         <option value="">Select Product</option>
                                         <?php foreach ($products as $product): ?>
-                                            <option value="<?= esc($product['product_id']) ?>" 
-                                                data-units="<?= esc($product['product_units_per_box'] ?? 1) ?>">
+                                            <option value="<?= esc($product['product_id']) ?>">
                                                 <?= esc($product['product_name']) ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -52,15 +50,7 @@
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="products[0][box_bought]" class="form-control box-bought" min="1" value="1" required>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">box</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="input-group">
-                                        <input type="number" name="products[0][unit_per_box]" class="form-control unit-per-box" min="1" value="1" required>
+                                        <input type="number" name="products[0][quantity_bought]" class="form-control quantity-bought" min="1" value="1" required>
                                         <div class="input-group-append">
                                             <span class="input-group-text">unit</span>
                                         </div>
@@ -71,12 +61,12 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">IDR</span>
                                         </div>
-                                        <input type="number" name="products[0][price_per_box]" class="form-control price-per-box" min="0" value="0" required>
+                                        <input type="number" name="products[0][purchase_price]" class="form-control purchase-price" min="0" value="0" required>
                                     </div>
                                 </td>
                                 <td class="text-right">
-                                    <div class="price-display">
-                                     <span class="total-price">0</span> IDR
+                                    <div class="price-display read-only-field">
+                                        <span class="unit-price">0</span> IDR
                                     </div>
                                 </td>
                                 <td class="text-center">
@@ -88,15 +78,15 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-light">
-                                <td colspan="4" class="text-right font-weight-bold pr-3">
-                                    <span style="line-height: 38px;">Grand Total:</span>
+                                <td colspan="2" class="text-right font-weight-bold pr-3">
+                                    <span style="line-height: 38px;">Grand Total</span>
                                 </td>
                                 <td class="text-right font-weight-bold">
                                     <div class="price-display grand-total-display text-right">
                                         <span id="grand-total">0</span> IDR
                                     </div>
                                 </td>
-                                <td></td>
+                                <td colspan="2"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -165,13 +155,9 @@
         const row = $(select).closest('.product-row');
         const productId = $(select).val();
         const productName = $(select).find('option:selected').text();
-        const unitsPerBox = $(select).find('option:selected').data('units') || 1;
         
         // Store product name in hidden input
         row.find('.product-name-input').val(productName);
-        
-        // Update units per box if available from data attribute
-        row.find('.unit-per-box').val(unitsPerBox);
         
         // Track selected products to avoid duplicates
         if (productId) {
@@ -189,8 +175,8 @@
             updateAvailableOptions();
         }
         
-        // Calculate total for this row
-        calculateRowTotal(row);
+        // Calculate unit price for this row
+        calculateUnitPrice(row);
         updateGrandTotal();
     }
     
@@ -222,8 +208,7 @@
                     <select name="products[${rowCount}][product_id]" class="form-control product-select" required>
                         <option value="">Select Product</option>
                         <?php foreach ($products as $product): ?>
-                            <option value="<?= esc($product['product_id']) ?>" 
-                                data-units="<?= esc($product['product_units_per_box'] ?? 1) ?>">
+                            <option value="<?= esc($product['product_id']) ?>">
                                 <?= esc($product['product_name']) ?>
                             </option>
                         <?php endforeach; ?>
@@ -232,15 +217,7 @@
                 </td>
                 <td>
                     <div class="input-group">
-                        <input type="number" name="products[${rowCount}][box_bought]" class="form-control box-bought" min="1" value="1" required>
-                        <div class="input-group-append">
-                            <span class="input-group-text">box</span>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="number" name="products[${rowCount}][unit_per_box]" class="form-control unit-per-box" min="1" value="1" required>
+                        <input type="number" name="products[${rowCount}][quantity_bought]" class="form-control quantity-bought" min="1" value="1" required>
                         <div class="input-group-append">
                             <span class="input-group-text">unit</span>
                         </div>
@@ -251,12 +228,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">IDR</span>
                         </div>
-                        <input type="number" name="products[${rowCount}][price_per_box]" class="form-control price-per-box" min="0" value="0" required>
+                        <input type="number" name="products[${rowCount}][purchase_price]" class="form-control purchase-price" min="0" value="0" required>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="price-display">
-                        <span class="total-price">0</span> IDR
+                        <span class="unit-price">0</span> IDR
                     </div>
                 </td>
                 <td class="text-center">
@@ -282,25 +259,24 @@
         return newRow;
     }
     
-    // Function to calculate and display row total
-    function calculateRowTotal(row) {
-        const boxBought = parseInt(row.find('.box-bought').val()) || 0;
-        const pricePerBox = parseFloat(row.find('.price-per-box').val()) || 0;
-        const totalPrice = boxBought * pricePerBox;
+    // Function to calculate and display unit price
+    function calculateUnitPrice(row) {
+        const quantityBought = parseInt(row.find('.quantity-bought').val()) || 1;
+        const purchasePrice = parseFloat(row.find('.purchase-price').val()) || 0;
+        const unitPrice = quantityBought > 0 ? purchasePrice / quantityBought : 0;
         
-        // Format the total price with thousands separator
-        const formattedPrice = new Intl.NumberFormat('id-ID').format(totalPrice);
-        row.find('.total-price').text(formattedPrice);
+        // Format the unit price with thousands separator
+        const formattedPrice = new Intl.NumberFormat('id-ID').format(unitPrice);
+        row.find('.unit-price').text(formattedPrice);
     }
-    
+
     // Function to calculate and update the grand total
     function updateGrandTotal() {
         let grandTotal = 0;
         
         $('.product-row').each(function() {
-            const boxBought = parseInt($(this).find('.box-bought').val()) || 0;
-            const pricePerBox = parseFloat($(this).find('.price-per-box').val()) || 0;
-            grandTotal += boxBought * pricePerBox;
+            const purchasePrice = parseFloat($(this).find('.purchase-price').val()) || 0;
+            grandTotal += purchasePrice;
         });
         
         // Format the grand total with thousands separator
@@ -336,9 +312,9 @@
         $('.product-select').each(function() {
             if ($(this).val() !== "") {
                 const row = $(this).closest('.product-row');
-                const pricePerBox = parseFloat(row.find('.price-per-box').val());
+                const purchasePrice = parseFloat(row.find('.purchase-price').val());
                 
-                if (pricePerBox === 0) {
+                if (purchasePrice === 0) {
                     hasEmptyPrices = true;
                     return false; // break the loop
                 }
@@ -406,60 +382,59 @@
         // Add event handlers to product selects
         $(document).on('change', '.product-select', function() {
             updateProductSelection(this);
-        });
+    });
+
+    // Add event handlers for remove buttons
+    $(document).on('click', '.remove-product', function() {
+        const row = $(this).closest('.product-row');
         
-        // Add event handlers for remove buttons
-        $(document).on('click', '.remove-product', function() {
-            const row = $(this).closest('.product-row');
-            
-            // If this is the only row, just clear it instead of removing
-            if ($('.product-row').length === 1) {
-                // Clear the selection
-                const select = row.find('.product-select');
-                const productId = select.val();
-                if (productId) {
-                    selectedProducts.delete(productId);
-                    row.removeData('selected-id');
-                }
-                
-                // Clear the fields
-                select.val('').trigger('change');
-                row.find('.box-bought').val('1');
-                row.find('.unit-per-box').val('1');
-                row.find('.price-per-box').val('0');
-                row.find('.total-price').text('0');
-                
-                // Update grand total
-                updateGrandTotal();
-                
-                return;
-            }
-            
-            // Remove the product from tracking
-            const productId = row.find('.product-select').val();
+        // If this is the only row, just clear it instead of removing
+        if ($('.product-row').length === 1) {
+            // Clear the selection
+            const select = row.find('.product-select');
+            const productId = select.val();
             if (productId) {
                 selectedProducts.delete(productId);
+                row.removeData('selected-id');
             }
             
-            // Remove the row
-            row.remove();
-            
-            // Update all selects
-            updateAvailableOptions();
-            
-            // Renumber remaining rows to keep indices sequential
-            $('.product-row').each(function(index) {
-                $(this).attr('id', `product-row-${index}`);
-                $(this).find('[name^="products["]').each(function() {
-                    const name = $(this).attr('name');
-                    const newName = name.replace(/products\[\d+\]/, `products[${index}]`);
-                    $(this).attr('name', newName);
-                });
-            });
+            // Clear the fields
+            select.val('').trigger('change');
+            row.find('.quantity-bought').val('1');
+            row.find('.purchase-price').val('0');
+            row.find('.unit-price').text('0');
             
             // Update grand total
             updateGrandTotal();
+            
+            return;
+        }
+        
+        // Remove the product from tracking
+        const productId = row.find('.product-select').val();
+        if (productId) {
+            selectedProducts.delete(productId);
+        }
+        
+        // Remove the row
+        row.remove();
+        
+        // Update all selects
+        updateAvailableOptions();
+        
+        // Renumber remaining rows to keep indices sequential
+        $('.product-row').each(function(index) {
+            $(this).attr('id', `product-row-${index}`);
+            $(this).find('[name^="products["]').each(function() {
+                const name = $(this).attr('name');
+                const newName = name.replace(/products\[\d+\]/, `products[${index}]`);
+                $(this).attr('name', newName);
+            });
         });
+        
+        // Update grand total
+        updateGrandTotal();
+    });
         
         // Add product button click handler
         $('#add-product').click(function() {
@@ -486,10 +461,10 @@
             });
         });
         
-        // Calculate row total when inputs change
-        $(document).on('input', '.box-bought, .price-per-box', function() {
+        // Calculate unit price when inputs change
+        $(document).on('input', '.quantity-bought, .purchase-price', function() {
             const row = $(this).closest('.product-row');
-            calculateRowTotal(row);
+            calculateUnitPrice(row);
             updateGrandTotal();
         });
         
@@ -635,8 +610,8 @@
         border-color: #b8daff;
     }
     
-    /* Total price display */
-    .total-price {
+    /* Unit price display */
+    .unit-price {
         font-weight: 600;
     }
     
@@ -660,6 +635,22 @@
     .product-row td {
         vertical-align: middle;
         padding: 10px 8px;
+    }
+    /* Read-only field styling */
+    .read-only-field {
+        background-color: #e9ecef;
+        color: #495057;
+        border: 1px solid #ced4da;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+
+    .read-only-field:before {
+        display: block;
+        font-size: 0.7rem;
+        color: #6c757d;
+        font-weight: normal;
+        margin-bottom: 3px;
     }
 </style>
 <?= $this->endSection() ?>

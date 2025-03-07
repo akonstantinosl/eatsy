@@ -27,7 +27,7 @@
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Buyer</th>
+                        <th>User</th>
                         <th>Supplier</th>
                         <th>Product</th>
                         <th>Quantity</th>
