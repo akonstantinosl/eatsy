@@ -239,7 +239,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="bg-light">
-                        <th colspan="4" class="text-right">TOTAL:</th>
+                        <th colspan="4" class="text-right">TOTAL</th>
                         <th class="text-center"><?= number_format($totalSalesQuantity) ?></th>
                         <th class="text-right"><?= number_format($totalSalesAmount, 0, ',', '.') ?> IDR</th>
                         <th class="text-center"><?= number_format($totalPurchaseQuantity) ?></th>
