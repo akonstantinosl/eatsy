@@ -113,6 +113,9 @@ class HomeController extends BaseController
         // Load user data into session
         $this->loadUserData();
         
+        // Get current user ID
+        $userId = session()->get('user_id');
+        
         // Initialize models
         $customerModel = new CustomerModel();
         $productModel = new ProductModel();
@@ -122,22 +125,26 @@ class HomeController extends BaseController
         $data['totalCustomers'] = $customerModel->countAll();
         $data['totalProducts'] = $productModel->countAll();
         
-        // Get count of today's sales
+        // Get count of today's sales for this staff member only
         $todayDate = date('Y-m-d');
-        $data['todaySales'] = $saleModel->where('DATE(created_at)', $todayDate)->countAllResults();
+        $data['todaySales'] = $saleModel->where('DATE(created_at)', $todayDate)
+                                        ->where('user_id', $userId)
+                                        ->countAllResults();
         
-        // Calculate today's revenue
+        // Calculate today's revenue for this staff member only
         $todayRevenue = $saleModel->selectSum('sale_amount')
                                   ->where('DATE(created_at)', $todayDate)
                                   ->where('transaction_status', 'completed')
+                                  ->where('user_id', $userId)
                                   ->first();
         $data['todayRevenue'] = $todayRevenue['sale_amount'] ?? 0;
         
-        // Get recent sales for the table
+        // Get recent sales for the table - only for this staff member
         $data['recentSales'] = $saleModel->select('sales.*, customers.customer_name')
                                          ->join('customers', 'customers.customer_id = sales.customer_id')
+                                         ->where('sales.user_id', $userId)
                                          ->orderBy('sales.created_at', 'DESC')
-                                         ->limit(5)
+                                         ->limit(8)
                                          ->find();
         
         // Get low stock products with category info
@@ -146,15 +153,15 @@ class HomeController extends BaseController
                                                 ->where('products.product_stock <', 10)
                                                 ->where('products.product_status', 'active')
                                                 ->orderBy('products.product_stock', 'ASC')
-                                                ->limit(5)
+                                                ->limit(3)
                                                 ->find();
         
         // Get recent customers
         $data['recentCustomers'] = $customerModel->where('customer_status', 'active')
                                                 ->orderBy('created_at', 'DESC')
-                                                ->limit(2)
+                                                ->limit(3)
                                                 ->find();
         
         return view('staff/staff_dashboard', $data);
-    }
+    }    
 }

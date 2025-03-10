@@ -61,6 +61,15 @@ class SaleController extends Controller
         // Base query
         $query = $saleModel;
         
+        // Get current user id and role from session
+        $userId = session()->get('user_id');
+        $userRole = session()->get('user_role');
+        
+        // If user is staff, only show their own sales
+        if ($userRole == 'staff') {
+            $query = $query->where('sales.user_id', $userId);
+        }
+        
         // Apply status filter if set
         if ($statusFilter && in_array($statusFilter, ['pending', 'processing', 'completed', 'cancelled'])) {
             $query = $query->where('transaction_status', $statusFilter);
@@ -372,6 +381,8 @@ class SaleController extends Controller
     {
         // Verify the sale ID exists
         $saleModel = new SaleModel();
+        $saleDetailModel = new SaleDetailModel();
+        $productModel = new ProductModel();
         $sale = $saleModel->find($saleId);
         
         if (!$sale) {
@@ -404,6 +415,60 @@ class SaleController extends Controller
         // Generate the current timestamp
         $currentTimestamp = date('Y-m-d H:i:s');
         
+        // If transitioning to completed or processing, check stock availability first
+        if (in_array($newStatus, ['completed', 'processing'])) {
+            // Get all sale details for this sale
+            $saleDetails = $saleDetailModel->where('sale_id', $saleId)->findAll();
+            $insufficientStockProducts = [];
+            
+            foreach ($saleDetails as $detail) {
+                // Get the current product data
+                $product = $productModel->find($detail['product_id']);
+                
+                if (!$product) {
+                    $insufficientStockProducts[] = "Product ID {$detail['product_id']} not found";
+                    continue;
+                }
+                
+                // Check if enough stock is available
+                if ($detail['quantity_sold'] > $product['product_stock']) {
+                    $insufficientStockProducts[] = "{$product['product_name']} (Requested: {$detail['quantity_sold']}, Available: {$product['product_stock']})";
+                }
+            }
+            
+            // If there are products with insufficient stock, auto-cancel the transaction
+            if (!empty($insufficientStockProducts)) {
+                $db->transRollback();
+                
+                // Format the list of products with insufficient stock
+                $productList = implode(", ", $insufficientStockProducts);
+                
+                // Auto-cancel the transaction
+                $cancelNotes = "CANCELLED: Insufficient stock for: " . $productList;
+                
+                // Update the sale status to cancelled with notes
+                if (!empty($sale['sale_notes'])) {
+                    $updateData['sale_notes'] = $sale['sale_notes'] . "\n\n" . $cancelNotes;
+                } else {
+                    $updateData['sale_notes'] = $cancelNotes;
+                }
+                
+                $updateData = [
+                    'transaction_status' => 'cancelled',
+                    'updated_at' => $currentTimestamp,
+                    'sale_notes' => $updateData['sale_notes'] ?? $cancelNotes
+                ];
+                
+                $db->table('sales')
+                    ->where('sale_id', $saleId)
+                    ->update($updateData);
+                
+                // Return with error message about insufficient stock
+                return redirect()->to('/sales/details/' . $saleId)
+                    ->with('error', 'Transaction automatically cancelled due to insufficient stock: ' . $productList);
+            }
+        }
+        
         // Update the sale status and updated_at timestamp
         $updateData = [
             'transaction_status' => $newStatus,
@@ -421,8 +486,8 @@ class SaleController extends Controller
         }
         
         $db->table('sales')
-        ->where('sale_id', $saleId)
-        ->update($updateData);
+            ->where('sale_id', $saleId)
+            ->update($updateData);
         
         // If status is completed, update product stock
         if ($newStatus === 'completed') {
@@ -440,7 +505,7 @@ class SaleController extends Controller
         
         return redirect()->to('/sales/details/' . $saleId)
             ->with('success', 'Sale status updated to ' . ucfirst($newStatus));
-    }
+    }    
     
     private function updateProductStock($saleId, $timestamp = null)
     {
