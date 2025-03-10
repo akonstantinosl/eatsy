@@ -22,6 +22,50 @@ class HomeController extends BaseController
     /**
      * Load user data into session for consistent display across layouts
      */
+
+    public function login()
+    {
+        // If form is submitted
+        if ($this->request->getMethod() === 'post') {
+            $username = $this->request->getPost('username');
+            $password = $this->request->getPost('password');
+            
+            // Validate credentials
+            $user = $this->userModel->where('user_name', $username)->first();
+            
+            if ($user && password_verify($password, $user['user_password'])) {
+                // Check if account is active
+                if ($user['user_status'] !== 'active') {
+                    // Return to login page with error
+                    return redirect()->to('login')->with('error', 'account_inactive');
+                }
+                
+                // Set session data and redirect
+                $sessionData = [
+                    'user_id' => $user['user_id'],
+                    'user_name' => $user['user_name'],
+                    'user_role' => $user['user_role'],
+                    'logged_in' => true
+                ];
+                
+                session()->set($sessionData);
+                
+                // Redirect based on role
+                if ($user['user_role'] == 'admin') {
+                    return redirect()->to('admin/dashboard');
+                } else {
+                    return redirect()->to('staff/dashboard');
+                }
+            } else {
+                // Invalid credentials
+                return redirect()->to('login')->with('error', 'invalid_credentials');
+            }
+        }
+        
+        // Display login page
+        return view('login');
+    }
+         
     protected function loadUserData()
     {
         // Get user data for navbar and sidebar if not already in session

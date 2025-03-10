@@ -12,7 +12,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css">
     <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.0.0/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.0/dist/sweetalert2.min.css">
 
     <style>
         body {
@@ -171,13 +171,14 @@
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.0.0/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.0/dist/sweetalert2.all.min.js"></script>
     
     <script>
-    $(document).ready(function() {
-        // Error handling can be implemented here
-        // Example:
-        /*
+$(document).ready(function() {
+    // Check for error messages from PHP
+    <?php if(session()->has('error')): ?>
+        var errorType = '<?= session('error') ?>';
+        
         if (errorType === 'account_inactive') {
             Swal.fire({
                 icon: 'error',
@@ -203,8 +204,8 @@
                 position: 'center'
             });
         }
-        */
-    });
-    </script>
+    <?php endif; ?>
+});
+</script>
 </body>
 </html>
