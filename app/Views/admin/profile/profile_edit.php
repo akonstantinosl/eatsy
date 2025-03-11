@@ -90,8 +90,8 @@
             </div>
 
             <div class="mt-4">
-                <button type="button" id="updateProfileBtn" class="btn btn-primary mr-2">Update Profile</button>
-                <button type="button" id="cancelBtn" class="btn btn-default">Cancel</button>
+                <button type="button" id="updateProfileBtn" class="btn btn-primary mr-2"><i class="fas fa-save"></i> Update Profile</button>
+                <button type="button" id="cancelBtn" class="btn btn-default"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </form>
     </div>
@@ -120,10 +120,48 @@
     
     // Initialize BS Custom File Input
     document.addEventListener('DOMContentLoaded', function() {
-        // For AdminLTE/Bootstrap custom file input
+        // Initialize AdminLTE components
         bsCustomFileInput.init();
         
-        // Handle Update Profile button click
+        // Advanced form state tracking
+        let formModified = false;
+        const originalFormState = {};
+        const formElements = document.querySelectorAll('#profileForm input, #profileForm select, #profileForm textarea');
+        
+        // Capture initial form state for precise delta detection
+        formElements.forEach(element => {
+            const elementName = element.name;
+            if (elementName) {
+                if (element.type === 'file') {
+                    originalFormState[elementName] = ''; // File inputs reset to empty state
+                } else if (element.type === 'checkbox' || element.type === 'radio') {
+                    originalFormState[elementName] = element.checked;
+                } else {
+                    originalFormState[elementName] = element.value;
+                }
+            }
+        });
+        
+        // Implement event delegation for optimized performance
+        document.getElementById('profileForm').addEventListener('input', function(e) {
+            const target = e.target;
+            if (!target.name) return;
+            
+            if (target.type === 'file') {
+                formModified = target.files.length > 0;
+            } else if (target.type === 'checkbox' || target.type === 'radio') {
+                formModified = target.checked !== originalFormState[target.name];
+            } else {
+                formModified = target.value !== originalFormState[target.name];
+            }
+        });
+        
+        // Handle special case for file input which doesn't trigger input event reliably
+        document.getElementById('photo').addEventListener('change', function() {
+            formModified = this.files.length > 0;
+        });
+        
+        // Profile update confirmation with state-aware UX
         document.getElementById('updateProfileBtn').addEventListener('click', function() {
             Swal.fire({
                 title: 'Update Profile?',
@@ -134,7 +172,7 @@
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, update it!',
                 cancelButtonText: 'Cancel',
-                reverseButtons: true // This will reverse the button positions
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('profileForm').submit();
@@ -142,8 +180,15 @@
             });
         });
         
-        // Handle Cancel button click
+        // Context-aware cancel button with intelligent state detection
         document.getElementById('cancelBtn').addEventListener('click', function() {
+            // Implement direct navigation if no modifications detected
+            if (!formModified) {
+                window.location.href = '<?= session()->get('user_role') == 'admin' ? '/admin/dashboard' : '/staff/dashboard' ?>';
+                return;
+            }
+            
+            // Present confirmation dialog only when form state has changed
             Swal.fire({
                 title: 'Cancel Updates?',
                 text: 'Any changes you made will not be saved!',
@@ -153,7 +198,7 @@
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, cancel!',
                 cancelButtonText: 'Continue editing',
-                reverseButtons: true // This will reverse the button positions
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = '<?= session()->get('user_role') == 'admin' ? '/admin/dashboard' : '/staff/dashboard' ?>';
@@ -161,7 +206,7 @@
             });
         });
         
-        // Display SweetAlert for validation errors if they exist
+        // SweetAlert integration for validation feedback
         <?php if (session()->has('validation_errors')): ?>
             let errorMessages = [];
             <?php foreach (session('validation_errors') as $field => $error): ?>
@@ -177,7 +222,7 @@
             });
         <?php endif; ?>
         
-        // Display SweetAlert for error message if it exists
+        // Error handling integration
         <?php if (session()->has('swal_error')): ?>
             Swal.fire({
                 title: 'Error!',
@@ -188,7 +233,7 @@
             });
         <?php endif; ?>
         
-        // Display SweetAlert for success message if it exists
+        // Success message integration
         <?php if (session()->has('swal_success')): ?>
             Swal.fire({
                 title: 'Success!',

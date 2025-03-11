@@ -48,8 +48,8 @@
             <!-- Hidden input for status -->
             <input type="hidden" name="supplier_status" value="<?= $supplier['supplier_status'] ?>">
 
-            <button type="button" id="saveBtn" class="btn btn-primary mr-2">Update</button>
-            <a href="/admin/suppliers" id="cancelBtn" class="btn btn-default">Cancel</a>
+            <button type="button" id="saveBtn" class="btn btn-primary mr-2"><i class="fas fa-save"></i> Update</button>
+            <a href="/admin/suppliers" id="cancelBtn" class="btn btn-default"><i class="fas fa-times"></i> Cancel</a>
         </form>
     </div>
     <!-- /.card-body -->
@@ -135,12 +135,32 @@
         document.getElementById('cancelBtn').addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Check if any values have changed
-            const nameChanged = document.getElementById('supplier_name').value.trim() !== originalName;
-            const phoneChanged = supplierPhoneInput.value.trim() !== originalPhone;
-            const addressChanged = document.getElementById('supplier_address').value.trim() !== originalAddress;
+            // Get current form values with consistent trimming
+            const currentName = document.getElementById('supplier_name').value.trim();
+            const currentPhone = document.getElementById('supplier_phone').value.trim();
+            const currentAddress = document.getElementById('supplier_address').value.trim();
             
-            if (nameChanged || phoneChanged || addressChanged) {
+            // Get original values with consistent trimming
+            const origName = String(originalName).trim();
+            const origPhone = String(originalPhone).trim();
+            const origAddress = String(originalAddress).trim();
+            
+            // Debug logging (you can remove this in production)
+            console.log('Current values:', { currentName, currentPhone, currentAddress });
+            console.log('Original values:', { origName, origPhone, origAddress });
+            console.log('Comparison results:', { 
+                nameChanged: currentName !== origName,
+                phoneChanged: currentPhone !== origPhone,
+                addressChanged: currentAddress !== origAddress
+            });
+            
+            // Check if any values have changed
+            if (
+                currentName !== origName || 
+                currentPhone !== origPhone || 
+                currentAddress !== origAddress
+            ) {
+                // Changes detected - show confirmation dialog
                 Swal.fire({
                     title: 'Are you sure you want to cancel?',
                     text: 'Any changes you made will not be saved!',
@@ -153,11 +173,12 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/admin/suppliers';  // Redirect back to suppliers page
+                        window.location.href = '/admin/suppliers';
                     }
                 });
             } else {
-                // No changes, just redirect
+                // No changes detected - redirect immediately without confirmation
+                console.log('No changes detected, redirecting without confirmation');
                 window.location.href = '/admin/suppliers';
             }
         });

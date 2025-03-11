@@ -51,8 +51,8 @@
             <!-- Hidden input for status (can't be edited) -->
             <input type="hidden" name="customer_status" value="<?= $customer['customer_status'] ?>">
 
-            <button type="button" id="saveBtn" class="btn btn-primary mr-2">Update</button>
-            <a href="/customers" id="cancelBtn" class="btn btn-default">Cancel</a>
+            <button type="button" id="saveBtn" class="btn btn-primary mr-2"><i class="fas fa-save"></i> Update</button>
+            <a href="/customers" id="cancelBtn" class="btn btn-default"><i class="fas fa-times"></i> Cancel</a>
         </form>
     </div>
     <!-- /.card-body -->

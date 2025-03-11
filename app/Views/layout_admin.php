@@ -19,6 +19,11 @@
     
     <!-- SweetAlert2 (Local) -->
     <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2/sweetalert2.min.css') ?>">
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/select2/select2.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/select2/select2-bootstrap4.min.css') ?>">
+
     <!-- Additional CSS -->
     <?= $this->renderSection('styles') ?>
 </head>
@@ -135,16 +140,16 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-user"></i>
-                                <p>Customers</p>
+                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>Suppliers</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-truck"></i>
-                                <p>Suppliers</p>
+                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>Customers</p>
                             </a>
                         </li>
 
@@ -279,6 +284,9 @@
 
     <!-- Chart.js (Local) -->
     <script src="<?= base_url('assets/js/chartjs/chart.umd.min.js') ?>"></script>
+
+    <!-- Select2 -->
+    <script src="<?= base_url('assets/js/select2/select2.full.min.js') ?>"></script>
 
     <!-- Additional scripts -->
     <?= $this->renderSection('scripts') ?>

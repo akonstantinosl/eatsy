@@ -786,3 +786,190 @@ echo "<script src=\"<?= base_url('assets/js/chartjs/chart.umd.min.js') ?>\"></sc
 echo ""
 echo "Complete! Chart.js is now available for offline use in your project."
 
+#!/bin/bash
+
+# Select2 Installation Script
+# This script downloads Select2 library and organizes files in the appropriate asset directories
+# Compatible with AdminLTE and Bootstrap 4 integration
+
+# Configuration
+SELECT2_VERSION="4.0.13"
+ASSETS_DIR="./public/assets"
+JS_DIR="${ASSETS_DIR}/js/select2"
+CSS_DIR="${ASSETS_DIR}/css/select2"
+TEMP_DIR="/tmp/select2-download"
+
+# Color codes for terminal output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Create necessary directories
+echo -e "${YELLOW}Creating directory structure...${NC}"
+mkdir -p "${JS_DIR}"
+mkdir -p "${CSS_DIR}"
+mkdir -p "${TEMP_DIR}"
+
+# Download Select2 library
+echo -e "${YELLOW}Downloading Select2 v${SELECT2_VERSION}...${NC}"
+curl -L "https://github.com/select2/select2/archive/refs/tags/${SELECT2_VERSION}.tar.gz" -o "${TEMP_DIR}/select2.tar.gz"
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to download Select2. Please check your internet connection.${NC}"
+    exit 1
+fi
+
+# Extract the archive
+echo -e "${YELLOW}Extracting files...${NC}"
+tar -xzf "${TEMP_DIR}/select2.tar.gz" -C "${TEMP_DIR}"
+
+# Copy necessary JavaScript files
+echo -e "${YELLOW}Installing JavaScript files...${NC}"
+cp "${TEMP_DIR}/select2-${SELECT2_VERSION}/dist/js/select2.full.min.js" "${JS_DIR}/"
+cp "${TEMP_DIR}/select2-${SELECT2_VERSION}/dist/js/select2.min.js" "${JS_DIR}/"
+
+# Copy CSS files
+echo -e "${YELLOW}Installing CSS files...${NC}"
+cp "${TEMP_DIR}/select2-${SELECT2_VERSION}/dist/css/select2.min.css" "${CSS_DIR}/"
+
+# Download Select2 Bootstrap 4 Theme
+echo -e "${YELLOW}Downloading Select2 Bootstrap 4 Theme...${NC}"
+curl -L "https://raw.githubusercontent.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.min.css" -o "${CSS_DIR}/select2-bootstrap4.min.css"
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to download Select2 Bootstrap 4 Theme. Please check your internet connection.${NC}"
+    exit 1
+fi
+
+# Clean up temporary files
+echo -e "${YELLOW}Cleaning up temporary files...${NC}"
+rm -rf "${TEMP_DIR}"
+
+# Verify installation
+if [ -f "${JS_DIR}/select2.full.min.js" ] && [ -f "${CSS_DIR}/select2.min.css" ] && [ -f "${CSS_DIR}/select2-bootstrap4.min.css" ]; then
+    echo -e "${GREEN}Select2 v${SELECT2_VERSION} with Bootstrap 4 Theme has been successfully installed.${NC}"
+    echo -e "${GREEN}JavaScript files are located at: ${JS_DIR}${NC}"
+    echo -e "${GREEN}CSS files are located at: ${CSS_DIR}${NC}"
+    
+    echo -e "\n${YELLOW}Add the following lines to your layout_admin.php file:${NC}"
+    echo -e "In the <head> section:"
+    echo -e "${GREEN}<!-- Select2 CSS -->${NC}"
+    echo -e "${GREEN}<link rel=\"stylesheet\" href=\"<?= base_url('assets/css/select2/select2.min.css') ?>\">${NC}"
+    echo -e "${GREEN}<link rel=\"stylesheet\" href=\"<?= base_url('assets/css/select2/select2-bootstrap4.min.css') ?>\">${NC}"
+    
+    echo -e "\nBefore the closing </body> tag:"
+    echo -e "${GREEN}<!-- Select2 -->${NC}"
+    echo -e "${GREEN}<script src=\"<?= base_url('assets/js/select2/select2.full.min.js') ?>\"></script>${NC}"
+else
+    echo -e "${RED}Installation failed. Some files are missing.${NC}"
+    exit 1
+fi
+
+echo -e "\n${YELLOW}Remember to update your Select2 initialization to use 'bootstrap4' theme:${NC}"
+echo -e "${GREEN}$('#select-element').select2({${NC}"
+echo -e "${GREEN}    theme: 'bootstrap4',${NC}"
+echo -e "${GREEN}    // other options...${NC}"
+echo -e "${GREEN}});${NC}"
+
+exit 0
+
+#!/bin/bash
+
+# Script to fix source map issues for Eatsy admin dashboard
+# This script either downloads missing source maps or removes their references
+
+# Color codes for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Base path for assets (adjust if your directory structure is different)
+ASSETS_PATH="./public/assets"
+
+# Array of JS files and their corresponding source maps
+declare -A JS_FILES=(
+  ["$ASSETS_PATH/js/adminlte/adminlte.min.js"]="adminlte.min.js.map"
+  ["$ASSETS_PATH/js/chartjs/chart.umd.min.js"]="chart.umd.js.map"
+  ["$ASSETS_PATH/js/bs-custom-file-input/bs-custom-file-input.min.js"]="bs-custom-file-input.min.js.map"
+)
+
+# Function to remove sourceMappingURL from a file
+remove_source_map_reference() {
+  local file=$1
+  local backup="${file}.bak"
+  
+  # Create a backup
+  cp "$file" "$backup"
+  
+  # Remove the sourceMappingURL line
+  sed -i 's/\/\/# sourceMappingURL=.*$//' "$file"
+  
+  echo -e "${GREEN}Removed source map reference from ${file}${NC}"
+}
+
+# Function to download source map
+download_source_map() {
+  local js_file=$1
+  local map_file=$2
+  local dir=$(dirname "$js_file")
+  
+  # Try to determine the download URL based on common CDN patterns
+  local filename=$(basename "$js_file")
+  local map_url=""
+  
+  if [[ "$filename" == "adminlte.min.js" ]]; then
+    map_url="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js.map"
+  elif [[ "$filename" == "chart.umd.min.js" ]]; then
+    map_url="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.js.map"
+  elif [[ "$filename" == "bs-custom-file-input.min.js" ]]; then
+    map_url="https://cdn.jsdelivr.net/npm/bs-custom-file-input@1.3.4/dist/bs-custom-file-input.min.js.map"
+  fi
+  
+  if [[ -n "$map_url" ]]; then
+    echo -e "${YELLOW}Attempting to download source map from: ${map_url}${NC}"
+    if curl -s --head "$map_url" | head -n 1 | grep "200" > /dev/null; then
+      curl -s "$map_url" -o "${dir}/${map_file}"
+      echo -e "${GREEN}Downloaded source map to ${dir}/${map_file}${NC}"
+      return 0
+    else
+      echo -e "${RED}Source map not available at ${map_url}${NC}"
+      return 1
+    fi
+  else
+    echo -e "${RED}Could not determine source map URL for ${filename}${NC}"
+    return 1
+  fi
+}
+
+# Main execution
+echo -e "${YELLOW}=== Fixing Source Map Issues for Eatsy Admin Dashboard ===${NC}"
+
+# Process each JS file
+for js_file in "${!JS_FILES[@]}"; do
+  map_file=${JS_FILES[$js_file]}
+  
+  echo -e "\n${YELLOW}Processing: ${js_file}${NC}"
+  
+  # Check if JS file exists
+  if [[ ! -f "$js_file" ]]; then
+    echo -e "${RED}JS file not found: ${js_file}${NC}"
+    continue
+  fi
+  
+  # Check if source map already exists
+  if [[ -f "$(dirname "$js_file")/${map_file}" ]]; then
+    echo -e "${GREEN}Source map already exists: $(dirname "$js_file")/${map_file}${NC}"
+    continue
+  fi
+  
+  # Try to download the source map
+  if ! download_source_map "$js_file" "$map_file"; then
+    # If download fails, remove the reference
+    remove_source_map_reference "$js_file"
+  fi
+done
+
+echo -e "\n${GREEN}=== Source map issues fixed ===${NC}"
+echo -e "${YELLOW}Note: You may need to clear your browser cache or do a hard refresh (Ctrl+F5) for changes to take effect.${NC}"
