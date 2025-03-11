@@ -22,6 +22,50 @@ class HomeController extends BaseController
     /**
      * Load user data into session for consistent display across layouts
      */
+
+    public function login()
+    {
+        // If form is submitted
+        if ($this->request->getMethod() === 'post') {
+            $username = $this->request->getPost('username');
+            $password = $this->request->getPost('password');
+            
+            // Validate credentials
+            $user = $this->userModel->where('user_name', $username)->first();
+            
+            if ($user && password_verify($password, $user['user_password'])) {
+                // Check if account is active
+                if ($user['user_status'] !== 'active') {
+                    // Return to login page with error
+                    return redirect()->to('login')->with('error', 'account_inactive');
+                }
+                
+                // Set session data and redirect
+                $sessionData = [
+                    'user_id' => $user['user_id'],
+                    'user_name' => $user['user_name'],
+                    'user_role' => $user['user_role'],
+                    'logged_in' => true
+                ];
+                
+                session()->set($sessionData);
+                
+                // Redirect based on role
+                if ($user['user_role'] == 'admin') {
+                    return redirect()->to('admin/dashboard');
+                } else {
+                    return redirect()->to('staff/dashboard');
+                }
+            } else {
+                // Invalid credentials
+                return redirect()->to('login')->with('error', 'invalid_credentials');
+            }
+        }
+        
+        // Display login page
+        return view('login');
+    }
+         
     protected function loadUserData()
     {
         // Get user data for navbar and sidebar if not already in session
@@ -113,6 +157,9 @@ class HomeController extends BaseController
         // Load user data into session
         $this->loadUserData();
         
+        // Get current user ID
+        $userId = session()->get('user_id');
+        
         // Initialize models
         $customerModel = new CustomerModel();
         $productModel = new ProductModel();
@@ -122,22 +169,26 @@ class HomeController extends BaseController
         $data['totalCustomers'] = $customerModel->countAll();
         $data['totalProducts'] = $productModel->countAll();
         
-        // Get count of today's sales
+        // Get count of today's sales for this staff member only
         $todayDate = date('Y-m-d');
-        $data['todaySales'] = $saleModel->where('DATE(created_at)', $todayDate)->countAllResults();
+        $data['todaySales'] = $saleModel->where('DATE(created_at)', $todayDate)
+                                        ->where('user_id', $userId)
+                                        ->countAllResults();
         
-        // Calculate today's revenue
+        // Calculate today's revenue for this staff member only
         $todayRevenue = $saleModel->selectSum('sale_amount')
                                   ->where('DATE(created_at)', $todayDate)
                                   ->where('transaction_status', 'completed')
+                                  ->where('user_id', $userId)
                                   ->first();
         $data['todayRevenue'] = $todayRevenue['sale_amount'] ?? 0;
         
-        // Get recent sales for the table
+        // Get recent sales for the table - only for this staff member
         $data['recentSales'] = $saleModel->select('sales.*, customers.customer_name')
                                          ->join('customers', 'customers.customer_id = sales.customer_id')
+                                         ->where('sales.user_id', $userId)
                                          ->orderBy('sales.created_at', 'DESC')
-                                         ->limit(5)
+                                         ->limit(8)
                                          ->find();
         
         // Get low stock products with category info
@@ -146,15 +197,15 @@ class HomeController extends BaseController
                                                 ->where('products.product_stock <', 10)
                                                 ->where('products.product_status', 'active')
                                                 ->orderBy('products.product_stock', 'ASC')
-                                                ->limit(5)
+                                                ->limit(3)
                                                 ->find();
         
         // Get recent customers
         $data['recentCustomers'] = $customerModel->where('customer_status', 'active')
                                                 ->orderBy('created_at', 'DESC')
-                                                ->limit(2)
+                                                ->limit(3)
                                                 ->find();
         
         return view('staff/staff_dashboard', $data);
-    }
+    }    
 }

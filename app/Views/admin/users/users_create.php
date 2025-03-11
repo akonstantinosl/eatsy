@@ -63,6 +63,7 @@
                         <?= session('errors')['phone'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Phone number must be unique and at least 10 digits</small>
                     </div>
                     
                     <div class="form-group">
@@ -104,8 +105,8 @@
                 <input type="hidden" name="status" value="active"> <!-- Hidden input for status -->
             </div>
             
-            <button type="button" id="saveBtn" class="btn btn-primary mr-2">Save</button>
-            <a href="/admin/users" id="cancelBtn" class="btn btn-default">Cancel</a>
+            <button type="button" id="saveBtn" class="btn btn-primary mr-2"><i class="fas fa-save"></i> Save</button>
+            <a href="/admin/users" id="cancelBtn" class="btn btn-default"><i class="fas fa-times"></i> Cancel</a>
         </form>
     </div>
 </div>
@@ -135,6 +136,27 @@
     document.addEventListener('DOMContentLoaded', function() {
         bsCustomFileInput.init();
 
+        // Track form changes
+        let formChanged = false;
+        const formInputs = document.querySelectorAll('#addUserForm input, #addUserForm select');
+        
+        // Store initial form values
+        const initialFormValues = {};
+        formInputs.forEach(input => {
+            initialFormValues[input.name] = input.type === 'file' ? '' : input.value;
+        });
+        
+        // Add change listeners to all form elements
+        formInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                if (input.type === 'file') {
+                    formChanged = input.files.length > 0;
+                } else {
+                    formChanged = true;
+                }
+            });
+        });
+        
         // Save Button Confirmation
         document.getElementById('saveBtn').addEventListener('click', function() {
             Swal.fire({
@@ -154,27 +176,35 @@
             });
         });
 
-        // Cancel Button Confirmation
+        // Enhanced Cancel Button Logic
         document.getElementById('cancelBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            Swal.fire({
-                title: 'Are you sure you want to cancel?',
-                text: 'Any changes you made will not be saved!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!',
-                cancelButtonText: 'Continue editing',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/admin/users';  // Redirect back to users page
-                }
-            });
+            
+            // Check if form has been modified
+            if (formChanged) {
+                // Show confirmation dialog only if changes were made
+                Swal.fire({
+                    title: 'Are you sure you want to cancel?',
+                    text: 'Any changes you made will not be saved!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'Continue editing',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/admin/users';  // Redirect back to users page
+                    }
+                });
+            } else {
+                // No changes made, redirect immediately
+                window.location.href = '/admin/users';
+            }
         });
 
-        // Display SweetAlert for validation errors if they exist
+        // Remaining code for validation errors and success messages
         <?php if (session()->has('errors')): ?>
             let errorMessages = [];
             <?php foreach (session('errors') as $field => $error): ?>
@@ -200,6 +230,6 @@
                 timerProgressBar: true
             });
         <?php endif; ?>
-    });
+});
 </script>
 <?= $this->endSection() ?>

@@ -5,12 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $title ?? 'Admin Dashboard' ?> | Eatsy</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
+    <!-- Source Sans Pro Font (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/fonts/source-sans-pro/source-sans-pro.css') ?>">
+    
+    <!-- Font Awesome (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/fontawesome/all.min.css') ?>">
+    
+    <!-- Bootstrap CSS (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap/bootstrap.min.css') ?>">
+    
+    <!-- AdminLTE CSS - You'll need to download this separately if not already done -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/adminlte/adminlte.min.css') ?>">
+    
+    <!-- SweetAlert2 (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2/sweetalert2.min.css') ?>">
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/select2/select2.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/select2/select2-bootstrap4.min.css') ?>">
+
     <!-- Additional CSS -->
     <?= $this->renderSection('styles') ?>
 </head>
@@ -127,6 +140,20 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>Suppliers</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>Customers</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="/admin/purchases/" class="nav-link <?= (current_url() == base_url('admin/products/purchase')) ? 'active' : '' ?>">
                                 <i class="fas fa-cart-plus nav-icon"></i>
                                 <p>Purchases</p>
@@ -140,19 +167,6 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="/customers" class="nav-link <?= (strpos(current_url(), base_url('/customers')) !== false) ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-user"></i>
-                                <p>Customers</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="/admin/suppliers" class="nav-link <?= (strpos(current_url(), base_url('admin/suppliers')) !== false) ? 'active' : '' ?>">
-                                <i class="nav-icon fas fa-truck"></i>
-                                <p>Suppliers</p>
-                            </a>
-                        </li>
                         <!-- Reports Menu -->
                         <li class="nav-item">
                             <a href="#" class="nav-link">
@@ -253,22 +267,26 @@
     </div>
     <!-- ./wrapper -->
 
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
-    <!-- SweetAlert2 (Ensure this is loaded after jQuery) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Include Select2 CSS dan JS files -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <!-- Include Font Awesome untuk ikon -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <!-- BS Custom File Input -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bs-custom-file-input/1.3.4/bs-custom-file-input.min.js"></script>
+    <!-- jQuery (Local) -->
+    <script src="<?= base_url('assets/js/jquery/jquery.min.js') ?>"></script>
+    
+    <!-- Bootstrap JS (Local) -->
+    <script src="<?= base_url('assets/js/bootstrap/bootstrap.bundle.min.js') ?>"></script>
+    
+    <!-- AdminLTE App (You'll need to download this separately) -->
+    <script src="<?= base_url('assets/js/adminlte/adminlte.min.js') ?>"></script>
+    
+    <!-- SweetAlert2 (Local) -->
+    <script src="<?= base_url('assets/js/sweetalert2/sweetalert2.all.min.js') ?>"></script>
+
+    <!-- BS Custom File Input (Local) -->
+    <script src="<?= base_url('assets/js/bs-custom-file-input/bs-custom-file-input.min.js') ?>"></script>
+
+    <!-- Chart.js (Local) -->
+    <script src="<?= base_url('assets/js/chartjs/chart.umd.min.js') ?>"></script>
+
+    <!-- Select2 -->
+    <script src="<?= base_url('assets/js/select2/select2.full.min.js') ?>"></script>
 
     <!-- Additional scripts -->
     <?= $this->renderSection('scripts') ?>

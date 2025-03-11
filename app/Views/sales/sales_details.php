@@ -180,10 +180,8 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<!-- Include SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
+<<script>
 $(document).ready(function() {
     // Display SweetAlert for flash messages if they exist
     <?php if (session()->getFlashdata('success')): ?>
@@ -196,11 +194,27 @@ $(document).ready(function() {
     <?php endif; ?>
 
     <?php if (session()->getFlashdata('error')): ?>
+        <?php 
+            // Get the error message and ensure it's a string
+            $errorMsg = session()->getFlashdata('error');
+            $errorMsg = is_array($errorMsg) ? implode(', ', $errorMsg) : (string)$errorMsg;
+            
+            // Check if the error message contains "insufficient stock"
+            $isStockError = strpos($errorMsg, 'insufficient stock') !== false;
+            
+            // Escape single quotes for JavaScript
+            $errorMsg = str_replace("'", "\'", $errorMsg);
+        ?>
+        
         Swal.fire({
-            title: 'Error',
-            text: '<?= session()->getFlashdata('error') ?>',
+            title: <?= $isStockError ? "'Transaction Cancelled'" : "'Error'" ?>,
             icon: 'error',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            html: <?= $isStockError ? 
+                  "'<div class=\"text-left\"><strong>Transaction Automatically Cancelled</strong><br><br>" . 
+                  $errorMsg . 
+                  "<br><br>Please check product inventory before processing this sale.</div>'" : 
+                  "'" . $errorMsg . "'" ?>
         });
     <?php endif; ?>
     
@@ -215,12 +229,12 @@ $(document).ready(function() {
         // Set dialog content based on the action
         if (actionText.includes('Processing')) {
             confirmTitle = 'Start Processing';
-            confirmText = 'Are you sure you want to change the status to Processing?';
+            confirmText = 'Are you sure you want to change the status to Processing? The system will check product availability first.';
             confirmButtonText = 'Yes, start processing';
             confirmIcon = 'info';
         } else if (actionText.includes('Completed')) {
             confirmTitle = 'Mark as Completed';
-            confirmText = 'Are you sure you want to mark this sale as Completed? This will update the product inventory.';
+            confirmText = 'Are you sure you want to mark this sale as Completed? This will update the product inventory and the system will verify stock availability.';
             confirmButtonText = 'Yes, complete sale';
             confirmIcon = 'success';
         }
@@ -235,6 +249,20 @@ $(document).ready(function() {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Verifying product availability and updating status.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Redirect to the action URL
                 window.location.href = actionUrl;
             }
         });
@@ -266,6 +294,19 @@ $(document).ready(function() {
             if (result.isConfirmed) {
                 const cancelUrl = '/sales/update-status/<?= esc($sale['sale_id']) ?>/cancelled';
                 const cancelNotes = result.value.notes;
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Cancelling the sale...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 
                 // Update the sale notes in the background using AJAX
                 $.ajax({

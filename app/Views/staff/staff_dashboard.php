@@ -1,6 +1,20 @@
 <?= $this->extend('layout_staff') ?>
 
 <?= $this->section('content') ?>
+
+<?php if (session()->getFlashdata('swal_success')): ?>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated',
+                text: '<?= session()->getFlashdata('swal_success') ?>',
+                showConfirmButton: true
+            });
+        });
+    </script>
+<?php endif; ?>
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">

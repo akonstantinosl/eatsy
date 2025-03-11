@@ -114,8 +114,8 @@
             </div>
 
             <div class="mt-4">
-                <button type="button" class="btn btn-primary mr-2" id="saveBtn">Update</button>
-                <a href="/admin/users" class="btn btn-default" id="cancelBtn">Cancel</a>
+                <button type="button" class="btn btn-primary mr-2" id="saveBtn"><i class="fas fa-save"></i> Update</button>
+                <a href="/admin/users" class="btn btn-default" id="cancelBtn"><i class="fas fa-times"></i> Cancel</a>
             </div>
         </form>
     </div>

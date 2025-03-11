@@ -48,8 +48,8 @@
             <!-- Hidden input for status -->
             <input type="hidden" name="supplier_status" value="active">
 
-            <button type="button" id="saveBtn" class="btn btn-primary mr-2">Save</button>
-            <a href="/admin/suppliers" id="cancelBtn" class="btn btn-default">Cancel</a>
+            <button type="button" id="saveBtn" class="btn btn-primary mr-2"><i class="fas fa-save"></i> Save</button>
+            <a href="/admin/suppliers" id="cancelBtn" class="btn btn-default"><i class="fas fa-times"></i> Cancel</a>
         </form>
     </div>
     <!-- /.card-body -->
@@ -129,21 +129,33 @@
         // Cancel Button Confirmation
         document.getElementById('cancelBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            Swal.fire({
-                title: 'Are you sure you want to cancel?',
-                text: 'Any changes you made will not be saved!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!',
-                cancelButtonText: 'Continue editing',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/admin/suppliers';  // Redirect back to suppliers page
-                }
-            });
+            
+            // Check if any fields have been modified (not empty)
+            const nameValue = document.getElementById('supplier_name').value.trim();
+            const phoneValue = document.getElementById('supplier_phone').value.trim();
+            const addressValue = document.getElementById('supplier_address').value.trim();
+            
+            // If any field has content, show confirmation dialog
+            if (nameValue !== '' || phoneValue !== '' || addressValue !== '') {
+                Swal.fire({
+                    title: 'Are you sure you want to cancel?',
+                    text: 'Any changes you made will not be saved!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'Continue editing',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/admin/suppliers';  // Redirect back to suppliers page
+                    }
+                });
+            } else {
+                // No changes made, just redirect without confirmation
+                window.location.href = '/admin/suppliers';
+            }
         });
 
         // Display SweetAlert for validation errors if they exist
