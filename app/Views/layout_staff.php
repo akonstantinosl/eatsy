@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $title ?? 'Staff Dashboard' ?> | Eatsy</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
+    <!-- Source Sans Pro Font (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/fonts/source-sans-pro/source-sans-pro.css') ?>">
+    
+    <!-- Font Awesome (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/fontawesome/all.min.css') ?>">
+    
+    <!-- Bootstrap CSS (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap/bootstrap.min.css') ?>">
+    
+    <!-- AdminLTE CSS (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/adminlte/adminlte.min.css') ?>">
+    
+    <!-- SweetAlert2 (Local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2/sweetalert2.min.css') ?>">
     <!-- Additional CSS -->
     <?= $this->renderSection('styles') ?>
 </head>
@@ -166,16 +174,20 @@
     </div>
     <!-- ./wrapper -->
 
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
-    <!-- BS Custom File Input -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bs-custom-file-input/1.3.4/bs-custom-file-input.min.js"></script>
-    <!-- Sweet Alert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jQuery (Local) -->
+    <script src="<?= base_url('assets/js/jquery/jquery.min.js') ?>"></script>
+    
+    <!-- Bootstrap JS (Local) -->
+    <script src="<?= base_url('assets/js/bootstrap/bootstrap.bundle.min.js') ?>"></script>
+    
+    <!-- AdminLTE App (Local) -->
+    <script src="<?= base_url('assets/js/adminlte/adminlte.min.js') ?>"></script>
+    
+    <!-- SweetAlert2 (Local) -->
+    <script src="<?= base_url('assets/js/sweetalert2/sweetalert2.all.min.js') ?>"></script>
+    
+    <!-- BS Custom File Input (Local) -->
+    <script src="<?= base_url('assets/js/bs-custom-file-input/bs-custom-file-input.min.js') ?>"></script>
     <!-- Additional scripts -->
     <?= $this->renderSection('scripts') ?>
 </body>

@@ -63,6 +63,7 @@
                         <?= session('errors')['phone'] ?>
                     </div>
                 <?php endif; ?>
+                <small class="text-muted">Phone number must be unique and at least 10 digits</small>
                     </div>
                     
                     <div class="form-group">

@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login | Eatsy</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css">
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.0/dist/sweetalert2.min.css">
+    <!-- Google Font: Source Sans Pro (Now local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/fonts/source-sans-pro/source-sans-pro.css') ?>">
+    <!-- Font Awesome (Now local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/fontawesome/all.min.css') ?>">
+    <!-- Bootstrap CSS (Now local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap/bootstrap.min.css') ?>">
+    <!-- SweetAlert2 (Now local) -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2/sweetalert2.min.css') ?>">
 
     <style>
         body {
@@ -166,12 +166,12 @@
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.0/dist/sweetalert2.all.min.js"></script>
+    <!-- jQuery (Now local) -->
+    <script src="<?= base_url('assets/js/jquery/jquery.min.js') ?>"></script>
+    <!-- Bootstrap JS (Now local) -->
+    <script src="<?= base_url('assets/js/bootstrap/bootstrap.bundle.min.js') ?>"></script>
+    <!-- SweetAlert2 (Now local) -->
+    <script src="<?= base_url('assets/js/sweetalert2/sweetalert2.all.min.js') ?>"></script>
     
     <script>
 $(document).ready(function() {
